@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>團購主頁</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Serif+TC:wght@200;300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#ECECEA;
+  --card:#F7F6F2;
+  --white:#FEFEFE;
+  --ink:#2E2E2E;
+  --ink2:#5E5E5A;
+  --ink3:#9E9E98;
+  --rule:#D8D6D0;
+  --green:#C3CE6A;
+  --green-dk:#9EAA4A;
+  --yellow:#FFDF76;
+  --yellow-dk:#E8C030;
+  --accent:#9EAA4A;
+  --line-g:#06C755;
+}
+html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;font-family:'DM Sans','Noto Serif TC',sans-serif}
+.view{display:none;padding-bottom:80px}.view.on{display:block}
+#pg-front{padding-top:57px}
+
+/* ── IG top strip ── */
+.ig-strip{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(0,0,0,.06);
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;z-index:95;
+}
+.ig-strip-ava{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--yellow);
+  overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);font-size:16px;
+}
+.ig-strip-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.ig-strip-info{flex:1;min-width:0}
+.ig-strip-handle{font-size:12px;font-weight:500;color:var(--ink);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ig-strip-name{font-size:10px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ig-strip-btn{
+  flex-shrink:0;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:7px;
+  background:var(--green-dk);border:none;
+  color:#fff;font-size:11px;font-family:inherit;
+  font-weight:500;cursor:pointer;text-decoration:none;
+  white-space:nowrap;letter-spacing:.2px;
+}
+.ig-strip-btn svg{width:13px;height:13px}
+.line-nudge{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 20px;background:var(--card);border-bottom:1px solid var(--rule);cursor:pointer;text-decoration:none}
+.line-nudge span{font-size:11px;color:var(--ink3);letter-spacing:.5px;font-weight:300}
+.line-nudge svg{width:13px;height:13px;color:var(--ink3)}
+
+.hero{display:flex;flex-direction:column;align-items:center;padding:40px 28px 32px;background:var(--card);border-bottom:1px solid var(--rule)}
+.ava-wrap{width:88px;height:88px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2.5px;margin-bottom:16px}
+.ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--card)}
+.ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:.5px;text-align:center;margin-bottom:4px}
+.hero-handle{font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:300;margin-bottom:14px}
+.hero-divider{width:22px;height:1px;background:var(--green);margin:0 auto 14px}
+.hero-bio{font-family:'Noto Serif TC',serif;font-size:13px;font-weight:200;line-height:1.9;text-align:center;color:var(--ink2);max-width:280px}
+
+.sec-head{padding:32px 20px 20px;display:flex;align-items:center;gap:12px}
+.sec-h-line{flex:1;height:1px;background:var(--rule)}
+.sec-h-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);font-weight:400;white-space:nowrap}
+
+.soon-list{display:flex;flex-direction:column}
+.soon-row{background:var(--card);display:flex;align-items:center;padding:14px 20px;gap:14px;border-bottom:1px solid var(--rule)}
+.soon-date-col{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0}
+.soon-mo{font-size:9px;color:var(--ink3);font-weight:300}
+.soon-day{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;line-height:1;color:var(--ink)}
+.soon-info{flex:1;min-width:0}
+.soon-name{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.soon-cd{display:flex;gap:3px;align-items:center}
+.cd-unit{display:flex;flex-direction:column;align-items:center;background:var(--yellow);border-radius:4px;padding:3px 5px;min-width:26px}
+.cd-n{font-size:12px;font-weight:700;color:#2E2E2E;line-height:1}
+.cd-l{font-size:7px;color:#4A4A40;letter-spacing:.5px;margin-top:1px;font-weight:500}
+.cd-sep{font-size:9px;color:var(--ink2)}
+.soon-line-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:7px;background:var(--line-g);border:none;cursor:pointer;color:#fff;font-size:10px;font-family:inherit;text-decoration:none}
+.soon-line-btn svg{width:13px;height:13px}
+
+/* 2-col active grid */
+.active-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px;align-items:stretch}
+.acard{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--rule);display:flex;flex-direction:column}
+.acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
+.acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
+.acard-img-btn{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:28px 10px 10px;
+  background:linear-gradient(to top, rgba(42,51,32,.68) 0%, transparent 100%);
+  display:flex;align-items:flex-end;justify-content:center;
+  z-index:2;
+}
+.acard-img-btn a,.acard-img-btn button{
+  display:inline-block;
+  padding:5px 14px;
+  border-radius:20px;
+  background:rgba(255,253,245,.15);
+  border:1px solid rgba(255,253,245,.6);
+  color:#fff !important;
+  font-size:10px;font-family:inherit;font-weight:400;
+  letter-spacing:.6px;cursor:pointer;text-decoration:none !important;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  -webkit-appearance:none;
+}
+.acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
+.acard-name{font-family:'Noto Serif TC',serif;font-size:12px;font-weight:300;line-height:1.5;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acard-date{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--ink2);letter-spacing:.3px;margin-bottom:6px;font-weight:300;align-self:flex-start}
+.acard-date svg{width:10px;height:10px;color:var(--ink3);flex-shrink:0}
+.detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.3px;vertical-align:middle;margin-left:4px;flex-shrink:0}
+.detail-btn:active{border-color:var(--green);color:var(--green)}
+.detail-btn svg{width:9px;height:9px}
+.disc-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:3px 8px;cursor:pointer;margin-bottom:8px;align-self:flex-start}
+.disc-chip:active{border-color:var(--green)}
+.disc-label{font-size:8px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}
+.disc-code{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:1px;color:var(--ink)}
+.disc-copy{font-size:9px;color:var(--ink3)}
+.active-empty{grid-column:span 2;padding:20px;text-align:center;font-size:12px;color:var(--ink3);font-weight:300}
+
+.ended-list{display:flex;flex-direction:column}
+.ended-row{background:var(--card);display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule)}
+.ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap}
+
+.community{background:var(--card);padding:28px 20px 26px;border-top:1px solid var(--rule);margin-top:8px}
+.comm-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;text-align:center}
+.comm-btns{display:flex;gap:10px;margin-bottom:13px}
+.comm-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;color:#fff;text-decoration:none}
+.comm-btn.line{background:var(--green)}.comm-btn.ig{background:var(--yellow-dk);color:#fff}
+.comm-btn svg{width:17px;height:17px;flex-shrink:0}
+.pw-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.pw-label{font-size:11px;color:var(--ink3);font-weight:300}
+.pw-chip{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);border-radius:5px;padding:5px 10px;cursor:pointer;background:var(--white)}
+.pw-num{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:400;letter-spacing:2px;color:var(--ink)}
+.pw-icon{font-size:11px;color:var(--ink3)}
+
+.tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(236,236,234,.97);backdrop-filter:blur(16px);border-top:1px solid var(--rule);display:flex;z-index:90;padding-bottom:env(safe-area-inset-bottom,0)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border:none;background:none;font-size:10px;color:var(--ink3);font-family:inherit;cursor:pointer;letter-spacing:.5px}
+.tab-btn.on{color:var(--ink)}
+.tab-btn svg{width:19px;height:19px;stroke-width:1.5}
+
+/* admin tab nav */
+.adm-nav{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  z-index:85;
+  background:rgba(247,246,242,.97);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--rule);
+  padding:14px 16px 0;
+}
+.adm-nav-title{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;font-style:italic;color:var(--ink3);letter-spacing:.5px;margin-bottom:10px}
+.adm-nav-tabs{display:flex;gap:2px}
+.adm-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 10px;border:none;background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.5px;transition:all .15s}
+.adm-tab svg{width:19px;height:19px}
+.adm-tab.on{color:var(--ink);border-bottom-color:var(--green-dk)}
+.adm-panel{display:none;padding-bottom:30px;padding-top:80px}
+.adm-panel.on{display:block}
+
+/* broadcast */
+.bc-opts{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.bc-opt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink2);font-weight:300;cursor:pointer}
+.bc-opt input{accent-color:var(--green-dk);width:14px;height:14px}
+/* drag sort */
+.bc-sort-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bc-sort-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg);border:1px solid var(--rule);
+  border-radius:8px;padding:10px 12px;
+  cursor:grab;user-select:none;-webkit-user-select:none;
+  touch-action:none;
+}
+.bc-sort-row.dragging{opacity:.4}
+.bc-sort-row.drag-over{border-color:var(--green-dk);background:rgba(158,170,74,.08)}
+.bc-sort-handle{color:var(--ink3);font-size:16px;flex-shrink:0}
+.bc-sort-name{font-size:13px;font-weight:400;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-sort-date{font-size:10px;color:var(--ink3);flex-shrink:0}
+/* result */
+.bc-result-box{
+  width:100%;
+  background:var(--white);border:1px solid var(--rule);
+  border-radius:10px;padding:16px;
+  font-size:13px;line-height:1.85;color:var(--ink);
+  font-weight:300;font-family:inherit;
+  resize:vertical;min-height:200px;
+  outline:none;margin-bottom:10px;
+}
+.bc-result-box:focus{border-color:var(--green-dk)}
+.bc-copy-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:14px;
+  background:var(--ink);color:#fff;
+  border:none;border-radius:9px;
+  font-size:13px;font-family:inherit;font-weight:400;cursor:pointer;
+  transition:transform .1s, background .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.bc-copy-btn:active{transform:scale(.97);background:#444}
+/* ADMIN */
+.adm-top{background:var(--ink);padding:52px 20px 22px}
+.adm-top h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--yellow);margin-bottom:3px;font-style:italic}
+.adm-top p{font-size:11px;color:rgba(255,255,255,.4);font-weight:300}
+.asec{padding:22px 16px 0}
+.asec-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.asec-lbl::after{content:'';flex:1;height:1px;background:var(--rule)}
+.pcard{background:var(--card);border-radius:12px;border:1px solid var(--rule);padding:16px}
+
+/* crop widget */
+.crop-card{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden;margin-bottom:12px}
+.crop-zone{position:relative;width:100%;background:#1C1C1C;overflow:hidden;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none}
+.crop-zone.sq{aspect-ratio:1}.crop-zone.rect{aspect-ratio:4/3}
+.crop-zone img.cimg{position:absolute;display:block;pointer-events:none;transform-origin:top left}
+.crop-zone .cph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--ink3);font-size:11px;z-index:1;background:var(--bg)}
+.crop-zone .cph span{font-size:36px}
+.crop-zone .chint{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.6);pointer-events:none;z-index:4;letter-spacing:.3px}
+.crop-zone.sq::after{content:'';position:absolute;inset:0;background:radial-gradient(circle 38% at 50% 50%,transparent 37.5%,rgba(0,0,0,.55) 38%);pointer-events:none;z-index:2}
+.cring{
+  position:absolute;border-radius:50%;
+  border:2px dashed rgba(255,255,255,.9);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.15);
+  pointer-events:none;z-index:3;
+}
+.crop-scale{display:flex;align-items:center;gap:10px;padding:10px 14px 4px}
+.crop-scale label{font-size:10px;color:var(--ink3);white-space:nowrap}
+.crop-scale input[type=range]{flex:1;accent-color:var(--green)}
+.crop-acts{padding:8px 14px 14px;display:flex;gap:8px}
+.crop-act{flex:1;padding:10px;border-radius:8px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:12px;color:var(--ink2);cursor:pointer;text-align:center}
+.crop-act.g{background:var(--green);color:#fff;border-color:var(--green)}
+
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.fld input,.fld textarea{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--white);font-family:inherit;font-size:13px;color:var(--ink);outline:none;font-weight:300}
+.fld input:focus,.fld textarea:focus{border-color:var(--green)}
+.fld textarea{resize:none;height:64px;line-height:1.6}
+.sw-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.sw-row span{font-size:13px;font-weight:300}
+.sw{position:relative;width:40px;height:22px}
+.sw input{opacity:0;width:0;height:0}
+.sw-sl{position:absolute;inset:0;background:var(--rule);border-radius:22px;cursor:pointer;transition:.2s}
+.sw-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked+.sw-sl{background:var(--green)}
+.sw input:checked+.sw-sl::before{transform:translateX(18px)}
+.savebtn{width:100%;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer}
+.savebtn:active{opacity:.8}.savebtn.g{background:var(--green)}
+.adm-items{display:flex;flex-direction:column;gap:8px}
+.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden}
+.adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
+.adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.adm-ithumb img{width:100%;height:100%;object-fit:cover}
+.adm-iinfo{flex:1;min-width:0}
+.adm-iname{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.adm-isub{font-size:10px;color:var(--ink3);font-weight:300}
+.adm-ibtns{display:flex;gap:6px}
+.adm-ibtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--rule);background:none;cursor:pointer;font-size:13px}
+.adm-iform{display:none;padding:0 14px 14px;border-top:1px solid var(--rule)}
+.adm-iform.on{display:block;padding-top:13px}
+.hint-box{background:var(--bg);border-radius:7px;padding:9px 11px;font-size:10px;color:var(--ink3);line-height:1.7;margin-bottom:11px}
+.addbtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border:1.5px dashed var(--rule);border-radius:12px;background:none;color:var(--ink3);font-size:13px;font-family:inherit;cursor:pointer;margin-top:9px;font-weight:300}
+input[type=file]{display:none}
+
+/* footer */
+.site-footer{padding:28px 20px 36px;text-align:center}
+.site-footer-line{width:40px;height:1px;background:var(--rule);margin:0 auto 16px}
+.site-footer-text{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;color:var(--ink3);letter-spacing:.5px;margin-bottom:6px;font-style:italic}
+.site-footer-text span{color:var(--ink2)}
+.site-footer-copy{font-size:10px;color:var(--ink3);letter-spacing:.8px;font-weight:300;opacity:.7;cursor:default;user-select:none;-webkit-user-select:none}
+
+/* soon row expand */
+.soon-expand{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.soon-expand.open{max-height:300px}
+.soon-expand-inner{padding:12px 20px 14px 20px;background:var(--card);border-top:1px solid var(--rule)}
+.soon-expand-img{width:100%;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:var(--yellow);margin-bottom:10px}
+.soon-expand-img img{width:100%;height:100%;object-fit:cover;display:block}
+.soon-expand-emo{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px}
+.soon-expand-desc{font-size:12px;color:var(--ink2);line-height:1.7;font-weight:300;margin-bottom:10px}
+.soon-expand-links{display:flex;gap:8px;flex-wrap:wrap}
+.soon-expand-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink2);text-decoration:none;border:1px solid var(--rule);border-radius:6px;padding:6px 10px;background:var(--white)}
+.soon-expand-link:active{border-color:var(--green);color:var(--green)}
+.soon-chevron{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;cursor:pointer;background:none;transition:transform .25s}
+.soon-chevron.open{transform:rotate(180deg)}
+.soon-chevron svg{width:12px;height:12px;color:var(--ink3)}
+.confirm-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.confirm-overlay.on{opacity:1;pointer-events:all}
+.confirm-box{background:var(--card);border-radius:16px;padding:24px 20px 16px;width:280px;text-align:center}
+.confirm-box h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;margin-bottom:8px}
+.confirm-box p{font-size:13px;color:var(--ink2);font-weight:300;line-height:1.6;margin-bottom:20px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btn{flex:1;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;cursor:pointer}
+.confirm-btn.cancel{background:var(--bg);color:var(--ink2)}
+.confirm-btn.danger{background:#C0392B;color:#fff}
+/* toast */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(5px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .22s;z-index:200;font-weight:300}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{position:fixed;inset:0;background:rgba(28,25,23,.42);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.on{opacity:1;pointer-events:all}
+.sheet{width:100%;max-width:430px;background:var(--card);border-radius:20px 20px 0 0;padding:20px 24px calc(44px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .3s cubic-bezier(.3,1,.2,1)}
+.overlay.on .sheet{transform:translateY(0)}
+.sh-handle{width:28px;height:3px;background:var(--rule);border-radius:2px;margin:0 auto 20px}
+.sh-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:6px;font-style:italic}
+.sh-desc{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:20px;font-weight:300}
+.sh-acts{display:flex;flex-direction:column;gap:8px}
+.sh-a{display:block;text-align:center;padding:13px;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer;border:none;text-decoration:none}
+.sh-a.primary{background:var(--green);color:#fff}
+.sh-a.linec{background:var(--line-g);color:#fff}
+.sh-a.ghost{background:none;border:1px solid var(--rule);color:var(--ink2)}
+
+/* password modal */
+.pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.pw-modal-overlay.on{opacity:1;pointer-events:all}
+.pw-modal-box{background:var(--card);border-radius:16px;padding:28px 24px 20px;width:300px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.pw-modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:4px;letter-spacing:.3px}
+.pw-modal-sub{font-size:12px;color:var(--ink3);font-weight:300;margin-bottom:18px}
+.pw-modal-input{width:100%;padding:11px 14px;border:1px solid var(--rule);border-radius:9px;background:var(--white);font-family:inherit;font-size:18px;text-align:center;letter-spacing:6px;outline:none;margin-bottom:8px;color:var(--ink)}
+.pw-modal-input:focus{border-color:var(--green-dk)}
+.pw-modal-err{font-size:11px;color:#C0392B;margin-bottom:8px;font-weight:300}
+.pw-modal-btns{display:flex;gap:8px;margin-top:4px}
+.pw-modal-btn{flex:1;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;cursor:pointer;font-weight:400}
+.pw-modal-btn.cancel{background:var(--bg);color:var(--ink2)}
+.pw-modal-btn.confirm{background:var(--ink);color:#fff}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu .28s ease both}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="pg-front" class="view on">
+
+  <!-- IG top strip -->
+  <div class="ig-strip" id="ig-strip">
+    <div class="ig-strip-ava" id="ig-strip-ava">🛍️</div>
+    <div class="ig-strip-info">
+      <div class="ig-strip-handle" id="ig-strip-handle">@puff.andmom</div>
+      <div class="ig-strip-name" id="ig-strip-name">泡芙與媽</div>
+    </div>
+    <a id="ig-strip-btn" class="ig-strip-btn" href="https://instagram.com/puff.andmom" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      追蹤
+    </a>
+  </div>
+
+  <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)">
+    <span>加入 LINE 社群</span>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+  </a>
+  <div class="hero">
+    <div class="ava-wrap"><div class="ava-inner" id="f-ava">🛍️</div></div>
+    <div class="hero-name" id="f-name">團媽小美</div>
+    <div class="hero-handle" id="f-handle">@xiaomei_buys</div>
+    <div class="hero-divider"></div>
+    <div class="hero-bio" id="f-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</div>
+  </div>
+
+  <div id="soon-sec">
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團</span><span class="sec-h-line"></span></div>
+    <div class="soon-list" id="soon-list"></div>
+  </div>
+
+  <div id="active-sec">
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中</span><span class="sec-h-line"></span></div>
+    <div class="active-grid" id="active-grid"></div>
+  </div>
+
+  <div id="ended-sec">
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">已結團</span><span class="sec-h-line"></span></div>
+    <div class="ended-list" id="ended-list"></div>
+  </div>
+
+  <div id="community-block" class="community">
+    <div class="comm-label">加入社群</div>
+    <div class="comm-btns">
+      <a id="line-btn" class="comm-btn line" href="#" onclick="handleLine(event)">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.07 2 11.07c0 4.43 3.93 8.14 9.25 8.89v2.54c0 .28.32.43.54.26l3.89-2.83C18.71 18.85 22 15.28 22 11.07 22 6.07 17.52 2 12 2z"/></svg>
+        LINE 社群
+      </a>
+      <a id="ig-btn" class="comm-btn ig" href="#" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        Instagram
+      </a>
+    </div>
+    <div class="pw-row" id="pw-row">
+      <span class="pw-label">LINE 社群驗證密碼</span>
+      <div class="pw-chip" onclick="copyPW()"><span class="pw-num" id="pw-display">4343</span><span class="pw-icon">⎘</span></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="site-footer-line"></div>
+    <div class="site-footer-text">Curated with ♥ by <span>Puffandmom</span></div>
+    <div class="site-footer-copy" id="footer-copy" onclick="handleFooterClick()">© 2026 Puffandmom · All rights reserved</div>
+  </footer>
+</div>
+
+<div id="pg-admin" class="view">
+
+  <!-- Admin sticky top tab bar -->
+  <div class="adm-nav">
+    <div class="adm-nav-title">後台管理</div>
+    <div class="adm-nav-tabs">
+      <button class="adm-tab on" id="adm-tab-profile" onclick="switchAdmTab('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        個人
+      </button>
+      <button class="adm-tab" id="adm-tab-social" onclick="switchAdmTab('social')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 2H3v16h5l4 4 4-4h5V2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+        社群
+      </button>
+      <button class="adm-tab" id="adm-tab-items" onclick="switchAdmTab('items')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        商品
+      </button>
+      <button class="adm-tab" id="adm-tab-broadcast" onclick="switchAdmTab('broadcast')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16z"/></svg>
+        廣播
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel: 個人資料 -->
+  <div class="adm-panel on" id="adm-panel-profile">
+    <div class="asec">
+      <div class="asec-lbl">大頭貼</div>
+      <div class="crop-card">
+        <div class="crop-zone sq" id="czava">
+          <div class="cph" id="czava-ph"><span>📷</span>上傳大頭貼</div>
+          <div class="cring" id="czava-ring" style="display:none"></div>
+          <div class="chint" id="czava-hint" style="display:none">拖曳移動・滑桿縮放</div>
+        </div>
+        <div class="crop-scale" id="czava-scrow" style="display:none">
+          <label>縮放</label>
+          <input type="range" id="czava-sc" min="0.1" max="4" step="0.01" value="1">
+        </div>
+        <div class="crop-acts">
+          <button class="crop-act" onclick="document.getElementById('ava-file').click()">📷 上傳照片</button>
+          <button class="crop-act g" id="czava-apply" style="display:none" onclick="cropApply('ava')">✓ 套用</button>
+        </div>
+        <input type="file" id="ava-file" accept="image/*" onchange="cropLoad('ava',event)">
+      </div>
+    </div>
+    <div class="asec" style="margin-top:20px">
+      <div class="asec-lbl">個人資料</div>
+      <div class="pcard">
+        <div class="fld"><label>名稱</label><input id="a-name" value="團媽小美"></div>
+        <div class="fld"><label>帳號</label><input id="a-handle" value="@xiaomei_buys"></div>
+        <div class="fld"><label>關於我</label><textarea id="a-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</textarea></div>
+        <button class="savebtn" onclick="saveProfile()">儲存個人資料</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: 社群設定 -->
+  <div class="adm-panel" id="adm-panel-social">
+    <div class="asec">
+      <div class="asec-lbl">社群設定</div>
+      <div class="pcard">
+        <div class="sw-row"><span>顯示社群區塊</span><label class="sw"><input type="checkbox" id="a-comm-vis" checked><span class="sw-sl"></span></label></div>
+        <div class="fld"><label>頂部 IG 帳號（@開頭）</label><input id="a-ig-handle" value="@puff.andmom"></div>
+        <div class="fld"><label>頂部 IG 名稱</label><input id="a-ig-name" value="泡芙與媽"></div>
+        <div class="fld"><label>頂部 IG 連結</label><input type="url" id="a-ig-url" value="https://instagram.com/puff.andmom" placeholder="https://instagram.com/..."></div>
+        <div class="fld"><label>LINE 社群連結</label><input type="url" id="a-line" placeholder="https://line.me/..."></div>
+        <div class="fld"><label>Instagram（社群區塊）連結</label><input type="url" id="a-ig" placeholder="https://instagram.com/..."></div>
+        <div class="fld"><label>LINE 驗證密碼</label><input id="a-pw" value="4343" maxlength="20"></div>
+        <div class="sw-row"><span>顯示驗證密碼</span><label class="sw"><input type="checkbox" id="a-pw-vis" checked><span class="sw-sl"></span></label></div>
+        <button class="savebtn g" onclick="saveSocial()">儲存社群設定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: 商品管理 -->
+  <div class="adm-panel" id="adm-panel-items">
+    <div class="asec">
+      <div class="asec-lbl">商品管理</div>
+      <div class="adm-items" id="adm-items"></div>
+      <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
+    </div>
+  </div>
+
+  <!-- Panel: 廣播 -->
+  <div class="adm-panel" id="adm-panel-broadcast">
+    <div class="asec">
+      <div class="asec-lbl">LINE 廣播訊息產生器</div>
+      <div class="pcard" style="margin-bottom:14px">
+        <div class="fld"><label>開頭文字</label><textarea id="bc-header" style="height:44px">❤️‍🔥開團中❤️‍🔥</textarea></div>
+        <div class="bc-opts">
+          <label class="bc-opt"><input type="checkbox" id="bc-show-date" checked>截止日期</label>
+          <label class="bc-opt"><input type="checkbox" id="bc-show-desc" checked>商品說明</label>
+          <label class="bc-opt"><input type="checkbox" id="bc-show-disc" checked>折扣碼</label>
+        </div>
+        <div class="fld" style="margin-top:14px"><label>拖曳調整廣播順序</label>
+          <div class="bc-sort-list" id="bc-sort-list"></div>
+        </div>
+        <button class="savebtn g" onclick="genBroadcast()" style="margin-top:4px">⚡ 產生廣播文字</button>
+      </div>
+      <div id="bc-result-wrap" style="display:none">
+        <div class="asec-lbl">廣播內容（可直接編輯）</div>
+        <textarea class="bc-result-box" id="bc-result"></textarea>
+        <button class="bc-copy-btn" onclick="copyBroadcast()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          複製全文
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="tab-bar">
+  <button class="tab-btn on" id="tb-front" onclick="go('front')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>前台
+  </button>
+  <button class="tab-btn" id="tb-admin" onclick="go('admin')" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>後台
+  </button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-handle"></div>
+    <div class="sh-name" id="sh-name"></div>
+    <div class="sh-desc" id="sh-desc"></div>
+    <div class="sh-acts">
+      <a id="sh-buy" class="sh-a primary" href="#" target="_blank">前往購買</a>
+      <a id="sh-line" class="sh-a linec" href="#">加入 LINE 通知</a>
+      <button class="sh-a ghost" onclick="closeSheet()">關閉</button>
+    </div>
+  </div>
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>確認刪除</h3>
+    <p id="confirm-msg">確定要刪除這個商品嗎？<br>此動作無法復原。</p>
+    <div class="confirm-btns">
+      <button class="confirm-btn cancel" onclick="closeConfirm()">取消</button>
+      <button class="confirm-btn danger" id="confirm-ok">刪除</button>
+    </div>
+  </div>
+</div>
+<!-- Password Modal -->
+<div class="pw-modal-overlay" id="pw-modal">
+  <div class="pw-modal-box">
+    <div class="pw-modal-title">後台管理</div>
+    <div class="pw-modal-sub">請輸入密碼以進入後台</div>
+    <input class="pw-modal-input" id="pw-modal-input" type="password" placeholder="••••" maxlength="20" autocomplete="off">
+    <div class="pw-modal-err" id="pw-modal-err" style="display:none">密碼錯誤，請再試一次</div>
+    <div class="pw-modal-btns">
+      <button class="pw-modal-btn cancel" onclick="closePwModal()">取消</button>
+      <button class="pw-modal-btn confirm" onclick="submitPw()">進入</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── SUPABASE ── */
+var SUPABASE_URL = 'https://hkjazchummqlfinyyeys.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhramF6Y2h1bW1xbGZpbnl5ZXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjY1OTksImV4cCI6MjA5NTE0MjU5OX0.pu87JTWk06uJ8QR5BjFVQhnhVn6PUg5qj1sYC_0pVoE';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ── DATA (local cache) ── */
+var D = {
+  profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null},
+  social:  {commVis:true, lineUrl:'', igUrl:'', pw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
+  items: []
+};
+
+/* ── INIT ── */
+async function initApp() {
+  try {
+    var res = await sb.from('profile').select('*').eq('id', 1).single();
+    var profile = res.data;
+    if (profile) {
+      D.profile = {
+        name:       profile.name       || '團媽小美',
+        handle:     profile.handle     || '@xiaomei_buys',
+        bio:        profile.bio        || '',
+        avatarData: profile.avatar_data || null
+      };
+      D.social = {
+        commVis:    profile.comm_vis    !== false,
+        lineUrl:    profile.line_url    || '',
+        igUrl:      profile.ig_url      || '',
+        igStripUrl: profile.ig_strip_url || 'https://instagram.com/puff.andmom',
+        igHandle:   profile.ig_handle   || '@puff.andmom',
+        igName:     profile.ig_name     || '泡芙與媽',
+        pw:         profile.pw          || '4343',
+        pwVis:      profile.pw_vis      !== false
+      };
+    }
+    var iRes = await sb.from('items').select('*').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
+    if (iRes.data) {
+      D.items = iRes.data.map(function(i) {
+        return {
+          id:       i.id,
+          name:     i.name        || '',
+          emoji:    i.emoji       || '🛍️',
+          imgData:  i.img_data    || null,
+          openD:    i.open_d      || '',
+          closeD:   i.close_d     || '',
+          link:     i.link        || '',
+          desc:     i.description || '',
+          discCode: i.disc_code   || '',
+          igUrl:    i.ig_url      || ''
+        };
+      });
+    }
+  } catch(e) {
+    console.error('載入資料失敗：', e);
+  }
+  renderFront();
+  if (sessionStorage.getItem('adminUnlocked') === '1') {
+    document.getElementById('tb-admin').style.display = '';
+  }
+}
+
+/* ── PROFILE ROW BUILDER ── */
+function buildProfileRow() {
+  return {
+    id:           1,
+    name:         D.profile.name,
+    handle:       D.profile.handle,
+    bio:          D.profile.bio,
+    avatar_data:  D.profile.avatarData,
+    comm_vis:     D.social.commVis,
+    line_url:     D.social.lineUrl,
+    ig_url:       D.social.igUrl,
+    ig_strip_url: D.social.igStripUrl,
+    ig_handle:    D.social.igHandle,
+    ig_name:      D.social.igName,
+    pw:           D.social.pw,
+    pw_vis:       D.social.pwVis
+  };
+}
+
+/* ── CROP ENGINE ── */
+var CZ = {};
+
+function czGet(id) {
+  if (!CZ[id]) CZ[id] = {raw:null, natW:0, natH:0, x:0, y:0, scale:1, drag:false, sx:0, sy:0, sox:0, soy:0};
+  return CZ[id];
+}
+
+function czWrapId(id)   { return id === 'ava' ? 'czava'       : 'czitem-' + id; }
+function czScaleId(id)  { return id === 'ava' ? 'czava-sc'    : 'czitem-sc-' + id; }
+function czScRowId(id)  { return id === 'ava' ? 'czava-scrow' : 'czitem-scrow-' + id; }
+function czApplyId(id)  { return id === 'ava' ? 'czava-apply' : 'czitem-apply-' + id; }
+function czHintId(id)   { return id === 'ava' ? 'czava-hint'  : 'czitem-hint-' + id; }
+function czPhId(id)     { return id === 'ava' ? 'czava-ph'    : 'czitem-ph-' + id; }
+function czRingId(id)   { return id === 'ava' ? 'czava-ring'  : null; }
+function isAva(id)      { return id === 'ava'; }
+
+function cropLoad(id, e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var c = czGet(id);
+    c.raw = ev.target.result;
+    cropSetup(id);
+  };
+  reader.readAsDataURL(file);
+}
+
+function cropSetup(id) {
+  var c = czGet(id);
+  var wrapEl = document.getElementById(czWrapId(id));
+  if (!wrapEl) return;
+  var old = wrapEl.querySelector('img.cimg');
+  if (old) old.remove();
+  var res = document.getElementById('czresult-' + id);
+  if (res) res.style.display = 'none';
+  var ph = document.getElementById(czPhId(id));
+  if (ph) ph.style.display = 'none';
+
+  var img = document.createElement('img');
+  img.className = 'cimg';
+  img.style.position = 'absolute';
+  img.style.transformOrigin = 'top left';
+  img.style.pointerEvents = 'none';
+  img.style.display = 'block';
+
+  img.onload = function() {
+    c.natW = img.naturalWidth;
+    c.natH = img.naturalHeight;
+    var ww = wrapEl.offsetWidth;
+    var wh = wrapEl.offsetHeight;
+    var guideW = isAva(id) ? ww * 0.76 : ww;
+    var guideH = isAva(id) ? ww * 0.76 : wh;
+    var fit = Math.max(guideW / c.natW, guideH / c.natH);
+    c.scale = fit;
+    c.x = (ww - c.natW * fit) / 2;
+    c.y = (wh - c.natH * fit) / 2;
+
+    var scEl = document.getElementById(czScaleId(id));
+    if (scEl) { scEl.min = fit * 0.4; scEl.max = fit * 4; scEl.value = fit; }
+
+    cropDraw(id, img);
+    var ring = wrapEl.querySelector('.cring');
+    var hint = wrapEl.querySelector('.chint');
+    var before = ring || hint || null;
+    wrapEl.insertBefore(img, before);
+
+    if (isAva(id)) {
+      var ringEl = document.getElementById(czRingId(id));
+      if (ringEl) {
+        var rSize = Math.round(ww * 0.76);
+        ringEl.style.width  = rSize + 'px';
+        ringEl.style.height = rSize + 'px';
+        ringEl.style.left   = Math.round((ww - rSize) / 2) + 'px';
+        ringEl.style.top    = Math.round((wh - rSize) / 2) + 'px';
+        ringEl.style.display = 'block';
+      }
+    }
+
+    var hintEl = document.getElementById(czHintId(id));
+    if (hintEl) { hintEl.style.display = 'block'; hintEl.textContent = '單指拖曳・雙指縮放'; }
+    var scrow = document.getElementById(czScRowId(id));
+    if (scrow) scrow.style.display = 'flex';
+    var applyBtn = document.getElementById(czApplyId(id));
+    if (applyBtn) applyBtn.style.display = 'block';
+  };
+
+  img.src = c.raw;
+}
+
+function cropDraw(id, imgEl) {
+  var c = czGet(id);
+  var el = imgEl || document.getElementById(czWrapId(id)).querySelector('img.cimg');
+  if (!el) return;
+  el.style.left   = c.x + 'px';
+  el.style.top    = c.y + 'px';
+  el.style.width  = (c.natW * c.scale) + 'px';
+  el.style.height = (c.natH * c.scale) + 'px';
+}
+
+function cropClamp(id) {
+  var c = czGet(id);
+  var wrapEl = document.getElementById(czWrapId(id));
+  if (!wrapEl) return;
+  var ww = wrapEl.offsetWidth, wh = wrapEl.offsetHeight;
+  var iw = c.natW * c.scale, ih = c.natH * c.scale;
+  var gx, gy, gw, gh;
+  if (isAva(id)) { gw = ww * 0.76; gh = gw; gx = (ww - gw) / 2; gy = (wh - gh) / 2; }
+  else           { gx = 0; gy = 0; gw = ww; gh = wh; }
+  c.x = Math.min(gx, Math.max(gx + gw - iw, c.x));
+  c.y = Math.min(gy, Math.max(gy + gh - ih, c.y));
+}
+
+function czBindDrag(wrapEl, id) {
+  wrapEl.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    var c = czGet(id);
+    c.drag = true; c.sx = e.clientX; c.sy = e.clientY; c.sox = c.x; c.soy = c.y;
+    window._czId = id;
+  });
+  wrapEl.addEventListener('touchstart', function(e) {
+    var c = czGet(id);
+    window._czId = id;
+    if (e.touches.length === 2) {
+      c.drag = false;
+      c.pinching = true;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      c.pinchDist = Math.sqrt(dx*dx + dy*dy);
+      c.pinchScale = c.scale;
+      c.pinchCx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      c.pinchCy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      var rect = wrapEl.getBoundingClientRect();
+      c.pinchOriginX = c.pinchCx - rect.left;
+      c.pinchOriginY = c.pinchCy - rect.top;
+    } else {
+      c.pinching = false;
+      c.drag = true;
+      c.sx = e.touches[0].clientX; c.sy = e.touches[0].clientY;
+      c.sox = c.x; c.soy = c.y;
+    }
+  }, {passive: true});
+}
+
+window.addEventListener('mousemove', function(e) {
+  var id = window._czId; if (!id) return;
+  var c = czGet(id); if (!c.drag) return;
+  c.x = c.sox + (e.clientX - c.sx);
+  c.y = c.soy + (e.clientY - c.sy);
+  cropClamp(id); cropDraw(id);
+});
+window.addEventListener('touchmove', function(e) {
+  var id = window._czId; if (!id) return;
+  var c = czGet(id);
+  var wrapEl = document.getElementById(czWrapId(id)); if (!wrapEl) return;
+
+  if (e.touches.length === 2 && c.pinching) {
+    var dx = e.touches[0].clientX - e.touches[1].clientX;
+    var dy = e.touches[0].clientY - e.touches[1].clientY;
+    var newDist = Math.sqrt(dx*dx + dy*dy);
+    var ratio = newDist / c.pinchDist;
+    var newScale = c.pinchScale * ratio;
+    var scEl = document.getElementById(czScaleId(id));
+    var minS = scEl ? parseFloat(scEl.min) : 0.1;
+    var maxS = scEl ? parseFloat(scEl.max) : 4;
+    newScale = Math.min(maxS, Math.max(minS, newScale));
+    var ox = c.pinchOriginX, oy = c.pinchOriginY;
+    c.x = ox - (ox - c.x) * (newScale / c.scale);
+    c.y = oy - (oy - c.y) * (newScale / c.scale);
+    c.scale = newScale;
+    if (scEl) scEl.value = newScale;
+    cropClamp(id); cropDraw(id);
+  } else if (e.touches.length === 1 && c.drag) {
+    c.x = c.sox + (e.touches[0].clientX - c.sx);
+    c.y = c.soy + (e.touches[0].clientY - c.sy);
+    cropClamp(id); cropDraw(id);
+  }
+}, {passive: true});
+window.addEventListener('mouseup', function() {
+  window._czId = null;
+  Object.keys(CZ).forEach(function(id){ CZ[id].drag = false; CZ[id].pinching = false; });
+});
+window.addEventListener('touchend', function() {
+  var id = window._czId; if (!id) return;
+  var c = czGet(id);
+  if (c.pinching) { c.pinching = false; }
+  else { c.drag = false; }
+  window._czId = null;
+});
+
+function cropScaleChange(id) {
+  var scEl = document.getElementById(czScaleId(id));
+  if (!scEl) return;
+  var c = czGet(id);
+  var wrapEl = document.getElementById(czWrapId(id));
+  if (!wrapEl) return;
+  var newS = parseFloat(scEl.value);
+  var oldS = c.scale;
+  var cx = wrapEl.offsetWidth / 2, cy = wrapEl.offsetHeight / 2;
+  c.x = cx - (cx - c.x) * (newS / oldS);
+  c.y = cy - (cy - c.y) * (newS / oldS);
+  c.scale = newS;
+  cropClamp(id); cropDraw(id);
+}
+
+function cropApply(id) {
+  var c = czGet(id);
+  if (!c.natW) return;
+  var wrapEl = document.getElementById(czWrapId(id));
+  if (!wrapEl) return;
+  var ww = wrapEl.offsetWidth, wh = wrapEl.offsetHeight;
+  var gx, gy, gw, gh;
+  if (isAva(id)) { gw = Math.round(ww * 0.76); gh = gw; gx = (ww - gw) / 2; gy = (wh - gh) / 2; }
+  else           { gx = 0; gy = 0; gw = ww; gh = wh; }
+  var OUT  = isAva(id) ? 600 : 1200;
+  var OUTH = isAva(id) ? 600 : Math.round(1200 * gh / gw);
+  var canvas = document.createElement('canvas');
+  canvas.width = OUT; canvas.height = OUTH;
+  var ctx = canvas.getContext('2d');
+  if (isAva(id)) { ctx.beginPath(); ctx.arc(OUT/2, OUTH/2, OUT/2, 0, Math.PI*2); ctx.clip(); }
+  var srcX = (gx - c.x) / c.scale;
+  var srcY = (gy - c.y) / c.scale;
+  var srcW = gw / c.scale;
+  var srcH = gh / c.scale;
+  var tmpImg = wrapEl.querySelector('img.cimg');
+  if (!tmpImg) return;
+  ctx.drawImage(tmpImg, srcX, srcY, srcW, srcH, 0, 0, OUT, OUTH);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+  if (tmpImg) tmpImg.style.display = 'none';
+  var res = document.getElementById('czresult-' + id);
+  if (!res) {
+    res = document.createElement('img');
+    res.id = 'czresult-' + id;
+    res.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;';
+    wrapEl.appendChild(res);
+  }
+  res.style.display = 'block';
+  res.src = dataUrl;
+
+  var hintEl = document.getElementById(czHintId(id));
+  if (hintEl) hintEl.textContent = '點「上傳照片」可重新選擇';
+  var applyBtn = document.getElementById(czApplyId(id));
+  if (applyBtn) applyBtn.style.display = 'none';
+  var scrow = document.getElementById(czScRowId(id));
+  if (scrow) scrow.style.display = 'none';
+
+  if (isAva(id)) {
+    D.profile.avatarData = dataUrl;
+    toast('✓ 大頭貼已套用');
+  } else {
+    var numId = parseInt(id);
+    var item = D.items.find(function(i){ return i.id === numId; });
+    if (item) {
+      item.imgData = dataUrl;
+      var thumb = document.querySelector('#ic' + numId + ' .adm-ithumb');
+      if (thumb) thumb.innerHTML = '<img src="' + dataUrl + '">';
+    }
+    toast('✓ 圖片已套用');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var avaWrap = document.getElementById('czava');
+  if (avaWrap) czBindDrag(avaWrap, 'ava');
+  var pwInput = document.getElementById('pw-modal-input');
+  if (pwInput) pwInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') submitPw(); });
+});
+
+/* ── PASSWORD PROTECTION ── */
+var _footerClicks = 0, _footerTimer = null;
+
+function handleFooterClick() {
+  _footerClicks++;
+  clearTimeout(_footerTimer);
+  _footerTimer = setTimeout(function(){ _footerClicks = 0; }, 1800);
+  if (_footerClicks >= 5) {
+    _footerClicks = 0;
+    showPwModal();
+  }
+}
+
+function showPwModal() {
+  document.getElementById('pw-modal').classList.add('on');
+  document.getElementById('pw-modal-input').value = '';
+  document.getElementById('pw-modal-err').style.display = 'none';
+  setTimeout(function(){ document.getElementById('pw-modal-input').focus(); }, 150);
+}
+
+function closePwModal() {
+  document.getElementById('pw-modal').classList.remove('on');
+}
+
+function submitPw() {
+  var input = document.getElementById('pw-modal-input').value;
+  if (input === D.social.pw) {
+    sessionStorage.setItem('adminUnlocked', '1');
+    document.getElementById('tb-admin').style.display = '';
+    closePwModal();
+    toast('✓ 後台已解鎖');
+  } else {
+    document.getElementById('pw-modal-err').style.display = 'block';
+    document.getElementById('pw-modal-input').value = '';
+    document.getElementById('pw-modal-input').focus();
+  }
+}
+
+/* ── CLASSIFY ── */
+function classify(item) {
+  var now = new Date(); now.setHours(0,0,0,0);
+  var open = new Date(item.openD); open.setHours(0,0,0,0);
+  var closeD = new Date(item.closeD); closeD.setHours(0,0,0,0);
+  var closeTs = new Date(item.closeD); closeTs.setHours(23,59,59,0);
+  var daysToOpen = Math.ceil((open - now) / 86400000);
+  var daysSinceClose = Math.floor((now - closeD) / 86400000);
+  if (daysSinceClose > 14) return 'hidden';
+  if (closeD < now) return 'ended';
+  if (open <= now && closeTs >= new Date()) return 'active';
+  if (daysToOpen <= 7 && daysToOpen > 0) return 'soon';
+  return 'hidden';
+}
+
+/* ── FRONT ── */
+function renderFront() {
+  var p = D.profile, s = D.social;
+  document.getElementById('f-name').textContent = p.name;
+  document.getElementById('f-handle').textContent = p.handle;
+  document.getElementById('f-bio').textContent = p.bio;
+  document.getElementById('f-ava').innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
+  document.getElementById('ig-strip-handle').textContent = s.igHandle || '@puff.andmom';
+  document.getElementById('ig-strip-name').textContent   = s.igName   || '泡芙與媽';
+  var stripBtn = document.getElementById('ig-strip-btn');
+  if (s.igStripUrl) stripBtn.href = s.igStripUrl;
+  var stripAva = document.getElementById('ig-strip-ava');
+  stripAva.innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
+
+  var nudge = document.getElementById('line-nudge');
+  nudge.style.display = s.lineUrl ? 'flex' : 'none';
+  if (s.lineUrl) nudge.href = s.lineUrl;
+  document.getElementById('community-block').style.display = s.commVis ? 'block' : 'none';
+  if (s.lineUrl) document.getElementById('line-btn').href = s.lineUrl;
+  if (s.igUrl)   document.getElementById('ig-btn').href  = s.igUrl;
+  document.getElementById('pw-display').textContent = s.pw || '';
+  document.getElementById('pw-row').style.display = (s.pwVis && s.pw) ? 'flex' : 'none';
+
+  var soon = [], active = [], ended = [];
+  D.items.forEach(function(i) {
+    var st = classify(i);
+    if (st === 'soon')        soon.push(i);
+    else if (st === 'active') active.push(i);
+    else if (st === 'ended')  ended.push(i);
+  });
+  renderSoon(soon); renderActive(active); renderEnded(ended);
+  document.getElementById('soon-sec').style.display   = soon.length  ? 'block' : 'none';
+  document.getElementById('active-sec').style.display = 'block';
+  document.getElementById('ended-sec').style.display  = ended.length ? 'block' : 'none';
+}
+
+function renderSoon(items) {
+  var list = document.getElementById('soon-list'); list.innerHTML = '';
+  items.forEach(function(item, idx) {
+    var open = new Date(item.openD + 'T00:00:00'), diff = open - new Date();
+    var d = String(Math.max(0, Math.floor(diff/86400000))).padStart(2,'0');
+    var h = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+    var m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    var s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    var lh = D.social.lineUrl || '#';
+    var el = document.createElement('div');
+    el.className = 'fu'; el.style.animationDelay = (idx * .05) + 's';
+    el.innerHTML =
+      '<div class="soon-row">' +
+        '<div class="soon-date-col">' +
+          '<span class="soon-mo">' + open.toLocaleDateString('zh-TW',{month:'numeric'}) + '月</span>' +
+          '<span class="soon-day">' + open.getDate() + '</span>' +
+        '</div>' +
+        '<div class="soon-info">' +
+          '<div class="soon-name">' + item.name + '</div>' +
+          '<div class="soon-cd" id="scd' + item.id + '">' +
+            '<div class="cd-unit"><span class="cd-n">' + d + '</span><span class="cd-l">天</span></div>' +
+            '<span class="cd-sep">·</span>' +
+            '<div class="cd-unit"><span class="cd-n">' + h + '</span><span class="cd-l">時</span></div>' +
+            '<span class="cd-sep">·</span>' +
+            '<div class="cd-unit"><span class="cd-n">' + m + '</span><span class="cd-l">分</span></div>' +
+            '<span class="cd-sep">·</span>' +
+            '<div class="cd-unit"><span class="cd-n">' + s + '</span><span class="cd-l">秒</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<a class="soon-line-btn" href="' + lh + '"' + (lh !== '#' ? ' target="_blank"' : '') + '>' +
+          '<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.07 2 11.07c0 4.43 3.93 8.14 9.25 8.89v2.54c0 .28.32.43.54.26l3.89-2.83C18.71 18.85 22 15.28 22 11.07 22 6.07 17.52 2 12 2z"/></svg>' +
+          '通知我' +
+        '</a>' +
+      '</div>';
+    list.appendChild(el);
+  });
+  startCD();
+}
+
+function renderActive(items) {
+  var grid = document.getElementById('active-grid'); grid.innerHTML = '';
+  if (!items.length) {
+    grid.innerHTML = '<div class="active-empty">目前沒有進行中的團購</div>';
+    return;
+  }
+  items.forEach(function(item, idx) {
+    var openFmt  = item.openD.slice(5).replace('-', '.');
+    var closeFmt = item.closeD.slice(5).replace('-', '.');
+    var imgH = item.imgData
+      ? '<img src="' + item.imgData + '" alt="">'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)">' + (item.emoji || '🛍️') + '</div>';
+    var igBtnH = item.igUrl
+      ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
+          '詳細介紹</a>'
+      : '';
+    var discRow = (item.discCode || item.igUrl)
+      ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap">' +
+          (item.discCode
+            ? '<div class="disc-chip" style="margin-bottom:0" onclick="copyDisc(event,\'' + item.discCode + '\')">' +
+                '<span class="disc-label">折扣碼</span>' +
+                '<span class="disc-code">' + item.discCode + '</span>' +
+                '<span class="disc-copy">⎘</span></div>'
+            : '') +
+          igBtnH +
+        '</div>'
+      : '';
+    var buyHref = item.link || 'javascript:void(0)';
+    var buyTarget = item.link ? ' target="_blank"' : '';
+    var el = document.createElement('div');
+    el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
+    el.innerHTML =
+      '<div class="acard-img">' +
+        imgH +
+        '<div class="acard-img-btn">' +
+          '<a href="' + buyHref + '"' + buyTarget + '>前往購買 →</a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="acard-body">' +
+        '<div class="acard-name">' + item.name + '</div>' +
+        '<div class="acard-date">' +
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/></svg>' +
+          openFmt + ' → ' + closeFmt +
+        '</div>' +
+        discRow +
+      '</div>';
+    if (!item.link) {
+      (function(iid) {
+        el.querySelector('.acard-img-btn a').onclick = function(e) { e.preventDefault(); openSheet(iid); };
+      })(item.id);
+    }
+    grid.appendChild(el);
+  });
+}
+
+function renderEnded(items) {
+  var list = document.getElementById('ended-list'); list.innerHTML = '';
+  items.forEach(function(item, idx) {
+    var url = item.link || '#';
+    var el = document.createElement('div');
+    el.className = 'ended-row fu'; el.style.animationDelay = (idx * .05) + 's';
+    el.innerHTML = '<span class="ended-name">' + item.name + '</span>' +
+      '<a class="ended-cs" href="' + url + '"' + (url !== '#' ? ' target="_blank"' : '') + '>已結團・找客服 →</a>';
+    list.appendChild(el);
+  });
+}
+
+function startCD() {
+  clearInterval(window._cd);
+  window._cd = setInterval(function() {
+    D.items.forEach(function(item) {
+      var el = document.getElementById('scd' + item.id); if (!el) return;
+      var diff = new Date(item.openD + 'T00:00:00') - new Date(); if (diff <= 0) return;
+      var ns = el.querySelectorAll('.cd-n');
+      [Math.floor(diff/86400000), Math.floor((diff%86400000)/3600000),
+       Math.floor((diff%3600000)/60000), Math.floor((diff%60000)/1000)]
+        .forEach(function(v, i) { if (ns[i]) ns[i].textContent = String(Math.max(0,v)).padStart(2,'0'); });
+    });
+  }, 1000);
+}
+
+function copyDisc(e, code) {
+  e.stopPropagation();
+  copyText(code, '已複製折扣碼：' + code);
+}
+function copyPW() {
+  var pw = D.social.pw || document.getElementById('pw-display').textContent;
+  copyText(pw, '已複製密碼：' + pw);
+}
+function copyText(text, msg) {
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ toast('✓ ' + msg); }); }
+  else { var t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);toast('✓ ' + msg); }
+}
+function handleLine(e) { if (!D.social.lineUrl) { e.preventDefault(); toast('請先設定 LINE 連結'); } }
+function handleLineNudge(e) { if (!D.social.lineUrl) { e.preventDefault(); toast('請先設定 LINE 連結'); } }
+
+function openSheet(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  document.getElementById('sh-name').textContent = item.name;
+  document.getElementById('sh-desc').textContent = item.desc || '';
+  var buy = document.getElementById('sh-buy'); buy.href = item.link || '#'; buy.style.display = item.link ? 'block' : 'none';
+  var ln  = document.getElementById('sh-line'); ln.style.display = D.social.lineUrl ? 'block' : 'none';
+  if (D.social.lineUrl) ln.href = D.social.lineUrl;
+  document.getElementById('overlay').classList.add('on');
+}
+function closeSheet() { document.getElementById('overlay').classList.remove('on'); }
+
+/* ── ADMIN ── */
+function renderAdmin() {
+  var p = D.profile, s = D.social;
+  document.getElementById('a-name').value    = p.name;
+  document.getElementById('a-handle').value  = p.handle;
+  document.getElementById('a-bio').value     = p.bio;
+  if (p.avatarData) {
+    var wrap = document.getElementById('czava');
+    var res = document.getElementById('czresult-ava');
+    if (!res) { res = document.createElement('img'); res.id = 'czresult-ava'; res.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;'; wrap.appendChild(res); }
+    res.src = p.avatarData; res.style.display = 'block';
+    var ph = document.getElementById('czava-ph'); if (ph) ph.style.display = 'none';
+    var hint = document.getElementById('czava-hint'); if (hint) { hint.style.display = 'block'; hint.textContent = '點「上傳照片」可重新選擇'; }
+  }
+  document.getElementById('a-comm-vis').checked = s.commVis;
+  document.getElementById('a-ig-handle').value  = s.igHandle   || '@puff.andmom';
+  document.getElementById('a-ig-name').value    = s.igName     || '泡芙與媽';
+  document.getElementById('a-ig-url').value     = s.igStripUrl || '';
+  document.getElementById('a-line').value       = s.lineUrl    || '';
+  document.getElementById('a-ig').value         = s.igUrl      || '';
+  document.getElementById('a-pw').value         = s.pw         || '4343';
+  document.getElementById('a-pw-vis').checked   = s.pwVis;
+  renderAdmItems();
+}
+
+function renderAdmItems() {
+  var list = document.getElementById('adm-items'); list.innerHTML = '';
+  D.items.forEach(function(item) {
+    var st = classify(item);
+    var stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[st] || '—';
+    var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '🛍️');
+    var el = document.createElement('div'); el.className = 'adm-icard'; el.id = 'ic' + item.id;
+    el.innerHTML =
+      '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
+        '<div class="adm-ithumb">' + th + '</div>' +
+        '<div class="adm-iinfo"><div class="adm-iname">' + item.name + '</div><div class="adm-isub">' + item.openD + ' – ' + item.closeD + ' · ' + stLabel + '</div></div>' +
+        '<div class="adm-ibtns">' +
+          '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
+          '<button class="adm-ibtn" onclick="event.stopPropagation();delItem(' + item.id + ')">🗑️</button>' +
+        '</div></div>' +
+      '<div class="adm-iform" id="if' + item.id + '">' +
+        '<div class="fld" style="margin-bottom:6px"><label>商品圖片</label></div>' +
+        '<div class="crop-card">' +
+          '<div class="crop-zone rect" id="czitem-' + item.id + '">' +
+            (item.imgData ? '<img id="czresult-' + item.id + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;" src="' + item.imgData + '">' : '') +
+            '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '🛍️') + '</span>點擊上傳圖片</div>' +
+            '<div class="chint" id="czitem-hint-' + item.id + '" style="display:' + (item.imgData ? 'block' : 'none') + '">' + (item.imgData ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
+          '</div>' +
+          '<div class="crop-scale" id="czitem-scrow-' + item.id + '" style="display:none">' +
+            '<label>縮放</label><input type="range" id="czitem-sc-' + item.id + '" min="0.1" max="4" step="0.01" value="1" oninput="cropScaleChange(' + item.id + ')">' +
+          '</div>' +
+          '<div class="crop-acts">' +
+            '<button class="crop-act" onclick="document.getElementById(\'ifile-' + item.id + '\').click()">' + (item.imgData ? '🔄 重新上傳' : '📷 上傳圖片') + '</button>' +
+            '<button class="crop-act g" id="czitem-apply-' + item.id + '" style="display:none" onclick="cropApply(' + item.id + ')">✓ 套用</button>' +
+          '</div>' +
+          '<input type="file" id="ifile-' + item.id + '" accept="image/*" onchange="cropLoad(' + item.id + ',event)">' +
+        '</div>' +
+        '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
+        '<div class="fld"><label>Emoji（無圖片時）</label><input id="fe' + item.id + '" value="' + (item.emoji || '') + '" placeholder="🛍️" style="max-width:70px"></div>' +
+        '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
+        '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
+        '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
+        '<div class="sw-row"><span>有折扣碼</span><label class="sw"><input type="checkbox" id="fdc-sw-' + item.id + '"' + (item.discCode ? ' checked' : '') + ' onchange="toggleDisc(' + item.id + ')"><span class="sw-sl"></span></label></div>' +
+        '<div class="fld" id="fdc-fld-' + item.id + '" style="display:' + (item.discCode ? 'block' : 'none') + '"><label>折扣碼</label><input id="fdc-' + item.id + '" value="' + (item.discCode || '') + '" placeholder="例如 BEAUTY10"></div>' +
+        '<div style="display:flex;gap:8px">' +
+          '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + item.openD + '"></div>' +
+          '<div class="fld" style="flex:1"><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + item.closeD + '"></div>' +
+        '</div>' +
+        '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後14天→已結團 ／ 超過14天→自動下架</div>' +
+        '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
+      '</div>';
+    list.appendChild(el);
+
+    var cw = document.getElementById('czitem-' + item.id);
+    if (cw) czBindDrag(cw, item.id);
+  });
+}
+
+function toggleDisc(id) {
+  var on = document.getElementById('fdc-sw-' + id).checked;
+  document.getElementById('fdc-fld-' + id).style.display = on ? 'block' : 'none';
+}
+function tF(id) { document.getElementById('if' + id).classList.toggle('on'); }
+
+async function saveItem(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  var applyBtn = document.getElementById('czitem-apply-' + id);
+  if (applyBtn && applyBtn.style.display !== 'none') cropApply(id);
+  item.name     = document.getElementById('fn' + id).value;
+  item.emoji    = document.getElementById('fe' + id).value;
+  item.desc     = document.getElementById('fd' + id).value;
+  item.link     = document.getElementById('fl' + id).value;
+  item.igUrl    = document.getElementById('fig' + id).value;
+  item.openD    = document.getElementById('fo' + id).value;
+  item.closeD   = document.getElementById('fz' + id).value;
+  var discOn    = document.getElementById('fdc-sw-' + id).checked;
+  item.discCode = discOn ? (document.getElementById('fdc-' + id).value || '') : '';
+
+  var res = await sb.from('items').upsert({
+    id:          item.id,
+    name:        item.name,
+    emoji:       item.emoji,
+    img_data:    item.imgData,
+    open_d:      item.openD,
+    close_d:     item.closeD,
+    link:        item.link,
+    description: item.desc,
+    disc_code:   item.discCode,
+    ig_url:      item.igUrl
+  });
+  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  toast('✓ 已儲存');
+  renderAdmItems();
+  setTimeout(function(){ var f = document.getElementById('if' + id); if (f) f.classList.add('on'); }, 80);
+}
+
+function delItem(id) {
+  var item = D.items.find(function(i){ return i.id === id; });
+  var name = item ? item.name : '此商品';
+  document.getElementById('confirm-msg').innerHTML = '確定要刪除「' + name + '」嗎？<br><span style="font-size:11px;color:var(--ink3)">此動作無法復原</span>';
+  document.getElementById('confirm-ok').onclick = async function() {
+    var res = await sb.from('items').delete().eq('id', id);
+    if (res.error) { toast('❌ 刪除失敗，請重試'); console.error(res.error); closeConfirm(); return; }
+    D.items = D.items.filter(function(i){ return i.id !== id; });
+    closeConfirm();
+    toast('🗑️ 已刪除');
+    renderAdmItems();
+  };
+  document.getElementById('confirm-overlay').classList.add('on');
+}
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('on'); }
+
+async function addItem() {
+  var today = new Date().toISOString().slice(0,10);
+  var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
+  var res = await sb.from('items').insert({
+    name: '新商品', emoji: '🛍️', img_data: null,
+    open_d: today, close_d: close,
+    link: '', description: '', disc_code: '', ig_url: '', sort_order: 0
+  }).select().single();
+  if (res.error) { toast('❌ 新增失敗，請重試'); console.error(res.error); return; }
+  var d = res.data;
+  D.items.unshift({
+    id: d.id, name: d.name, emoji: d.emoji, imgData: d.img_data,
+    openD: d.open_d, closeD: d.close_d, link: d.link,
+    desc: d.description, discCode: d.disc_code, igUrl: d.ig_url
+  });
+  renderAdmItems();
+  setTimeout(function(){ var f = document.getElementById('if' + d.id); if (f) f.classList.add('on'); }, 80);
+}
+
+async function saveProfile() {
+  D.profile.name   = document.getElementById('a-name').value;
+  D.profile.handle = document.getElementById('a-handle').value;
+  D.profile.bio    = document.getElementById('a-bio').value;
+  var res = await sb.from('profile').upsert(buildProfileRow());
+  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  toast('✓ 個人資料已儲存');
+  renderFront();
+}
+
+async function saveSocial() {
+  D.social.commVis    = document.getElementById('a-comm-vis').checked;
+  D.social.igHandle   = document.getElementById('a-ig-handle').value;
+  D.social.igName     = document.getElementById('a-ig-name').value;
+  D.social.igStripUrl = document.getElementById('a-ig-url').value;
+  D.social.lineUrl    = document.getElementById('a-line').value;
+  D.social.igUrl      = document.getElementById('a-ig').value;
+  D.social.pw         = document.getElementById('a-pw').value;
+  D.social.pwVis      = document.getElementById('a-pw-vis').checked;
+  document.getElementById('pw-display').textContent = D.social.pw;
+  document.getElementById('pw-row').style.display = (D.social.pwVis && D.social.pw) ? 'flex' : 'none';
+  var res = await sb.from('profile').upsert(buildProfileRow());
+  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  toast('✓ 社群設定已儲存');
+}
+
+function switchAdmTab(tab) {
+  var tabs = ['profile','social','items','broadcast'];
+  tabs.forEach(function(t) {
+    var btn   = document.getElementById('adm-tab-' + t);
+    var panel = document.getElementById('adm-panel-' + t);
+    if (btn)   btn.classList.toggle('on',   t === tab);
+    if (panel) panel.classList.toggle('on', t === tab);
+  });
+  if (tab === 'broadcast') renderBcSortList();
+}
+
+/* ── BROADCAST SORT LIST ── */
+var bcOrder = [];
+var bcDragId = null;
+
+function renderBcSortList() {
+  var active = D.items.filter(function(i){ return classify(i) === 'active'; });
+  var existing = bcOrder.filter(function(id){ return active.find(function(i){ return i.id === id; }); });
+  var newIds = active.filter(function(i){ return existing.indexOf(i.id) === -1; }).map(function(i){ return i.id; });
+  bcOrder = existing.concat(newIds);
+
+  var list = document.getElementById('bc-sort-list');
+  list.innerHTML = '';
+  if (!bcOrder.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--ink3);padding:10px 0;font-weight:300">目前沒有開團中的商品</div>';
+    return;
+  }
+  bcOrder.forEach(function(id) {
+    var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+    var row = document.createElement('div');
+    row.className = 'bc-sort-row';
+    row.dataset.id = id;
+    var closeFmt = '～' + item.closeD.slice(5).replace('-','/');
+    row.innerHTML =
+      '<span class="bc-sort-handle">☰</span>' +
+      '<span class="bc-sort-name">' + item.name + '</span>' +
+      '<span class="bc-sort-date">' + closeFmt + '</span>';
+    row.addEventListener('touchstart', bcTouchStart, {passive:false});
+    row.addEventListener('dragstart',  bcDragStart);
+    row.addEventListener('dragover',   bcDragOver);
+    row.addEventListener('drop',       bcDrop);
+    row.addEventListener('dragend',    bcDragEnd);
+    row.setAttribute('draggable','true');
+    list.appendChild(row);
+  });
+}
+
+function bcDragStart(e){ bcDragId = this.dataset.id; this.classList.add('dragging'); }
+function bcDragEnd(e){ this.classList.remove('dragging'); document.querySelectorAll('.bc-sort-row').forEach(function(r){r.classList.remove('drag-over');}); }
+function bcDragOver(e){ e.preventDefault(); document.querySelectorAll('.bc-sort-row').forEach(function(r){r.classList.remove('drag-over');}); this.classList.add('drag-over'); }
+function bcDrop(e){
+  e.preventDefault();
+  var targetId = parseInt(this.dataset.id);
+  var fromId   = parseInt(bcDragId);
+  if (fromId === targetId) return;
+  var fi = bcOrder.indexOf(fromId), ti = bcOrder.indexOf(targetId);
+  bcOrder.splice(fi, 1); bcOrder.splice(ti, 0, fromId);
+  renderBcSortList();
+}
+
+var bcTouchDragEl = null, bcTouchClone = null, bcTouchFromId = null;
+function bcTouchStart(e) {
+  e.preventDefault();
+  bcTouchFromId = parseInt(this.dataset.id);
+  bcTouchDragEl = this;
+  var t = e.touches[0];
+  bcTouchClone = this.cloneNode(true);
+  bcTouchClone.style.cssText = 'position:fixed;left:' + (t.clientX-20) + 'px;top:' + (t.clientY-20) + 'px;width:' + this.offsetWidth + 'px;opacity:.85;pointer-events:none;z-index:999;border-radius:8px;background:var(--card);border:1px solid var(--green-dk);padding:10px 12px;display:flex;align-items:center;gap:10px;font-size:13px;';
+  document.body.appendChild(bcTouchClone);
+  this.classList.add('dragging');
+  window.addEventListener('touchmove', bcTouchMove, {passive:false});
+  window.addEventListener('touchend',  bcTouchEnd);
+}
+function bcTouchMove(e) {
+  e.preventDefault();
+  var t = e.touches[0];
+  if (bcTouchClone) { bcTouchClone.style.left = (t.clientX-20)+'px'; bcTouchClone.style.top = (t.clientY-20)+'px'; }
+  var el = document.elementFromPoint(t.clientX, t.clientY);
+  var row = el && el.closest('.bc-sort-row');
+  document.querySelectorAll('.bc-sort-row').forEach(function(r){ r.classList.remove('drag-over'); });
+  if (row && row !== bcTouchDragEl) row.classList.add('drag-over');
+}
+function bcTouchEnd(e) {
+  window.removeEventListener('touchmove', bcTouchMove);
+  window.removeEventListener('touchend',  bcTouchEnd);
+  if (bcTouchClone) { document.body.removeChild(bcTouchClone); bcTouchClone = null; }
+  var over = document.querySelector('.bc-sort-row.drag-over');
+  if (over) {
+    var targetId = parseInt(over.dataset.id);
+    var fi = bcOrder.indexOf(bcTouchFromId), ti = bcOrder.indexOf(targetId);
+    if (fi !== -1 && ti !== -1 && fi !== ti) { bcOrder.splice(fi,1); bcOrder.splice(ti,0,bcTouchFromId); }
+  }
+  bcTouchDragEl = null; bcTouchFromId = null;
+  renderBcSortList();
+}
+
+function genBroadcast() {
+  var showDate = document.getElementById('bc-show-date').checked;
+  var showDesc = document.getElementById('bc-show-desc').checked;
+  var showDisc = document.getElementById('bc-show-disc').checked;
+  var header   = document.getElementById('bc-header').value;
+
+  var lines = [];
+  if (header.trim()) { lines.push(header.trim()); lines.push(''); }
+
+  var ordered = bcOrder.map(function(id){ return D.items.find(function(i){ return i.id === id; }); }).filter(Boolean);
+  if (!ordered.length) { lines.push('目前沒有開團中的商品。'); }
+
+  ordered.forEach(function(item, idx) {
+    var nameLine = '✨' + item.name;
+    if (showDate) nameLine += '（～' + item.closeD.slice(5).replace('-','/') + '）';
+    lines.push(nameLine);
+    if (item.link) lines.push(item.link);
+    if (showDesc && item.desc) lines.push('✦ ' + item.desc);
+    if (showDisc && item.discCode) lines.push('🏷 折扣碼：' + item.discCode);
+    if (idx < ordered.length - 1) lines.push('');
+  });
+
+  var result = document.getElementById('bc-result');
+  result.value = lines.join('\n');
+  document.getElementById('bc-result-wrap').style.display = 'block';
+  result.style.height = 'auto';
+  result.style.height = Math.min(result.scrollHeight, 420) + 'px';
+  document.getElementById('bc-result-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyBroadcast() {
+  var text = document.getElementById('bc-result').value;
+  var btn = document.querySelector('.bc-copy-btn');
+  copyText(text, '廣播文字已複製！貼到 LINE 社群吧 🎉');
+  if (btn) {
+    btn.style.background = '#9EAA4A';
+    btn.textContent = '✓ 已複製！';
+    setTimeout(function(){
+      btn.style.background = '';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> 複製全文';
+    }, 2000);
+  }
+}
+
+function go(pg) {
+  if (pg === 'admin' && sessionStorage.getItem('adminUnlocked') !== '1') {
+    showPwModal();
+    return;
+  }
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('on'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.getElementById('pg-' + pg).classList.add('on');
+  document.getElementById('tb-' + pg).classList.add('on');
+  if (pg === 'front') renderFront();
+  if (pg === 'admin') { switchAdmTab('profile'); renderAdmin(); }
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(function(){ t.classList.remove('on'); }, 2200);
+}
+
+initApp();
+</script>
+</body>
+</html>
