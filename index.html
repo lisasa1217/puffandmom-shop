@@ -14,18 +14,18 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#EBF3F8;
-  --card:#F6FAFB;
+  --bg:#FBF8EE;
+  --card:#FEFCF6;
   --white:#FEFEFE;
-  --ink:#2A3D47;
-  --ink2:#4D6E7C;
-  --ink3:#8AAEBB;
-  --rule:#C8DDE7;
-  --green:#82B7CC;
-  --green-dk:#5A9AB5;
-  --yellow:#F5D46B;
-  --yellow-dk:#E8BF45;
-  --accent:#5A9AB5;
+  --ink:#2E2A18;
+  --ink2:#625A3A;
+  --ink3:#ABA07A;
+  --rule:#EDE5CC;
+  --green:#F0C94A;
+  --green-dk:#C8A018;
+  --yellow:#82B7CC;
+  --yellow-dk:#5A9AB5;
+  --accent:#C8A018;
   --line-g:#06C755;
 }
 html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;font-family:'DM Sans','Noto Serif TC',sans-serif}
@@ -107,7 +107,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--rule);display:flex;flex-direction:column}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:8px;right:8px;z-index:4;background:var(--yellow);color:#2A3D47;font-size:9.5px;font-weight:600;padding:4px 9px;border-radius:20px;letter-spacing:.4px;box-shadow:0 2px 8px rgba(0,0,0,.18);max-width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.acard-note{position:absolute;bottom:8px;left:8px;z-index:4;background:rgba(255,255,255,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--ink);font-size:9px;font-weight:300;padding:3px 8px 3px 7px;border-radius:3px;letter-spacing:.6px;border-left:2px solid var(--green);max-width:92px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
   position:absolute;bottom:0;left:0;right:0;
