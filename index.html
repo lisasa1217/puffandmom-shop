@@ -29,6 +29,12 @@
   --line-g:#06C755;
 }
 html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;font-family:'DM Sans','Noto Serif TC',sans-serif}
+#loading-veil{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
+#loading-veil.fade{opacity:0;pointer-events:none}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin:0 4px;animation:ldot 1.2s ease-in-out infinite}
+.loading-dot:nth-child(2){animation-delay:.2s}
+.loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes ldot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 .view{display:none;padding-bottom:80px}.view.on{display:block}
 #pg-front{padding-top:57px}
 
@@ -343,11 +349,17 @@ input[type=file]{display:none}
 </head>
 <body>
 
+<div id="loading-veil">
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
+</div>
+
 <div id="pg-front" class="view on">
 
   <!-- IG top strip -->
   <div class="ig-strip" id="ig-strip">
-    <div class="ig-strip-ava" id="ig-strip-ava">🛍️</div>
+    <div class="ig-strip-ava" id="ig-strip-ava"></div>
     <div class="ig-strip-info">
       <div class="ig-strip-handle" id="ig-strip-handle">@puff.andmom</div>
       <div class="ig-strip-name" id="ig-strip-name">泡芙與媽</div>
@@ -363,11 +375,11 @@ input[type=file]{display:none}
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
   </a>
   <div class="hero">
-    <div class="ava-wrap"><div class="ava-inner" id="f-ava">🛍️</div></div>
-    <div class="hero-name" id="f-name">團媽小美</div>
-    <div class="hero-handle" id="f-handle">@xiaomei_buys</div>
+    <div class="ava-wrap"><div class="ava-inner" id="f-ava"></div></div>
+    <div class="hero-name" id="f-name"></div>
+    <div class="hero-handle" id="f-handle"></div>
     <div class="hero-divider"></div>
-    <div class="hero-bio" id="f-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</div>
+    <div class="hero-bio" id="f-bio"></div>
   </div>
 
   <div id="soon-sec">
@@ -630,6 +642,12 @@ async function initApp() {
   renderFront();
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
+  }
+  /* 移除載入遮罩 */
+  var veil = document.getElementById('loading-veil');
+  if (veil) {
+    veil.classList.add('fade');
+    setTimeout(function(){ veil.remove(); }, 400);
   }
 }
 
