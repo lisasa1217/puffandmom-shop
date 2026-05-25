@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>團購主頁</title>
+<title>泡芙與媽｜@puff.andmom</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Serif+TC:wght@200;300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -472,8 +472,9 @@ input[type=file]{display:none}
         <div class="fld"><label>頂部 IG 連結</label><input type="url" id="a-ig-url" value="https://instagram.com/puff.andmom" placeholder="https://instagram.com/..."></div>
         <div class="fld"><label>LINE 社群連結</label><input type="url" id="a-line" placeholder="https://line.me/..."></div>
         <div class="fld"><label>Instagram（社群區塊）連結</label><input type="url" id="a-ig" placeholder="https://instagram.com/..."></div>
-        <div class="fld"><label>LINE 驗證密碼</label><input id="a-pw" value="4343" maxlength="20"></div>
-        <div class="sw-row"><span>顯示驗證密碼</span><label class="sw"><input type="checkbox" id="a-pw-vis" checked><span class="sw-sl"></span></label></div>
+        <div class="fld"><label>LINE 社群驗證碼（前台顯示給客人）</label><input id="a-comm-pw" value="4343" maxlength="20"></div>
+        <div class="sw-row"><span>顯示驗證碼</span><label class="sw"><input type="checkbox" id="a-pw-vis" checked><span class="sw-sl"></span></label></div>
+        <div class="fld"><label>後台登入密碼</label><input id="a-pw" type="password" value="0403" maxlength="20"></div>
         <button class="savebtn g" onclick="saveSocial()">儲存社群設定</button>
       </div>
     </div>
@@ -572,7 +573,7 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 /* ── DATA (local cache) ── */
 var D = {
   profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null},
-  social:  {commVis:true, lineUrl:'', igUrl:'', pw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
+  social:  {commVis:true, lineUrl:'', igUrl:'', pw:'0403', commPw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
   items: []
 };
 
@@ -595,7 +596,8 @@ async function initApp() {
         igStripUrl: profile.ig_strip_url || 'https://instagram.com/puff.andmom',
         igHandle:   profile.ig_handle   || '@puff.andmom',
         igName:     profile.ig_name     || '泡芙與媽',
-        pw:         profile.pw          || '4343',
+        pw:         profile.pw          || '0403',
+        commPw:     profile.comm_pw     || '4343',
         pwVis:      profile.pw_vis      !== false
       };
     }
@@ -640,6 +642,7 @@ function buildProfileRow() {
     ig_handle:    D.social.igHandle,
     ig_name:      D.social.igName,
     pw:           D.social.pw,
+    comm_pw:      D.social.commPw,
     pw_vis:       D.social.pwVis
   };
 }
@@ -988,8 +991,8 @@ function renderFront() {
   document.getElementById('community-block').style.display = s.commVis ? 'block' : 'none';
   if (s.lineUrl) document.getElementById('line-btn').href = s.lineUrl;
   if (s.igUrl)   document.getElementById('ig-btn').href  = s.igUrl;
-  document.getElementById('pw-display').textContent = s.pw || '';
-  document.getElementById('pw-row').style.display = (s.pwVis && s.pw) ? 'flex' : 'none';
+  document.getElementById('pw-display').textContent = s.commPw || '';
+  document.getElementById('pw-row').style.display = (s.pwVis && s.commPw) ? 'flex' : 'none';
 
   var soon = [], active = [], ended = [];
   D.items.forEach(function(i) {
@@ -1171,7 +1174,8 @@ function renderAdmin() {
   document.getElementById('a-ig-url').value     = s.igStripUrl || '';
   document.getElementById('a-line').value       = s.lineUrl    || '';
   document.getElementById('a-ig').value         = s.igUrl      || '';
-  document.getElementById('a-pw').value         = s.pw         || '4343';
+  document.getElementById('a-comm-pw').value    = s.commPw     || '4343';
+  document.getElementById('a-pw').value         = s.pw         || '0403';
   document.getElementById('a-pw-vis').checked   = s.pwVis;
   renderAdmItems();
 }
@@ -1319,10 +1323,11 @@ async function saveSocial() {
   D.social.igStripUrl = document.getElementById('a-ig-url').value;
   D.social.lineUrl    = document.getElementById('a-line').value;
   D.social.igUrl      = document.getElementById('a-ig').value;
+  D.social.commPw     = document.getElementById('a-comm-pw').value;
   D.social.pw         = document.getElementById('a-pw').value;
   D.social.pwVis      = document.getElementById('a-pw-vis').checked;
-  document.getElementById('pw-display').textContent = D.social.pw;
-  document.getElementById('pw-row').style.display = (D.social.pwVis && D.social.pw) ? 'flex' : 'none';
+  document.getElementById('pw-display').textContent = D.social.commPw;
+  document.getElementById('pw-row').style.display = (D.social.pwVis && D.social.commPw) ? 'flex' : 'none';
   var res = await sb.from('profile').upsert(buildProfileRow());
   if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
   toast('✓ 社群設定已儲存');
