@@ -863,8 +863,8 @@ function cropApply(id) {
   var gx, gy, gw, gh;
   if (isAva(id)) { gw = Math.round(ww * 0.76); gh = gw; gx = (ww - gw) / 2; gy = (wh - gh) / 2; }
   else           { gx = 0; gy = 0; gw = ww; gh = wh; }
-  var OUT  = isAva(id) ? 600 : 1200;
-  var OUTH = isAva(id) ? 600 : Math.round(1200 * gh / gw);
+  var OUT  = isAva(id) ? 400 : 800;
+  var OUTH = isAva(id) ? 400 : Math.round(800 * gh / gw);
   var canvas = document.createElement('canvas');
   canvas.width = OUT; canvas.height = OUTH;
   var ctx = canvas.getContext('2d');
@@ -1253,8 +1253,7 @@ async function saveItem(id) {
   var discOn    = document.getElementById('fdc-sw-' + id).checked;
   item.discCode = discOn ? (document.getElementById('fdc-' + id).value || '') : '';
 
-  var res = await sb.from('items').upsert({
-    id:          item.id,
+  var res = await sb.from('items').update({
     name:        item.name,
     emoji:       item.emoji,
     img_data:    item.imgData,
@@ -1264,8 +1263,8 @@ async function saveItem(id) {
     description: item.desc,
     disc_code:   item.discCode,
     ig_url:      item.igUrl
-  });
-  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  }).eq('id', item.id);
+  if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
   toast('✓ 已儲存');
   renderAdmItems();
   setTimeout(function(){ var f = document.getElementById('if' + id); if (f) f.classList.add('on'); }, 80);
@@ -1310,8 +1309,9 @@ async function saveProfile() {
   D.profile.name   = document.getElementById('a-name').value;
   D.profile.handle = document.getElementById('a-handle').value;
   D.profile.bio    = document.getElementById('a-bio').value;
-  var res = await sb.from('profile').upsert(buildProfileRow());
-  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  var row = buildProfileRow(); delete row.id;
+  var res = await sb.from('profile').update(row).eq('id', 1);
+  if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
   toast('✓ 個人資料已儲存');
   renderFront();
 }
@@ -1328,8 +1328,9 @@ async function saveSocial() {
   D.social.pwVis      = document.getElementById('a-pw-vis').checked;
   document.getElementById('pw-display').textContent = D.social.commPw;
   document.getElementById('pw-row').style.display = (D.social.pwVis && D.social.commPw) ? 'flex' : 'none';
-  var res = await sb.from('profile').upsert(buildProfileRow());
-  if (res.error) { toast('❌ 儲存失敗，請重試'); console.error(res.error); return; }
+  var row = buildProfileRow(); delete row.id;
+  var res = await sb.from('profile').update(row).eq('id', 1);
+  if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
   toast('✓ 社群設定已儲存');
 }
 
