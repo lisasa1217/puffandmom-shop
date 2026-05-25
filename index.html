@@ -14,18 +14,18 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#ECECEA;
-  --card:#F7F6F2;
+  --bg:#EBF3F8;
+  --card:#F6FAFB;
   --white:#FEFEFE;
-  --ink:#2E2E2E;
-  --ink2:#5E5E5A;
-  --ink3:#9E9E98;
-  --rule:#D8D6D0;
-  --green:#C3CE6A;
-  --green-dk:#9EAA4A;
-  --yellow:#FFDF76;
-  --yellow-dk:#E8C030;
-  --accent:#9EAA4A;
+  --ink:#2A3D47;
+  --ink2:#4D6E7C;
+  --ink3:#8AAEBB;
+  --rule:#C8DDE7;
+  --green:#82B7CC;
+  --green-dk:#5A9AB5;
+  --yellow:#F5D46B;
+  --yellow-dk:#E8BF45;
+  --accent:#5A9AB5;
   --line-g:#06C755;
 }
 html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;font-family:'DM Sans','Noto Serif TC',sans-serif}
@@ -107,6 +107,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--rule);display:flex;flex-direction:column}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.acard-note{position:absolute;top:8px;right:8px;z-index:4;background:var(--yellow);color:#2A3D47;font-size:9.5px;font-weight:600;padding:4px 9px;border-radius:20px;letter-spacing:.4px;box-shadow:0 2px 8px rgba(0,0,0,.18);max-width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
   position:absolute;bottom:0;left:0;right:0;
@@ -632,7 +633,8 @@ async function initApp() {
           link:     i.link        || '',
           desc:     i.description || '',
           discCode: i.disc_code   || '',
-          igUrl:    i.ig_url      || ''
+          igUrl:    i.ig_url      || '',
+          note:     i.note        || ''
         };
       });
     }
@@ -1102,9 +1104,11 @@ function renderActive(items) {
     var buyTarget = item.link ? ' target="_blank"' : '';
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
+    var noteH = item.note ? '<div class="acard-note">' + item.note + '</div>' : '';
     el.innerHTML =
       '<div class="acard-img">' +
         imgH +
+        noteH +
         '<div class="acard-img-btn">' +
           '<a href="' + buyHref + '"' + buyTarget + '>前往購買 →</a>' +
         '</div>' +
@@ -1238,6 +1242,7 @@ function renderAdmItems() {
         '</div>' +
         '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
         '<div class="fld"><label>Emoji（無圖片時）</label><input id="fe' + item.id + '" value="' + (item.emoji || '') + '" placeholder="🛍️" style="max-width:70px"></div>' +
+        '<div class="fld"><label>備註標籤（圖片角落顯示，例如：限時優惠、買一送一）</label><input id="fnote' + item.id + '" value="' + (item.note || '') + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12"></div>' +
         '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
         '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
         '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
@@ -1269,6 +1274,7 @@ async function saveItem(id) {
   if (applyBtn && applyBtn.style.display !== 'none') cropApply(id);
   item.name     = document.getElementById('fn' + id).value;
   item.emoji    = document.getElementById('fe' + id).value;
+  item.note     = document.getElementById('fnote' + id).value;
   item.desc     = document.getElementById('fd' + id).value;
   item.link     = document.getElementById('fl' + id).value;
   item.igUrl    = document.getElementById('fig' + id).value;
@@ -1286,7 +1292,8 @@ async function saveItem(id) {
     link:        item.link,
     description: item.desc,
     disc_code:   item.discCode,
-    ig_url:      item.igUrl
+    ig_url:      item.igUrl,
+    note:        item.note
   }).eq('id', item.id);
   if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
   toast('✓ 已儲存');
@@ -1316,14 +1323,14 @@ async function addItem() {
   var res = await sb.from('items').insert({
     name: '新商品', emoji: '🛍️', img_data: null,
     open_d: today, close_d: close,
-    link: '', description: '', disc_code: '', ig_url: '', sort_order: 0
+    link: '', description: '', disc_code: '', ig_url: '', note: '', sort_order: 0
   }).select().single();
   if (res.error) { toast('❌ 新增失敗，請重試'); console.error(res.error); return; }
   var d = res.data;
   D.items.unshift({
     id: d.id, name: d.name, emoji: d.emoji, imgData: d.img_data,
     openD: d.open_d, closeD: d.close_d, link: d.link,
-    desc: d.description, discCode: d.disc_code, igUrl: d.ig_url
+    desc: d.description, discCode: d.disc_code, igUrl: d.ig_url, note: d.note || ''
   });
   renderAdmItems();
   setTimeout(function(){ var f = document.getElementById('if' + d.id); if (f) f.classList.add('on'); }, 80);
