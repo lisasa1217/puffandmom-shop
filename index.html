@@ -111,33 +111,39 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
   position:absolute;bottom:0;left:0;right:0;
-  padding:28px 10px 10px;
-  background:linear-gradient(to top, rgba(42,51,32,.68) 0%, transparent 100%);
+  padding:32px 10px 11px;
+  background:linear-gradient(to top, rgba(0,0,0,.52) 0%, transparent 100%);
   display:flex;align-items:flex-end;justify-content:center;
   z-index:2;
 }
 .acard-img-btn a,.acard-img-btn button{
   display:inline-block;
-  padding:5px 14px;
+  padding:6px 16px;
   border-radius:20px;
-  background:rgba(255,253,245,.15);
-  border:1px solid rgba(255,253,245,.6);
+  background:linear-gradient(to bottom, rgba(255,255,255,.38) 0%, rgba(255,255,255,.14) 55%, rgba(255,255,255,.06) 100%);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:0 6px 16px rgba(0,0,0,.28), 0 2px 4px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.55);
   color:#fff !important;
-  font-size:10px;font-family:inherit;font-weight:400;
-  letter-spacing:.6px;cursor:pointer;text-decoration:none !important;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  font-size:10px;font-family:inherit;font-weight:500;
+  letter-spacing:.7px;cursor:pointer;text-decoration:none !important;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   -webkit-appearance:none;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.acard-img-btn a:active,.acard-img-btn button:active{
+  transform:scale(.96) translateY(1px);
+  box-shadow:0 2px 8px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.4);
 }
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'Noto Serif TC',serif;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.acard-date{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--ink2);letter-spacing:.3px;margin-bottom:6px;font-weight:300;align-self:flex-start}
-.acard-date svg{width:10px;height:10px;color:var(--ink3);flex-shrink:0}
-.detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--green);background:rgba(130,183,204,.08);font-family:inherit;font-size:9px;color:var(--green-dk);cursor:pointer;letter-spacing:.3px;vertical-align:middle;margin-left:4px;flex-shrink:0}
-.detail-btn:active{background:rgba(130,183,204,.2)}
+.acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.14);border:1px solid rgba(130,183,204,.38);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--green-dk);letter-spacing:.3px;margin-bottom:6px;font-weight:400;align-self:flex-start}
+.acard-date svg{width:10px;height:10px;color:var(--green-dk);flex-shrink:0}
+.detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.3px;vertical-align:middle;margin-left:4px;flex-shrink:0}
+.detail-btn:active{background:var(--bg)}
 .detail-btn svg{width:9px;height:9px}
-.disc-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.08);border:1px dashed var(--green);border-radius:4px;padding:3px 8px;cursor:pointer;margin-bottom:8px;align-self:flex-start}
-.disc-chip:active{background:rgba(130,183,204,.18)}
-.disc-label{font-size:8px;letter-spacing:.8px;text-transform:uppercase;color:var(--green-dk)}
+.disc-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:3px 8px;cursor:pointer;margin-bottom:8px;align-self:flex-start}
+.disc-chip:active{background:var(--card)}
+.disc-label{font-size:8px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}
 .disc-code{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:13px;letter-spacing:1.5px;color:var(--ink)}
 .disc-copy{font-size:9px;color:var(--ink3)}
 .active-empty{grid-column:span 2;padding:20px;text-align:center;font-size:12px;color:var(--ink3);font-weight:300}
