@@ -74,9 +74,13 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
 .hero{display:flex;flex-direction:column;align-items:center;padding:40px 28px 32px;background:var(--card);border-bottom:1px solid var(--rule)}
-.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px}
-.ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--card)}
+.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--card);transition:transform .18s}
+.ava-wrap:active .ava-inner{transform:scale(.92)}
 .ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
+/* heart burst */
+.ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
+@keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
 .hero-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:26px;font-weight:300;letter-spacing:4px;text-align:center;margin-bottom:6px}
 .hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
 .hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
@@ -172,6 +176,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .comm-btn svg{width:17px;height:17px;flex-shrink:0}
 .pw-row{display:flex;align-items:center;justify-content:center;gap:8px}
 .pw-label{font-size:11px;color:var(--ink3);font-weight:300}
+.pw-hint{font-size:9px;color:var(--rule);font-weight:300;letter-spacing:.4px;pointer-events:none}
 .pw-chip{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);border-radius:5px;padding:1px 12px;cursor:pointer;background:var(--white);transition:background .15s,border-color .15s}
 .pw-chip:hover{background:rgba(130,183,204,.12);border-color:var(--green)}
 .pw-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
@@ -404,7 +409,7 @@ input[type=file]{display:none}
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
   </a>
   <div class="hero">
-    <div class="ava-wrap"><div class="ava-inner" id="f-ava"></div></div>
+    <div class="ava-wrap" onclick="avaHeart(event)"><div class="ava-inner" id="f-ava"></div></div>
     <div class="hero-name" id="f-name"></div>
     <div class="hero-handle" id="f-handle"></div>
     <div class="hero-divider"></div>
@@ -441,6 +446,7 @@ input[type=file]{display:none}
     <div class="pw-row" id="pw-row">
       <span class="pw-label">LINE 社群驗證密碼</span>
       <div class="pw-chip" onclick="copyPW()"><span class="pw-num" id="pw-display">4343</span></div>
+      <span class="pw-hint">點選複製</span>
     </div>
   </div>
 
@@ -1178,7 +1184,7 @@ function renderSoon(items) {
         '</div>' +
         '<button class="soon-cal-btn" onclick="addToCalendar(' + item.id + ')">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="14" x2="12" y2="14" stroke-width="3" stroke-linecap="round"/><line x1="16" y1="14" x2="16" y2="14" stroke-width="3" stroke-linecap="round"/></svg>' +
-          '加入行事曆' +
+          '設提醒' +
         '</button>' +
       '</div>';
     list.appendChild(el);
@@ -1335,7 +1341,7 @@ function copyDisc(e, code, itemId) {
   copyText(code, '已複製折扣碼：' + code);
 }
 function copyPW() {
-  var pw = D.social.pw || document.getElementById('pw-display').textContent;
+  var pw = D.social.commPw || document.getElementById('pw-display').textContent;
   copyText(pw, '已複製密碼：' + pw);
 }
 function copyText(text, msg) {
@@ -1703,6 +1709,30 @@ function toast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('on');
   setTimeout(function(){ t.classList.remove('on'); }, 2200);
+}
+
+/* ── AVATAR HEART BURST ── */
+var _avaHearts = ['🩷','💛','🩵','💕','✨','🌸','💝'];
+var _avaIdx = 0;
+function avaHeart(e) {
+  var rect = e.currentTarget.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top;
+  for (var i = 0; i < 3; i++) {
+    (function(delay, offset) {
+      setTimeout(function() {
+        var el = document.createElement('span');
+        el.className = 'ava-heart';
+        el.textContent = _avaHearts[(_avaIdx + i) % _avaHearts.length];
+        el.style.left = (cx + offset) + 'px';
+        el.style.top  = cy + 'px';
+        el.style.fontSize = (18 + Math.random() * 10) + 'px';
+        document.body.appendChild(el);
+        setTimeout(function(){ el.remove(); }, 1100);
+      }, delay);
+    })(i * 80, (i - 1) * 22 + (Math.random() * 14 - 7));
+  }
+  _avaIdx = (_avaIdx + 3) % _avaHearts.length;
 }
 
 initApp();
