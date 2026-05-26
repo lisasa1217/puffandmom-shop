@@ -1030,13 +1030,13 @@ function submitPw() {
 
 /* ── ADMIN LOGOUT + AUTO-TIMEOUT ── */
 var _adminTimer = null;
-var ADMIN_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+var ADMIN_TIMEOUT_MS = 60 * 60 * 1000; // 60 minutes
 
 function adminLogout() {
   clearAdminTimeout();
   sessionStorage.removeItem('adminUnlocked');
   document.getElementById('tab-bar').style.display = 'none';
-  goPage('front');
+  go('front');
   toast('已登出後台');
 }
 
@@ -1045,7 +1045,7 @@ function startAdminTimeout() {
   _adminTimer = setTimeout(function() {
     if (sessionStorage.getItem('adminUnlocked') === '1') {
       adminLogout();
-      toast('⏱ 閒置超過 30 分鐘，已自動登出後台');
+      toast('⏱ 閒置超過 1 小時，已自動登出後台');
     }
   }, ADMIN_TIMEOUT_MS);
 }
