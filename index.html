@@ -381,7 +381,7 @@ input[type=file]{display:none}
 .kuka-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
 @keyframes kuka-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .kuka-fab-icon{font-size:20px;line-height:1;margin-bottom:4px}
-.kuka-fab-lbl{font-size:9px;font-weight:500;color:#5A3800;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
+.kuka-fab-lbl{font-size:11px;font-weight:500;color:#5A3800;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
 /* ── 每日誇誇 modal ── */
 .kuka-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:450;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .kuka-overlay.on{opacity:1;pointer-events:all}
@@ -421,7 +421,7 @@ input[type=file]{display:none}
 .doll-fab:hover{transform:translateX(3px);filter:brightness(1.06)}.doll-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
 @keyframes doll-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .doll-fab-icon{font-size:19px;line-height:1;margin-bottom:4px}
-.doll-fab-lbl{font-size:8px;font-weight:500;color:#fff;letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
+.doll-fab-lbl{font-size:11px;font-weight:500;color:#fff;letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
 /* ── 小人退散 modal ── */
 .doll-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .doll-overlay.on{opacity:1;pointer-events:all}
@@ -770,7 +770,7 @@ input[type=file]{display:none}
 <!-- 每日誇誇 FAB -->
 <button class="kuka-fab" onclick="openKuka()" aria-label="每日誇誇">
   <span class="kuka-fab-icon">🌸</span>
-  <span class="kuka-fab-lbl">誇誇</span>
+  <span class="kuka-fab-lbl">每日一籤</span>
 </button>
 
 <!-- 每日誇誇 modal -->
@@ -797,7 +797,7 @@ input[type=file]{display:none}
 
 <!-- 小人退散 FAB -->
 <button class="doll-fab" onclick="tryOpenDoll()" aria-label="小人退散">
-  <span class="doll-fab-icon">🪆</span>
+  <span class="doll-fab-icon">👹</span>
   <span class="doll-fab-lbl">小人退散</span>
 </button>
 
@@ -2177,9 +2177,9 @@ function closeDoll() {
       var f = document.createElement('div');
       f.className = 'doll-farewell';
       f.textContent = '💳 來購物解解悶！';
-      f.style.animationDuration = '5.2s';
+      f.style.animationDuration = '5.0s';
       document.body.appendChild(f);
-      setTimeout(function(){ f.remove(); }, 5300);
+      setTimeout(function(){ f.remove(); }, 5100);
     }, 180);
     // scroll to 現正開團中 section
     setTimeout(function() {
