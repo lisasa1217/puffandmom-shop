@@ -360,8 +360,12 @@ input[type=file]{display:none}
 .pw-modal-box{background:var(--card);border-radius:16px;padding:28px 24px 20px;width:300px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18)}
 .pw-modal-title{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:20px;font-weight:300;margin-bottom:4px;letter-spacing:.3px}
 .pw-modal-sub{font-size:12px;color:var(--ink3);font-weight:300;margin-bottom:18px}
-.pw-modal-input{width:100%;padding:11px 14px;border:1px solid var(--rule);border-radius:9px;background:var(--white);font-family:inherit;font-size:18px;text-align:center;letter-spacing:6px;outline:none;margin-bottom:8px;color:var(--ink)}
+.pw-modal-wrap{position:relative;margin-bottom:8px}
+.pw-modal-input{width:100%;padding:11px 40px 11px 14px;border:1px solid var(--rule);border-radius:9px;background:var(--white);font-family:inherit;font-size:18px;text-align:center;letter-spacing:6px;outline:none;color:var(--ink)}
 .pw-modal-input:focus{border-color:var(--green-dk)}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;padding:4px;cursor:pointer;color:var(--ink3);display:flex;align-items:center;transition:color .15s}
+.pw-eye:hover{color:var(--ink)}
+.pw-eye svg{width:18px;height:18px}
 .pw-modal-err{font-size:11px;color:#C0392B;margin-bottom:8px;font-weight:300}
 .pw-modal-btns{display:flex;gap:8px;margin-top:4px}
 .pw-modal-btn{flex:1;padding:11px;border-radius:9px;border:none;font-family:inherit;font-size:13px;cursor:pointer;font-weight:400}
@@ -616,7 +620,12 @@ input[type=file]{display:none}
   <div class="pw-modal-box">
     <div class="pw-modal-title">後台管理</div>
     <div class="pw-modal-sub">請輸入密碼以進入後台</div>
-    <input class="pw-modal-input" id="pw-modal-input" type="password" placeholder="••••" maxlength="20" autocomplete="off">
+    <div class="pw-modal-wrap">
+      <input class="pw-modal-input" id="pw-modal-input" type="password" placeholder="••••" maxlength="20" autocomplete="off">
+      <button class="pw-eye" id="pw-eye-btn" type="button" onclick="togglePwEye()" tabindex="-1" aria-label="顯示密碼">
+        <svg id="pw-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
     <div class="pw-modal-err" id="pw-modal-err" style="display:none">密碼錯誤，請再試一次</div>
     <div class="pw-modal-btns">
       <button class="pw-modal-btn cancel" onclick="closePwModal()">取消</button>
@@ -1011,6 +1020,26 @@ function showPwModal() {
 
 function closePwModal() {
   document.getElementById('pw-modal').classList.remove('on');
+  // reset eye to hidden state
+  var inp = document.getElementById('pw-modal-input');
+  if (inp) inp.type = 'password';
+  var icon = document.getElementById('pw-eye-icon');
+  if (icon) icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+function togglePwEye() {
+  var inp  = document.getElementById('pw-modal-input');
+  var icon = document.getElementById('pw-eye-icon');
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    // eye-off icon (slashed eye)
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type = 'password';
+    // eye icon
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
 }
 
 function submitPw() {
