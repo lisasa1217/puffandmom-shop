@@ -410,9 +410,12 @@ input[type=file]{display:none}
 .kuka-draw-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;letter-spacing:.5px;transition:transform .12s,background .12s}
 .kuka-draw-btn:disabled{background:var(--ink3);cursor:default}
 .kuka-draw-btn:not(:disabled):active{transform:scale(.96);background:#444}
-/* farewell float */
-.kuka-farewell{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;z-index:9100;background:var(--ink);color:#fff;font-size:13px;font-weight:300;letter-spacing:.6px;padding:10px 20px;border-radius:20px;white-space:nowrap;pointer-events:none;animation:kuka-fare 2.8s ease forwards}
-@keyframes kuka-fare{0%{opacity:0;transform:translateX(-50%) translateY(20px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}75%{opacity:1;transform:translateX(-50%) translateY(-8px)}100%{opacity:0;transform:translateX(-50%) translateY(-24px)}}
+/* farewell float text */
+.kuka-farewell{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:9100;background:rgba(130,183,204,.92);color:#fff;font-size:13px;font-weight:400;letter-spacing:.8px;padding:10px 22px;border-radius:20px;white-space:nowrap;pointer-events:none;animation:kuka-fare 2.8s ease forwards}
+@keyframes kuka-fare{0%{opacity:0;transform:translateX(-50%) translateY(20px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}78%{opacity:1;transform:translateX(-50%) translateY(-6px)}100%{opacity:0;transform:translateX(-50%) translateY(-20px)}}
+/* farewell hearts */
+.kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
+@keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
 /* ── pw modal ── */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .pw-modal-overlay.on{opacity:1;pointer-events:all}
@@ -1833,13 +1836,13 @@ var KUKA_MSGS = [
   '今天的你已經超棒了！就算只是讓孩子吃飽睡好，也是大功一件 🌟',
   '媽媽不是超人，但你做到的事連超人都佩服 👏',
   '偶爾發脾氣沒關係，你還是孩子心裡最愛的那個人 🥹',
-  '今天可以累，明天又是一條好漢！加油小可愛 💪',
+  '今天很累吧！沒關係！睡一覺～明天又是一條好漢！加油小可愛 💪',
   '你一邊照顧全家，一邊還在努力變更好，太厲害了吧 🥺✨',
-  '孩子不需要完美媽媽，他只需要你 🫶',
-  '喘口氣，喝杯水，你值得被照顧 🧋',
+  '孩子不需要完美媽媽，他只需要你 🫶你很棒了！',
+  '喘口氣，喝杯珍奶，你值得被照顧 🧋',
   '你付出的每一件小事，都有被看見喔 🌸',
   '今天辛苦了！記得給自己一個抱抱 🤗',
-  '選對自己好一點，不是自私，是聰明 😌💕',
+  '今天也要對自己好一點！去買個單純就是自己想吃的東西吧 😌💕',
   '媽媽也有情緒，這超正常！你沒有做錯任何事 🍀',
   '你扛著好多，但你真的很厲害你知道嗎 🌈',
   '今天不管發生什麼，你已經是孩子最需要的人了 💛',
@@ -1862,12 +1865,29 @@ function openKuka() {
 
 function closeKuka() {
   document.getElementById('kuka-overlay').classList.remove('on');
-  // farewell float
-  var f = document.createElement('div');
-  f.className = 'kuka-farewell';
-  f.textContent = '莉莎今天也覺得你很棒！';
-  document.body.appendChild(f);
-  setTimeout(function(){ f.remove(); }, 2900);
+  // float hearts across full page
+  var positions = [12, 28, 45, 62, 78, 90];
+  positions.forEach(function(pct, i) {
+    setTimeout(function() {
+      var el = document.createElement('div');
+      el.className = 'kuka-heart-rise';
+      el.textContent = '🩵';
+      el.style.left = pct + '%';
+      el.style.fontSize = (22 + Math.random() * 14) + 'px';
+      el.style.animationDelay = '0s';
+      el.style.animationDuration = (2.0 + Math.random() * 0.8) + 's';
+      document.body.appendChild(el);
+      setTimeout(function(){ el.remove(); }, 3000);
+    }, i * 120);
+  });
+  // farewell text after hearts start
+  setTimeout(function() {
+    var f = document.createElement('div');
+    f.className = 'kuka-farewell';
+    f.textContent = '🩵 莉莎今天也覺得你很棒！';
+    document.body.appendChild(f);
+    setTimeout(function(){ f.remove(); }, 2900);
+  }, 200);
 }
 
 function kukaOverlayClick(e) {
@@ -1877,9 +1897,11 @@ function kukaOverlayClick(e) {
 function startKukaDraw() {
   if (_kukaDrawing) return;
   _kukaDrawing = true;
-  var btn = document.getElementById('kuka-draw-btn');
-  if (btn) btn.disabled = true;
+  // always show idle pane (ceremony) whether first draw or re-draw
+  document.getElementById('kuka-idle-pane').style.display = '';
+  document.getElementById('kuka-result-pane').style.display = 'none';
   var bamboo = document.getElementById('kuka-bamboo');
+  bamboo.textContent = '🎋';
   var box = document.getElementById('kuka-box');
   box.classList.add('kuka-spinning');
   // shake 竹筒 for 1.4s then reveal
