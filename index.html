@@ -99,8 +99,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cd-n{font-size:12px;font-weight:600;color:#8B6000;line-height:1}
 .cd-l{font-size:7px;color:#A87820;letter-spacing:.5px;margin-top:1px}
 .cd-sep{font-size:8px;color:var(--ink3);margin:0 1px}
-.soon-cal-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:7px;background:var(--green);border:none;cursor:pointer;color:#fff;font-size:10px;font-family:inherit;text-decoration:none;-webkit-appearance:none;transition:filter .12s,transform .12s}
-.soon-cal-btn:active{filter:brightness(.82);transform:scale(.95)}
+.soon-cal-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:7px;background:var(--green);border:none;cursor:pointer;color:#fff;font-size:10px;font-family:inherit;text-decoration:none;-webkit-appearance:none;transition:filter .15s,transform .15s,box-shadow .15s}
+.soon-cal-btn:hover{transform:translateY(-3px);box-shadow:0 7px 18px rgba(0,0,0,.2);filter:brightness(1.08)}
+.soon-cal-btn:active{filter:brightness(.82);transform:translateY(0) scale(.95);box-shadow:none}
 .soon-cal-btn svg{width:13px;height:13px}
 
 /* 2-col active grid */
@@ -128,9 +129,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   letter-spacing:.6px;cursor:pointer;text-decoration:none !important;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   -webkit-appearance:none;
-  transition:opacity .12s,transform .12s;
+  transition:opacity .15s,transform .15s,box-shadow .15s,background .15s;
 }
-.acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:scale(.93)}
+.acard-img-btn a:hover,.acard-img-btn button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.3);background:rgba(255,253,245,.28)}
+.acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93);box-shadow:none}
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'Noto Serif TC',serif;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.16);border:none;border-radius:4px;padding:4px 9px;font-size:11px;color:var(--green-dk);letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
@@ -164,8 +166,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .community{background:var(--card);padding:28px 20px 26px;border-top:1px solid var(--rule);margin-top:8px}
 .comm-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;text-align:center}
 .comm-btns{display:flex;gap:10px;margin-bottom:13px}
-.comm-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;color:#fff;text-decoration:none;transition:filter .12s,transform .12s}
-.comm-btn:active{filter:brightness(.82);transform:scale(.96)}
+.comm-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;color:#fff;text-decoration:none;transition:filter .15s,transform .15s,box-shadow .15s}
+.comm-btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.18);filter:brightness(1.06)}
+.comm-btn:active{filter:brightness(.82);transform:translateY(0) scale(.96);box-shadow:none}
 .comm-btn.line{background:var(--green)}.comm-btn.ig{background:var(--yellow)}
 .comm-btn svg{width:17px;height:17px;flex-shrink:0}
 .pw-row{display:flex;align-items:center;justify-content:center;gap:8px}
