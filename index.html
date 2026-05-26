@@ -303,7 +303,22 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .savebtn{width:100%;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer}
 .savebtn:active{opacity:.8}.savebtn.g{background:var(--green)}
 .adm-items{display:flex;flex-direction:column;gap:8px}
-.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden}
+.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden;transition:opacity .18s}
+.adm-icard.dragging-src{opacity:.38}
+/* archive zone */
+.adm-arch-sep{font-size:9px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:20px 0 10px}
+.adm-arch-sep::before,.adm-arch-sep::after{content:'';flex:1;height:1px;background:var(--rule)}
+.adm-arch-zone{border:2px dashed var(--rule);border-radius:12px;padding:8px 10px 6px;min-height:52px;transition:border-color .2s,background .2s}
+.adm-arch-zone.drag-active{border-color:#FF6B95;background:rgba(255,107,149,.05)}
+.adm-arch-hint{font-size:11px;color:var(--ink3);text-align:center;padding:6px 0;font-weight:300;pointer-events:none}
+.adm-arch-item{background:var(--bg);border-radius:9px;border:1px solid var(--rule);padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.adm-arch-ithumb{width:32px;height:32px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden}
+.adm-arch-ithumb img{width:100%;height:100%;object-fit:cover}
+.adm-arch-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.restore-btn{font-size:10px;color:var(--green-dk);background:none;border:1px solid var(--green);border-radius:5px;padding:3px 9px;cursor:pointer;font-family:inherit;flex-shrink:0;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
+.restore-btn:active{background:rgba(130,183,204,.15)}
+/* permanent badge */
+.perm-badge{display:inline-flex;align-items:center;background:rgba(130,183,204,.15);color:var(--green-dk);font-size:9px;padding:2px 6px;border-radius:4px;font-weight:400;letter-spacing:.5px;margin-left:4px}
 .adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
 .adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .adm-ithumb img{width:100%;height:100%;object-fit:cover}
@@ -678,6 +693,12 @@ input[type=file]{display:none}
       <div class="asec-lbl">商品管理</div>
       <div class="adm-items" id="adm-items"></div>
       <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
+      <div class="adm-arch-sep">下架區</div>
+      <div class="adm-arch-zone" id="adm-arch-zone"
+           ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
+        <div id="adm-arch-list"></div>
+        <div class="adm-arch-hint" id="adm-arch-hint">拖曳商品到這裡，或點「📦」按鈕下架</div>
+      </div>
     </div>
   </div>
 
@@ -923,18 +944,20 @@ async function initApp() {
     if (iRes.data) {
       D.items = iRes.data.map(function(i) {
         return {
-          id:       i.id,
-          name:     i.name        || '',
-          emoji:    i.emoji       || '🛍️',
-          imgData:  i.img_data    || null,
-          openD:    i.open_d      || '',
-          closeD:   i.close_d     || '',
-          link:     i.link        || '',
-          desc:     i.description || '',
-          discCode: i.disc_code   || '',
-          igUrl:      i.ig_url      || '',
-          note:       i.note        || '',
-          discLabel:  i.disc_label  || ''
+          id:        i.id,
+          name:      i.name        || '',
+          emoji:     i.emoji       || '🛍️',
+          imgData:   i.img_data    || null,
+          openD:     i.open_d      || '',
+          closeD:    i.close_d     || '',
+          link:      i.link        || '',
+          desc:      i.description || '',
+          discCode:  i.disc_code   || '',
+          igUrl:     i.ig_url      || '',
+          note:      i.note        || '',
+          discLabel: i.disc_label  || '',
+          permanent: i.close_d === '2099-12-31',
+          archived:  i.open_d  === '1970-01-01'
         };
       });
     }
@@ -1382,14 +1405,16 @@ function renderFront() {
   document.getElementById('pw-display').textContent = s.commPw || '';
   document.getElementById('pw-row').style.display = (s.pwVis && s.commPw) ? 'flex' : 'none';
 
-  var soon = [], active = [], ended = [];
+  var soon = [], active = [], ended = [], permanent = [];
   D.items.forEach(function(i) {
+    if (i.archived) return;
+    if (i.permanent) { permanent.push(i); return; }
     var st = classify(i);
     if (st === 'soon')        soon.push(i);
     else if (st === 'active') active.push(i);
     else if (st === 'ended')  ended.push(i);
   });
-  renderSoon(soon); renderActive(active); renderEnded(ended);
+  renderSoon(soon); renderActive(active, permanent); renderEnded(ended);
   document.getElementById('soon-sec').style.display   = soon.length  ? 'block' : 'none';
   document.getElementById('active-sec').style.display = 'block';
   document.getElementById('ended-sec').style.display  = ended.length ? 'block' : 'none';
@@ -1434,15 +1459,17 @@ function renderSoon(items) {
   startCD();
 }
 
-function renderActive(items) {
+function renderActive(items, permanentItems) {
+  permanentItems = permanentItems || [];
   var grid = document.getElementById('active-grid'); grid.innerHTML = '';
-  if (!items.length) {
+  if (!items.length && !permanentItems.length) {
     grid.innerHTML = '<div class="active-empty">目前沒有進行中的團購</div>';
     return;
   }
-  items.forEach(function(item, idx) {
-    var openFmt  = item.openD.slice(5).replace('-', '.');
-    var closeFmt = item.closeD.slice(5).replace('-', '.');
+  var buildCard = function(item, idx, isPerm) {
+    var dateLbl = isPerm
+      ? '常駐優惠'
+      : (item.openD.slice(5).replace('-', '.') + ' → ' + item.closeD.slice(5).replace('-', '.'));
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt="">'
       : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)">' + (item.emoji || '🛍️') + '</div>';
@@ -1465,17 +1492,14 @@ function renderActive(items) {
     var noteH = item.note ? '<div class="acard-note">' + item.note + '</div>' : '';
     el.innerHTML =
       '<div class="acard-img">' +
-        imgH +
-        noteH +
-        '<div class="acard-img-btn">' +
-          '<a href="' + buyHref + '"' + buyTarget + buyTrack + '>前往購買 →</a>' +
-        '</div>' +
+        imgH + noteH +
+        '<div class="acard-img-btn"><a href="' + buyHref + '"' + buyTarget + buyTrack + '>前往購買 →</a></div>' +
       '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
         '<div class="acard-date">' +
           '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="1" x2="5" y2="4"/><line x1="11" y1="1" x2="11" y2="4"/><line x1="2" y1="7" x2="14" y2="7"/></svg>' +
-          openFmt + ' → ' + closeFmt +
+          dateLbl +
         '</div>' +
         discRow + igBtnH +
       '</div>';
@@ -1485,7 +1509,9 @@ function renderActive(items) {
       })(item.id);
     }
     grid.appendChild(el);
-  });
+  };
+  items.forEach(function(item, idx) { buildCard(item, idx, false); });
+  permanentItems.forEach(function(item, idx) { buildCard(item, items.length + idx, true); });
 }
 
 function renderEnded(items) {
@@ -1631,66 +1657,148 @@ function renderAdmin() {
   renderAdmItems();
 }
 
+function _buildItemCard(item) {
+  var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '🛍️');
+  var stLabel;
+  if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
+  else {
+    var st = classify(item);
+    stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[st] || '—';
+  }
+  var subText = item.permanent
+    ? '常駐優惠'
+    : (item.openD + ' – ' + item.closeD);
+  var el = document.createElement('div');
+  el.className = 'adm-icard'; el.id = 'ic' + item.id;
+  el.setAttribute('draggable','true');
+  el.innerHTML =
+    '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
+      '<div class="adm-ithumb">' + th + '</div>' +
+      '<div class="adm-iinfo">' +
+        '<div class="adm-iname">' + item.name + (item.permanent ? '<span class="perm-badge" style="margin-left:5px">常駐優惠</span>' : '') + '</div>' +
+        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? '常駐' : ({soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
+      '</div>' +
+      '<div class="adm-ibtns">' +
+        '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
+        '<button class="adm-ibtn" title="下架" onclick="event.stopPropagation();archiveItem(' + item.id + ')">📦</button>' +
+        '<button class="adm-ibtn" onclick="event.stopPropagation();delItem(' + item.id + ')">🗑️</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="adm-iform" id="if' + item.id + '">' +
+      '<div class="fld" style="margin-bottom:6px"><label>商品圖片</label></div>' +
+      '<div class="crop-card">' +
+        '<div class="crop-zone rect" id="czitem-' + item.id + '">' +
+          (item.imgData ? '<img id="czresult-' + item.id + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;" src="' + item.imgData + '">' : '') +
+          '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '🛍️') + '</span>點擊上傳圖片</div>' +
+          '<div class="chint" id="czitem-hint-' + item.id + '" style="display:' + (item.imgData ? 'block' : 'none') + '">' + (item.imgData ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
+        '</div>' +
+        '<div class="crop-scale" id="czitem-scrow-' + item.id + '" style="display:none">' +
+          '<label>縮放</label><input type="range" id="czitem-sc-' + item.id + '" min="0.1" max="4" step="0.01" value="1" oninput="cropScaleChange(' + item.id + ')">' +
+        '</div>' +
+        '<div class="crop-acts">' +
+          '<button class="crop-act" onclick="document.getElementById(\'ifile-' + item.id + '\').click()">' + (item.imgData ? '🔄 重新上傳' : '📷 上傳圖片') + '</button>' +
+          '<button class="crop-act g" id="czitem-apply-' + item.id + '" style="display:none" onclick="cropApply(' + item.id + ')">✓ 套用</button>' +
+        '</div>' +
+        '<input type="file" id="ifile-' + item.id + '" accept="image/*" onchange="cropLoad(' + item.id + ',event)">' +
+      '</div>' +
+      '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
+      '<div class="fld"><label>Emoji（無圖片時）</label><input id="fe' + item.id + '" value="' + (item.emoji || '') + '" placeholder="🛍️" style="max-width:70px"></div>' +
+      '<div class="fld"><label>備註標籤（圖片角落顯示，例如：限時優惠、買一送一）</label><input id="fnote' + item.id + '" value="' + (item.note || '') + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12"></div>' +
+      '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
+      '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
+      '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
+      '<div class="sw-row"><span>有折扣碼</span><label class="sw"><input type="checkbox" id="fdc-sw-' + item.id + '"' + (item.discCode ? ' checked' : '') + ' onchange="toggleDisc(' + item.id + ')"><span class="sw-sl"></span></label></div>' +
+      '<div id="fdc-fld-' + item.id + '" style="display:' + (item.discCode ? 'flex' : 'none') + ';gap:8px">' +
+        '<div class="fld" style="flex:0 0 80px"><label>折扣說明</label><input id="fdlabel-' + item.id + '" value="' + (item.discLabel || '') + '" placeholder="如：8折" maxlength="6"></div>' +
+        '<div class="fld" style="flex:1"><label>折扣碼</label><input id="fdc-' + item.id + '" value="' + (item.discCode || '') + '" placeholder="如：BEAUTY10"></div>' +
+      '</div>' +
+      '<div class="sw-row"><span>常駐優惠（不設時效，常駐顯示於開團區底部）</span>' +
+        '<label class="sw"><input type="checkbox" id="fperm-' + item.id + '"' + (item.permanent ? ' checked' : '') + ' onchange="togglePermanent(' + item.id + ')"><span class="sw-sl"></span></label>' +
+      '</div>' +
+      '<div id="fdates-' + item.id + '" style="display:' + (item.permanent ? 'none' : 'flex') + ';gap:8px">' +
+        '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.permanent ? '' : item.openD) + '"></div>' +
+        '<div class="fld" style="flex:1"><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
+      '</div>' +
+      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後14天→已結團 ／ 勾選常駐優惠→永久顯示</div>' +
+      '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
+    '</div>';
+  return el;
+}
+
 function renderAdmItems() {
   var list = document.getElementById('adm-items'); list.innerHTML = '';
-  D.items.forEach(function(item) {
-    var st = classify(item);
-    var stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[st] || '—';
-    var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '🛍️');
-    var el = document.createElement('div'); el.className = 'adm-icard'; el.id = 'ic' + item.id;
-    el.innerHTML =
-      '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
-        '<div class="adm-ithumb">' + th + '</div>' +
-        '<div class="adm-iinfo"><div class="adm-iname">' + item.name + '</div><div class="adm-isub">' + item.openD + ' – ' + item.closeD + ' · ' + stLabel + '</div></div>' +
-        '<div class="adm-ibtns">' +
-          '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
-          '<button class="adm-ibtn" onclick="event.stopPropagation();delItem(' + item.id + ')">🗑️</button>' +
-        '</div></div>' +
-      '<div class="adm-iform" id="if' + item.id + '">' +
-        '<div class="fld" style="margin-bottom:6px"><label>商品圖片</label></div>' +
-        '<div class="crop-card">' +
-          '<div class="crop-zone rect" id="czitem-' + item.id + '">' +
-            (item.imgData ? '<img id="czresult-' + item.id + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;" src="' + item.imgData + '">' : '') +
-            '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '🛍️') + '</span>點擊上傳圖片</div>' +
-            '<div class="chint" id="czitem-hint-' + item.id + '" style="display:' + (item.imgData ? 'block' : 'none') + '">' + (item.imgData ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
-          '</div>' +
-          '<div class="crop-scale" id="czitem-scrow-' + item.id + '" style="display:none">' +
-            '<label>縮放</label><input type="range" id="czitem-sc-' + item.id + '" min="0.1" max="4" step="0.01" value="1" oninput="cropScaleChange(' + item.id + ')">' +
-          '</div>' +
-          '<div class="crop-acts">' +
-            '<button class="crop-act" onclick="document.getElementById(\'ifile-' + item.id + '\').click()">' + (item.imgData ? '🔄 重新上傳' : '📷 上傳圖片') + '</button>' +
-            '<button class="crop-act g" id="czitem-apply-' + item.id + '" style="display:none" onclick="cropApply(' + item.id + ')">✓ 套用</button>' +
-          '</div>' +
-          '<input type="file" id="ifile-' + item.id + '" accept="image/*" onchange="cropLoad(' + item.id + ',event)">' +
-        '</div>' +
-        '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
-        '<div class="fld"><label>Emoji（無圖片時）</label><input id="fe' + item.id + '" value="' + (item.emoji || '') + '" placeholder="🛍️" style="max-width:70px"></div>' +
-        '<div class="fld"><label>備註標籤（圖片角落顯示，例如：限時優惠、買一送一）</label><input id="fnote' + item.id + '" value="' + (item.note || '') + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12"></div>' +
-        '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
-        '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
-        '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
-        '<div class="sw-row"><span>有折扣碼</span><label class="sw"><input type="checkbox" id="fdc-sw-' + item.id + '"' + (item.discCode ? ' checked' : '') + ' onchange="toggleDisc(' + item.id + ')"><span class="sw-sl"></span></label></div>' +
-        '<div id="fdc-fld-' + item.id + '" style="display:' + (item.discCode ? 'flex' : 'none') + ';gap:8px">' +
-          '<div class="fld" style="flex:0 0 80px"><label>折扣說明</label><input id="fdlabel-' + item.id + '" value="' + (item.discLabel || '') + '" placeholder="如：8折" maxlength="6"></div>' +
-          '<div class="fld" style="flex:1"><label>折扣碼</label><input id="fdc-' + item.id + '" value="' + (item.discCode || '') + '" placeholder="如：BEAUTY10"></div>' +
-        '</div>' +
-        '<div style="display:flex;gap:8px">' +
-          '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + item.openD + '"></div>' +
-          '<div class="fld" style="flex:1"><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + item.closeD + '"></div>' +
-        '</div>' +
-        '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後14天→已結團 ／ 超過14天→自動下架</div>' +
-        '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
-      '</div>';
-    list.appendChild(el);
+  var archList = document.getElementById('adm-arch-list'); archList.innerHTML = '';
+  var archHint = document.getElementById('adm-arch-hint');
+  var archived = D.items.filter(function(i){ return i.archived; });
+  var normal   = D.items.filter(function(i){ return !i.archived; });
 
+  normal.forEach(function(item) {
+    var el = _buildItemCard(item);
+    el.addEventListener('dragstart', function(e){ _admDragId = item.id; el.classList.add('dragging-src'); });
+    el.addEventListener('dragend',   function(e){ el.classList.remove('dragging-src'); document.getElementById('adm-arch-zone').classList.remove('drag-active'); });
+    list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
   });
+
+  if (archived.length) {
+    archHint.style.display = 'none';
+    archived.forEach(function(item) {
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
+      var row = document.createElement('div'); row.className = 'adm-arch-item';
+      row.innerHTML =
+        '<div class="adm-arch-ithumb">' + th + '</div>' +
+        '<span class="adm-arch-name">' + item.name + '</span>' +
+        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')">🔄 恢復</button>';
+      archList.appendChild(row);
+    });
+  } else {
+    archHint.style.display = '';
+  }
 }
 
 function toggleDisc(id) {
   var on = document.getElementById('fdc-sw-' + id).checked;
   document.getElementById('fdc-fld-' + id).style.display = on ? 'flex' : 'none';
+}
+function togglePermanent(id) {
+  var on = document.getElementById('fperm-' + id).checked;
+  document.getElementById('fdates-' + id).style.display = on ? 'none' : 'flex';
+}
+
+/* ── ARCHIVE ── */
+var _admDragId = null;
+function archDragOver(e) { e.preventDefault(); document.getElementById('adm-arch-zone').classList.add('drag-active'); }
+function archDragLeave(e) { document.getElementById('adm-arch-zone').classList.remove('drag-active'); }
+function archDrop(e) {
+  e.preventDefault();
+  document.getElementById('adm-arch-zone').classList.remove('drag-active');
+  if (_admDragId) { archiveItem(_admDragId); _admDragId = null; }
+}
+
+async function archiveItem(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  item.archived = true; item.permanent = false;
+  item.openD = '1970-01-01'; item.closeD = '1970-01-01';
+  var res = await sb.from('items').update({ open_d: '1970-01-01', close_d: '1970-01-01' }).eq('id', id);
+  if (res.error) { toast('❌ 下架失敗'); return; }
+  toast('📦 已下架');
+  renderAdmItems();
+  renderFront();
+}
+
+async function restoreItem(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  var today = new Date().toISOString().slice(0,10);
+  var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
+  item.archived = false; item.permanent = false;
+  item.openD = today; item.closeD = close;
+  var res = await sb.from('items').update({ open_d: today, close_d: close }).eq('id', id);
+  if (res.error) { toast('❌ 恢復失敗'); return; }
+  toast('✓ 已恢復，請重新確認日期');
+  renderAdmItems();
+  renderFront();
+  setTimeout(function(){ var f = document.getElementById('if' + id); if (f) f.classList.add('on'); }, 80);
 }
 function tF(id) { document.getElementById('if' + id).classList.toggle('on'); }
 
@@ -1704,8 +1812,15 @@ async function saveItem(id) {
   item.desc     = document.getElementById('fd' + id).value;
   item.link     = document.getElementById('fl' + id).value;
   item.igUrl    = document.getElementById('fig' + id).value;
-  item.openD    = document.getElementById('fo' + id).value;
-  item.closeD   = document.getElementById('fz' + id).value;
+  var isPerm = document.getElementById('fperm-' + id).checked;
+  item.permanent = isPerm;
+  if (isPerm) {
+    item.openD = '2000-01-01';
+    item.closeD = '2099-12-31';
+  } else {
+    item.openD  = document.getElementById('fo' + id).value;
+    item.closeD = document.getElementById('fz' + id).value;
+  }
   var discOn    = document.getElementById('fdc-sw-' + id).checked;
   item.discCode  = discOn ? (document.getElementById('fdc-' + id).value || '') : '';
   item.discLabel = discOn ? (document.getElementById('fdlabel-' + id).value || '') : '';
@@ -1759,7 +1874,8 @@ async function addItem() {
     id: d.id, name: d.name, emoji: d.emoji, imgData: d.img_data,
     openD: d.open_d, closeD: d.close_d, link: d.link,
     desc: d.description, discCode: d.disc_code, discLabel: d.disc_label || '',
-    igUrl: d.ig_url, note: d.note || ''
+    igUrl: d.ig_url, note: d.note || '',
+    permanent: false, archived: false
   });
   renderAdmItems();
   setTimeout(function(){ var f = document.getElementById('if' + d.id); if (f) f.classList.add('on'); }, 80);
