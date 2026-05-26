@@ -81,9 +81,12 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* ping ring */
 .ava-wrap::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--yellow);opacity:0;animation:ava-ping 3.5s ease-out infinite}
 @keyframes ava-ping{0%{opacity:.55;transform:scale(1)}70%{opacity:0;transform:scale(1.5)}100%{opacity:0;transform:scale(1.5)}}
-/* tap hint */
-.ava-tap-hint{font-size:10px;color:var(--ink3);letter-spacing:.5px;margin-bottom:10px;animation:ava-hint-bob 2.4s ease-in-out infinite;pointer-events:none;user-select:none;-webkit-user-select:none}
-@keyframes ava-hint-bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-3px);opacity:1}}
+/* tap arrow hint */
+.ava-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:10px;pointer-events:none;user-select:none;-webkit-user-select:none;transition:opacity .4s}
+.ava-arrow svg{width:18px;height:18px;stroke:var(--green-dk);opacity:.7;animation:ava-arrow-bob 1.2s ease-in-out infinite}
+.ava-arrow svg:nth-child(2){animation-delay:.18s;opacity:.4}
+.ava-arrow svg:nth-child(3){animation-delay:.36s;opacity:.2}
+@keyframes ava-arrow-bob{0%,100%{transform:translateY(-3px)}50%{transform:translateY(3px)}}
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
@@ -365,6 +368,39 @@ input[type=file]{display:none}
 .sh-a.ghost{background:none;border:1px solid var(--rule);color:var(--ink2)}
 
 /* password modal */
+/* ── 每日誇誇 FAB ── */
+.kuka-fab{
+  position:fixed;left:0;top:38%;z-index:88;
+  display:flex;flex-direction:column;align-items:center;
+  background:var(--yellow);
+  border:none;border-radius:0 22px 22px 0;
+  padding:10px 9px 10px 6px;
+  cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.12);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s,filter .18s;
+  animation:kuka-fab-bob 3s ease-in-out infinite;
+}
+.kuka-fab:hover{transform:translateX(3px);filter:brightness(1.06)}
+.kuka-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
+@keyframes kuka-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.kuka-fab-icon{font-size:20px;line-height:1;margin-bottom:4px}
+.kuka-fab-lbl{font-size:9px;font-weight:500;color:#5A3800;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
+/* ── 每日誇誇 modal ── */
+.kuka-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:450;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.kuka-overlay.on{opacity:1;pointer-events:all}
+.kuka-box{background:var(--card);border-radius:20px;width:290px;text-align:center;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.22);transform:scale(.9);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.kuka-overlay.on .kuka-box{transform:scale(1)}
+.kuka-top{background:linear-gradient(135deg,var(--yellow) 0%,#F9E49A 100%);padding:20px 20px 16px;position:relative}
+.kuka-top-title{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:22px;font-weight:300;color:#5A3800;letter-spacing:1px;font-style:italic}
+.kuka-top-sub{font-size:10px;color:#8B6000;letter-spacing:.8px;margin-top:3px;font-weight:300}
+.kuka-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(90,56,0,.5);line-height:1;padding:2px}
+.kuka-body{padding:22px 24px 24px}
+.kuka-slip{min-height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.kuka-msg{font-family:'Noto Serif TC',serif;font-size:14px;line-height:2;font-weight:300;color:var(--ink);letter-spacing:.5px;animation:kuka-in .4s ease}
+@keyframes kuka-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kuka-draw-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;letter-spacing:.5px;transition:transform .12s,background .12s}
+.kuka-draw-btn:active{transform:scale(.96);background:#444}
+/* ── pw modal ── */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .pw-modal-overlay.on{opacity:1;pointer-events:all}
 .pw-modal-box{background:var(--card);border-radius:16px;padding:28px 24px 20px;width:300px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18)}
@@ -416,7 +452,11 @@ input[type=file]{display:none}
   </a>
   <div class="hero">
     <div class="ava-wrap" onclick="avaHeart(event)"><div class="ava-inner" id="f-ava"></div></div>
-    <div class="ava-tap-hint">✨ 點我</div>
+    <div class="ava-arrow" id="ava-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
     <div class="hero-name" id="f-name"></div>
     <div class="hero-handle" id="f-handle"></div>
     <div class="hero-divider"></div>
@@ -645,6 +685,27 @@ input[type=file]{display:none}
     </div>
   </div>
 </div>
+<!-- 每日誇誇 FAB -->
+<button class="kuka-fab" onclick="openKuka()" aria-label="每日誇誇">
+  <span class="kuka-fab-icon">🌸</span>
+  <span class="kuka-fab-lbl">誇誇</span>
+</button>
+
+<!-- 每日誇誇 modal -->
+<div class="kuka-overlay" id="kuka-overlay" onclick="kukaOverlayClick(event)">
+  <div class="kuka-box">
+    <div class="kuka-top">
+      <div class="kuka-top-title">每日誇誇 ✨</div>
+      <div class="kuka-top-sub">抽一支今日鼓勵語</div>
+      <button class="kuka-close" onclick="closeKuka()">✕</button>
+    </div>
+    <div class="kuka-body">
+      <div class="kuka-slip"><div class="kuka-msg" id="kuka-msg"></div></div>
+      <button class="kuka-draw-btn" onclick="drawKuka()">🎋 再抽一支</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1726,8 +1787,8 @@ function avaHeart(e) {
   // fade out hint after first tap
   if (!_avaTapped) {
     _avaTapped = true;
-    var hint = document.querySelector('.ava-tap-hint');
-    if (hint) { hint.style.transition = 'opacity .4s'; hint.style.opacity = '0'; setTimeout(function(){ hint.style.visibility='hidden'; }, 400); }
+    var arrow = document.getElementById('ava-arrow');
+    if (arrow) { arrow.style.opacity = '0'; setTimeout(function(){ arrow.style.display='none'; }, 400); }
   }
   var rect = e.currentTarget.getBoundingClientRect();
   var cx = rect.left + rect.width / 2;
@@ -1747,6 +1808,46 @@ function avaHeart(e) {
     })(i * 80, (i - 1) * 22 + (Math.random() * 14 - 7));
   }
   _avaIdx = (_avaIdx + 3) % _avaHearts.length;
+}
+
+/* ── 每日誇誇 ── */
+var KUKA_MSGS = [
+  '今天的你已經超棒了！就算只是讓孩子吃飽睡好，也是大功一件 🌟',
+  '媽媽不是超人，但你做到的事連超人都佩服 👏',
+  '偶爾發脾氣沒關係，你還是孩子心裡最愛的那個人 🥹',
+  '今天可以累，明天又是一條好漢！加油小可愛 💪',
+  '你一邊照顧全家，一邊還在努力變更好，太厲害了吧 🥺✨',
+  '孩子不需要完美媽媽，他只需要你 🫶',
+  '喘口氣，喝杯水，你值得被照顧 🧋',
+  '你付出的每一件小事，都有被看見喔 🌸',
+  '今天辛苦了！記得給自己一個抱抱 🤗',
+  '選對自己好一點，不是自私，是聰明 😌💕',
+  '媽媽也有情緒，這超正常！你沒有做錯任何事 🍀',
+  '你扛著好多，但你真的很厲害你知道嗎 🌈',
+  '今天不管發生什麼，你已經是孩子最需要的人了 💛',
+  '把自己照顧好，愛才能一直流出去 🌻',
+  '嘿！你今天有好好吃飯嗎？記得照顧自己喔 🍱💕'
+];
+var _kukaLast = -1;
+function openKuka() {
+  drawKuka();
+  document.getElementById('kuka-overlay').classList.add('on');
+}
+function closeKuka() {
+  document.getElementById('kuka-overlay').classList.remove('on');
+}
+function kukaOverlayClick(e) {
+  if (e.target === document.getElementById('kuka-overlay')) closeKuka();
+}
+function drawKuka() {
+  var idx;
+  do { idx = Math.floor(Math.random() * KUKA_MSGS.length); } while (idx === _kukaLast && KUKA_MSGS.length > 1);
+  _kukaLast = idx;
+  var el = document.getElementById('kuka-msg');
+  el.style.animation = 'none';
+  void el.offsetWidth; // reflow to restart animation
+  el.style.animation = '';
+  el.textContent = KUKA_MSGS[idx];
 }
 
 initApp();
