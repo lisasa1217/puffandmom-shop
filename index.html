@@ -74,19 +74,16 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
 .hero{display:flex;flex-direction:column;align-items:center;padding:40px 28px 32px;background:var(--card);border-bottom:1px solid var(--rule)}
-.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:6px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
 .ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--card);transition:transform .18s}
 .ava-wrap:active .ava-inner{transform:scale(.92)}
 .ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
 /* ping ring */
 .ava-wrap::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--yellow);opacity:0;animation:ava-ping 3.5s ease-out infinite}
 @keyframes ava-ping{0%{opacity:.55;transform:scale(1)}70%{opacity:0;transform:scale(1.5)}100%{opacity:0;transform:scale(1.5)}}
-/* tap arrow hint */
-.ava-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:10px;pointer-events:none;user-select:none;-webkit-user-select:none;transition:opacity .4s}
-.ava-arrow svg{width:18px;height:18px;stroke:var(--green-dk);opacity:.7;animation:ava-arrow-bob 1.2s ease-in-out infinite}
-.ava-arrow svg:nth-child(2){animation-delay:.18s;opacity:.4}
-.ava-arrow svg:nth-child(3){animation-delay:.36s;opacity:.2}
-@keyframes ava-arrow-bob{0%,100%{transform:translateY(-3px)}50%{transform:translateY(3px)}}
+/* tap badge on avatar */
+.ava-tap-badge{position:absolute;bottom:-4px;right:-6px;font-size:20px;pointer-events:none;filter:drop-shadow(0 1px 4px rgba(0,0,0,.18));animation:ava-badge-swing 1.6s ease-in-out infinite;transition:opacity .35s}
+@keyframes ava-badge-swing{0%,100%{transform:rotate(-15deg) scale(1)}40%{transform:rotate(12deg) scale(1.12)}70%{transform:rotate(-8deg) scale(1.04)}}
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
@@ -395,11 +392,27 @@ input[type=file]{display:none}
 .kuka-top-sub{font-size:10px;color:#8B6000;letter-spacing:.8px;margin-top:3px;font-weight:300}
 .kuka-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(90,56,0,.5);line-height:1;padding:2px}
 .kuka-body{padding:22px 24px 24px}
+/* idle state */
+.kuka-idle-icon{font-size:44px;margin-bottom:10px;animation:kuka-idol-sway 2s ease-in-out infinite}
+@keyframes kuka-idol-sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.kuka-idle-hint{font-size:12px;color:var(--ink3);font-weight:300;letter-spacing:.5px;margin-bottom:20px}
+/* spinning */
+.kuka-spinning .kuka-idle-icon{animation:kuka-shake .12s linear infinite}
+@keyframes kuka-shake{0%{transform:rotate(-8deg) scale(1.1)}50%{transform:rotate(8deg) scale(1.05)}100%{transform:rotate(-8deg) scale(1.1)}}
+/* revealed */
 .kuka-slip{min-height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
-.kuka-msg{font-family:'Noto Serif TC',serif;font-size:14px;line-height:2;font-weight:300;color:var(--ink);letter-spacing:.5px;animation:kuka-in .4s ease}
-@keyframes kuka-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kuka-msg{font-family:'Noto Serif TC',serif;font-size:14px;line-height:2;font-weight:300;color:var(--ink);letter-spacing:.5px}
+.kuka-msg.pop{animation:kuka-pop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes kuka-pop{from{opacity:0;transform:scale(.7) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+/* spinning ticker */
+.kuka-ticker{font-family:'Noto Serif TC',serif;font-size:13px;color:var(--ink3);line-height:1.6;opacity:.7;min-height:44px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;overflow:hidden}
+/* draw btn */
 .kuka-draw-btn{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;letter-spacing:.5px;transition:transform .12s,background .12s}
-.kuka-draw-btn:active{transform:scale(.96);background:#444}
+.kuka-draw-btn:disabled{background:var(--ink3);cursor:default}
+.kuka-draw-btn:not(:disabled):active{transform:scale(.96);background:#444}
+/* farewell float */
+.kuka-farewell{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;z-index:9100;background:var(--ink);color:#fff;font-size:13px;font-weight:300;letter-spacing:.6px;padding:10px 20px;border-radius:20px;white-space:nowrap;pointer-events:none;animation:kuka-fare 2.8s ease forwards}
+@keyframes kuka-fare{0%{opacity:0;transform:translateX(-50%) translateY(20px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}75%{opacity:1;transform:translateX(-50%) translateY(-8px)}100%{opacity:0;transform:translateX(-50%) translateY(-24px)}}
 /* ── pw modal ── */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .pw-modal-overlay.on{opacity:1;pointer-events:all}
@@ -451,11 +464,9 @@ input[type=file]{display:none}
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
   </a>
   <div class="hero">
-    <div class="ava-wrap" onclick="avaHeart(event)"><div class="ava-inner" id="f-ava"></div></div>
-    <div class="ava-arrow" id="ava-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="ava-wrap" onclick="avaHeart(event)">
+      <div class="ava-inner" id="f-ava"></div>
+      <div class="ava-tap-badge" id="ava-tap-badge">👆</div>
     </div>
     <div class="hero-name" id="f-name"></div>
     <div class="hero-handle" id="f-handle"></div>
@@ -693,15 +704,22 @@ input[type=file]{display:none}
 
 <!-- 每日誇誇 modal -->
 <div class="kuka-overlay" id="kuka-overlay" onclick="kukaOverlayClick(event)">
-  <div class="kuka-box">
+  <div class="kuka-box" id="kuka-box">
     <div class="kuka-top">
       <div class="kuka-top-title">每日誇誇 ✨</div>
       <div class="kuka-top-sub">抽一支今日鼓勵語</div>
       <button class="kuka-close" onclick="closeKuka()">✕</button>
     </div>
-    <div class="kuka-body">
+    <!-- idle -->
+    <div class="kuka-body" id="kuka-idle-pane">
+      <div class="kuka-idle-icon" id="kuka-bamboo">🎋</div>
+      <div class="kuka-idle-hint">搖一搖，抽出今日能量</div>
+      <button class="kuka-draw-btn" id="kuka-draw-btn" onclick="startKukaDraw()">抽一支</button>
+    </div>
+    <!-- revealed -->
+    <div class="kuka-body" id="kuka-result-pane" style="display:none">
       <div class="kuka-slip"><div class="kuka-msg" id="kuka-msg"></div></div>
-      <button class="kuka-draw-btn" onclick="drawKuka()">🎋 再抽一支</button>
+      <button class="kuka-draw-btn" onclick="startKukaDraw()">🎋 再抽一支</button>
     </div>
   </div>
 </div>
@@ -1787,8 +1805,8 @@ function avaHeart(e) {
   // fade out hint after first tap
   if (!_avaTapped) {
     _avaTapped = true;
-    var arrow = document.getElementById('ava-arrow');
-    if (arrow) { arrow.style.opacity = '0'; setTimeout(function(){ arrow.style.display='none'; }, 400); }
+    var badge = document.getElementById('ava-tap-badge');
+    if (badge) { badge.style.opacity = '0'; setTimeout(function(){ badge.style.display='none'; }, 350); }
   }
   var rect = e.currentTarget.getBoundingClientRect();
   var cx = rect.left + rect.width / 2;
@@ -1829,25 +1847,66 @@ var KUKA_MSGS = [
   '嘿！你今天有好好吃飯嗎？記得照顧自己喔 🍱💕'
 ];
 var _kukaLast = -1;
+var _kukaDrawing = false;
+
 function openKuka() {
-  drawKuka();
+  // reset to idle each open
+  document.getElementById('kuka-idle-pane').style.display = '';
+  document.getElementById('kuka-result-pane').style.display = 'none';
+  document.getElementById('kuka-box').classList.remove('kuka-spinning');
+  document.getElementById('kuka-bamboo').textContent = '🎋';
+  document.getElementById('kuka-draw-btn').disabled = false;
+  _kukaDrawing = false;
   document.getElementById('kuka-overlay').classList.add('on');
 }
+
 function closeKuka() {
   document.getElementById('kuka-overlay').classList.remove('on');
+  // farewell float
+  var f = document.createElement('div');
+  f.className = 'kuka-farewell';
+  f.textContent = '莉莎今天也覺得你很棒！';
+  document.body.appendChild(f);
+  setTimeout(function(){ f.remove(); }, 2900);
 }
+
 function kukaOverlayClick(e) {
   if (e.target === document.getElementById('kuka-overlay')) closeKuka();
 }
-function drawKuka() {
-  var idx;
-  do { idx = Math.floor(Math.random() * KUKA_MSGS.length); } while (idx === _kukaLast && KUKA_MSGS.length > 1);
-  _kukaLast = idx;
-  var el = document.getElementById('kuka-msg');
-  el.style.animation = 'none';
-  void el.offsetWidth; // reflow to restart animation
-  el.style.animation = '';
-  el.textContent = KUKA_MSGS[idx];
+
+function startKukaDraw() {
+  if (_kukaDrawing) return;
+  _kukaDrawing = true;
+  var btn = document.getElementById('kuka-draw-btn');
+  if (btn) btn.disabled = true;
+  var bamboo = document.getElementById('kuka-bamboo');
+  var box = document.getElementById('kuka-box');
+  box.classList.add('kuka-spinning');
+  // shake 竹筒 for 1.4s then reveal
+  var ticks = 0;
+  var maxTicks = 18;
+  var ticker = setInterval(function() {
+    ticks++;
+    if (bamboo) bamboo.textContent = ticks % 2 === 0 ? '🎋' : '✨';
+    if (ticks >= maxTicks) {
+      clearInterval(ticker);
+      box.classList.remove('kuka-spinning');
+      // pick message
+      var idx;
+      do { idx = Math.floor(Math.random() * KUKA_MSGS.length); } while (idx === _kukaLast && KUKA_MSGS.length > 1);
+      _kukaLast = idx;
+      // switch panes
+      document.getElementById('kuka-idle-pane').style.display = 'none';
+      var rp = document.getElementById('kuka-result-pane');
+      rp.style.display = '';
+      var msgEl = document.getElementById('kuka-msg');
+      msgEl.textContent = KUKA_MSGS[idx];
+      msgEl.classList.remove('pop');
+      void msgEl.offsetWidth;
+      msgEl.classList.add('pop');
+      _kukaDrawing = false;
+    }
+  }, 80);
 }
 
 initApp();
