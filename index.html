@@ -1069,7 +1069,7 @@ function renderSoon(items) {
     el.innerHTML =
       '<div class="soon-row">' +
         '<div class="soon-date-col">' +
-          '<span class="soon-mo">' + open.toLocaleDateString('zh-TW',{month:'numeric'}) + '月</span>' +
+          '<span class="soon-mo">' + (open.getMonth()+1) + '月</span>' +
           '<span class="soon-day">' + open.getDate() + '</span>' +
         '</div>' +
         '<div class="soon-info">' +
