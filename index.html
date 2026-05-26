@@ -99,7 +99,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cd-n{font-size:12px;font-weight:600;color:#8B6000;line-height:1}
 .cd-l{font-size:7px;color:#A87820;letter-spacing:.5px;margin-top:1px}
 .cd-sep{font-size:8px;color:var(--ink3);margin:0 1px}
-.soon-cal-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:7px;background:var(--green);border:none;cursor:pointer;color:#fff;font-size:10px;font-family:inherit;text-decoration:none;-webkit-appearance:none}
+.soon-cal-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:7px;background:var(--green);border:none;cursor:pointer;color:#fff;font-size:10px;font-family:inherit;text-decoration:none;-webkit-appearance:none;transition:filter .12s,transform .12s}
+.soon-cal-btn:active{filter:brightness(.82);transform:scale(.95)}
 .soon-cal-btn svg{width:13px;height:13px}
 
 /* 2-col active grid */
@@ -127,7 +128,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   letter-spacing:.6px;cursor:pointer;text-decoration:none !important;
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   -webkit-appearance:none;
+  transition:opacity .12s,transform .12s;
 }
+.acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:scale(.93)}
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'Noto Serif TC',serif;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.16);border:none;border-radius:4px;padding:4px 9px;font-size:11px;color:var(--green-dk);letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
@@ -135,8 +138,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
 .detail-btn:active{background:var(--bg)}
 .detail-btn svg{width:9px;height:9px}
-.disc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:3px 7px;cursor:pointer;margin-bottom:5px;align-self:flex-start}
-.disc-chip:active{background:var(--card)}
+.disc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:2px 7px;cursor:pointer;margin-bottom:5px;align-self:flex-start;transition:background .15s,border-color .15s}
+.disc-chip:hover{background:rgba(130,183,204,.13);border-color:var(--green)}
+.disc-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
 .disc-label{font-size:8px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3)}
 .disc-code{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:13px;letter-spacing:1.5px;color:var(--ink)}
 .disc-copy{font-size:9px;color:var(--ink3)}
@@ -164,7 +168,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .comm-btn svg{width:17px;height:17px;flex-shrink:0}
 .pw-row{display:flex;align-items:center;justify-content:center;gap:8px}
 .pw-label{font-size:11px;color:var(--ink3);font-weight:300}
-.pw-chip{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);border-radius:5px;padding:5px 10px;cursor:pointer;background:var(--white)}
+.pw-chip{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule);border-radius:5px;padding:3px 12px;cursor:pointer;background:var(--white);transition:background .15s,border-color .15s}
+.pw-chip:hover{background:rgba(130,183,204,.12);border-color:var(--green)}
+.pw-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
 .pw-num{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;letter-spacing:3px;color:var(--ink)}
 .pw-icon{font-size:11px;color:var(--ink3)}
 
@@ -421,7 +427,7 @@ input[type=file]{display:none}
     </div>
     <div class="pw-row" id="pw-row">
       <span class="pw-label">LINE 社群驗證密碼</span>
-      <div class="pw-chip" onclick="copyPW()"><span class="pw-num" id="pw-display">4343</span><span class="pw-icon">⎘</span></div>
+      <div class="pw-chip" onclick="copyPW()"><span class="pw-num" id="pw-display">4343</span></div>
     </div>
   </div>
 
@@ -1115,7 +1121,6 @@ function renderActive(items) {
       ? '<div class="disc-chip" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
           '<span class="disc-label">' + (item.discLabel || '折扣') + '</span>' +
           '<span class="disc-code">' + item.discCode + '</span>' +
-          '<span class="disc-copy">⎘</span>' +
         '</div>'
       : '';
     var buyHref = item.link || 'javascript:void(0)';
