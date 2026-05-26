@@ -474,6 +474,12 @@ input[type=file]{display:none}
 .doll-confirm-btn{background:#FF6B95;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:400;padding:8px 20px;cursor:pointer;letter-spacing:.3px;-webkit-tap-highlight-color:transparent;transition:transform .12s,filter .12s}
 .doll-confirm-btn:active{transform:scale(.95);filter:brightness(.9)}
 .doll-play-hint{font-size:11px;color:#FF6B95;font-weight:500;letter-spacing:.5px;text-align:center;padding:5px 0 2px}
+/* health bar */
+.doll-hp-wrap{display:flex;align-items:center;gap:7px;padding:0 20px 4px;justify-content:center}
+.doll-hp-icon{font-size:13px;line-height:1;flex-shrink:0}
+.doll-hp-track{flex:1;height:7px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;max-width:130px}
+.doll-hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF6B95,#FF3366);border-radius:4px;transition:width .28s ease,background .4s ease}
+.doll-hp-label{font-size:9px;color:var(--ink3);letter-spacing:.5px;text-align:center;margin-bottom:2px}
 /* reset strip — sits right below header, far from tools */
 .doll-reset-strip{padding:0 16px 2px;display:none;text-align:right}
 .doll-reset-s-btn{background:none;border:1px solid rgba(255,107,149,.35);border-radius:8px;font-size:10px;color:rgba(255,107,149,.85);padding:4px 10px;cursor:pointer;font-family:inherit;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
@@ -856,6 +862,15 @@ input[type=file]{display:none}
     </div>
     <!-- play hint: shown after photo confirmed -->
     <div class="doll-play-hint" id="doll-play-hint" style="display:none">選擇工具對著開打 👇</div>
+    <!-- health bar: shown after photo confirmed -->
+    <div id="doll-hp-bar-wrap" style="display:none">
+      <div class="doll-hp-label">血量條 — 打到歸零變大便 💩</div>
+      <div class="doll-hp-wrap">
+        <span class="doll-hp-icon">❤️</span>
+        <div class="doll-hp-track"><div class="doll-hp-fill" id="doll-hp-fill"></div></div>
+        <span class="doll-hp-icon">💩</span>
+      </div>
+    </div>
     <!-- tools -->
     <div class="doll-tools">
       <button class="doll-tool-btn on" id="doll-tb-hammer" onclick="selectDollTool('hammer',event)">🔨</button>
@@ -2106,6 +2121,9 @@ function openDoll() {
   document.getElementById('doll-place-ctrl').style.display = 'none';
   document.getElementById('doll-play-hint').style.display = 'none';
   document.getElementById('doll-reset-strip').style.display = 'none';
+  document.getElementById('doll-hp-bar-wrap').style.display = 'none';
+  var fill0 = document.getElementById('doll-hp-fill');
+  if (fill0) { fill0.style.width = '100%'; fill0.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
   document.getElementById('doll-stars-wrap').style.display = 'none';
   document.querySelectorAll('.doll-tool-btn').forEach(function(b){b.classList.remove('on')});
   document.getElementById('doll-tb-hammer').classList.add('on');
@@ -2154,9 +2172,10 @@ function closeDoll() {
     setTimeout(function() {
       var f = document.createElement('div');
       f.className = 'doll-farewell';
-      f.textContent = '💳 拿出神奇小卡購物解解悶！';
+      f.textContent = '💳 來購物解解悶！';
+      f.style.animationDuration = '4.8s';
       document.body.appendChild(f);
-      setTimeout(function(){ f.remove(); }, 3300);
+      setTimeout(function(){ f.remove(); }, 4900);
     }, 180);
     // scroll to 現正開團中 section
     setTimeout(function() {
@@ -2209,6 +2228,10 @@ function confirmDollPhoto(e) {
   document.getElementById('doll-photo-controls').style.display = 'none';
   document.getElementById('doll-play-hint').style.display = '';
   document.getElementById('doll-reset-strip').style.display = '';
+  // show health bar
+  document.getElementById('doll-hp-bar-wrap').style.display = '';
+  var fill = document.getElementById('doll-hp-fill');
+  if (fill) { fill.style.width = '100%'; fill.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
 }
 
 function resetDollPhoto(e) {
@@ -2224,6 +2247,9 @@ function resetDollPhoto(e) {
   document.getElementById('doll-place-ctrl').style.display = 'none';
   document.getElementById('doll-play-hint').style.display = 'none';
   document.getElementById('doll-reset-strip').style.display = 'none';
+  document.getElementById('doll-hp-bar-wrap').style.display = 'none';
+  var fill1 = document.getElementById('doll-hp-fill');
+  if (fill1) { fill1.style.width = '100%'; fill1.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
   var fileInp = document.getElementById('doll-file');
   if (fileInp) { fileInp.value = ''; fileInp.click(); }
 }
@@ -2323,14 +2349,25 @@ function _dollUpdateAppearance() {
   if (svg && h>=8) {
     svg.style.transform = 'scaleX('+Math.min(1+(h-7)*0.04,1.35)+') scaleY('+Math.max(1-(h-7)*0.025,.72)+')';
   }
+  // update health bar
+  var fill = document.getElementById('doll-hp-fill');
+  if (fill) {
+    var pct = Math.max(0, (13 - h) / 13 * 100);
+    fill.style.width = pct + '%';
+    if (pct <= 0)       fill.style.background = '#333';
+    else if (pct < 25)  fill.style.background = 'linear-gradient(90deg,#8B1A1A,#CC2200)';
+    else if (pct < 55)  fill.style.background = 'linear-gradient(90deg,#D4742A,#FF7722)';
+    else                fill.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)';
+  }
 }
 
 function _dollGoPooo() {
   _dollPooped = true;
-  // hide reset strip so user can't reset after poop
+  // hide UI after poop
   var rs = document.getElementById('doll-reset-strip');
   if (rs) rs.style.display = 'none';
   document.getElementById('doll-play-hint').style.display = 'none';
+  document.getElementById('doll-hp-bar-wrap').style.display = 'none';
   var fig = document.getElementById('doll-figure');
   fig.style.transition = 'transform .9s ease,filter .9s ease';
   fig.style.transform = 'scaleY(0.25) scaleX(1.6)';
