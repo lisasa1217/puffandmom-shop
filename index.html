@@ -330,8 +330,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .adm-ithumb img{width:100%;height:100%;object-fit:cover}
 .adm-iinfo{flex:1;min-width:0}
-.adm-iname{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.adm-isub{font-size:10px;color:var(--ink3);font-weight:300}
+.adm-iname{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;-webkit-user-select:text;user-select:text}
+.adm-isub{font-size:10px;color:var(--ink3);font-weight:300;-webkit-user-select:text;user-select:text}
+.adm-icard input,.adm-icard textarea,.adm-icard label{-webkit-user-select:text;user-select:text;cursor:auto}
 .adm-ibtns{display:flex;gap:6px}
 .adm-ibtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--rule);background:none;cursor:pointer;font-size:13px}
 .adm-iform{display:none;padding:0 14px 14px;border-top:1px solid var(--rule)}
@@ -1751,6 +1752,14 @@ function renderAdmItems() {
   /* draggable non-permanent items */
   normalNonPerm.forEach(function(item) {
     var el = _buildItemCard(item);
+    /* Only allow drag when mousedown originates on the ⠿ handle */
+    el.addEventListener('mousedown', function(e) {
+      var onHandle = e.target && e.target.classList && e.target.classList.contains('adm-drag-handle');
+      if (!onHandle) {
+        el.setAttribute('draggable','false');
+        document.addEventListener('mouseup', function() { el.setAttribute('draggable','true'); }, {once:true});
+      }
+    });
     el.addEventListener('dragstart', function(e){ admDragStart(item, el, e); });
     el.addEventListener('dragend',   function(e){ admDragEnd(el, e); });
     el.addEventListener('dragover',  function(e){ admItemDragOver(item, el, e); });
