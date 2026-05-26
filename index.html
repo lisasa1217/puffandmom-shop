@@ -74,10 +74,16 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
 .hero{display:flex;flex-direction:column;align-items:center;padding:40px 28px 32px;background:var(--card);border-bottom:1px solid var(--rule)}
-.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.ava-wrap{width:68px;height:68px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:6px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
 .ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--card);transition:transform .18s}
 .ava-wrap:active .ava-inner{transform:scale(.92)}
 .ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
+/* ping ring */
+.ava-wrap::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--yellow);opacity:0;animation:ava-ping 3.5s ease-out infinite}
+@keyframes ava-ping{0%{opacity:.55;transform:scale(1)}70%{opacity:0;transform:scale(1.5)}100%{opacity:0;transform:scale(1.5)}}
+/* tap hint */
+.ava-tap-hint{font-size:10px;color:var(--ink3);letter-spacing:.5px;margin-bottom:10px;animation:ava-hint-bob 2.4s ease-in-out infinite;pointer-events:none;user-select:none;-webkit-user-select:none}
+@keyframes ava-hint-bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-3px);opacity:1}}
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
@@ -410,6 +416,7 @@ input[type=file]{display:none}
   </a>
   <div class="hero">
     <div class="ava-wrap" onclick="avaHeart(event)"><div class="ava-inner" id="f-ava"></div></div>
+    <div class="ava-tap-hint">✨ 點我</div>
     <div class="hero-name" id="f-name"></div>
     <div class="hero-handle" id="f-handle"></div>
     <div class="hero-divider"></div>
@@ -1714,7 +1721,14 @@ function toast(msg) {
 /* ── AVATAR HEART BURST ── */
 var _avaHearts = ['🩷','💛','🩵','💕','✨','🌸','💝'];
 var _avaIdx = 0;
+var _avaTapped = false;
 function avaHeart(e) {
+  // fade out hint after first tap
+  if (!_avaTapped) {
+    _avaTapped = true;
+    var hint = document.querySelector('.ava-tap-hint');
+    if (hint) { hint.style.transition = 'opacity .4s'; hint.style.opacity = '0'; setTimeout(function(){ hint.style.visibility='hidden'; }, 400); }
+  }
   var rect = e.currentTarget.getBoundingClientRect();
   var cx = rect.left + rect.width / 2;
   var cy = rect.top;
