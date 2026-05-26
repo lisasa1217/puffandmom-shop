@@ -467,6 +467,12 @@ input[type=file]{display:none}
 .doll-tool-btn:active{transform:scale(.93)}
 /* farewell */
 .doll-farewell{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:9100;background:rgba(255,107,149,.9);color:#fff;font-size:13px;font-weight:400;letter-spacing:.6px;padding:11px 22px;border-radius:20px;white-space:nowrap;pointer-events:none;animation:kuka-fare 3.2s ease forwards}
+/* photo controls below body */
+.doll-photo-controls{text-align:center;padding:2px 0 0}
+.doll-play-hint{font-size:11px;color:#FF6B95;font-weight:500;letter-spacing:.5px;text-align:center;padding:5px 0 0}
+.doll-reset-wrap{text-align:center;padding:3px 0 0}
+.doll-reset-btn{background:none;border:1px solid var(--rule);border-radius:8px;font-size:11px;color:var(--ink3);padding:5px 14px;cursor:pointer;font-family:inherit;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
+.doll-reset-btn:active{background:var(--rule)}
 /* ── pw modal ── */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .pw-modal-overlay.on{opacity:1;pointer-events:all}
@@ -779,7 +785,7 @@ input[type=file]{display:none}
 </div>
 
 <!-- 小人退散 FAB -->
-<button class="doll-fab" onclick="openDoll()" aria-label="小人退散">
+<button class="doll-fab" onclick="tryOpenDoll()" aria-label="小人退散">
   <span class="doll-fab-icon">🪆</span>
   <span class="doll-fab-lbl">小人退散</span>
 </button>
@@ -801,12 +807,6 @@ input[type=file]{display:none}
             <span id="doll-face">😐</span>
             <img id="doll-head-img">
           </div>
-          <div class="doll-head-label" id="doll-head-label">📷 點換照片・拖曳調整位置</div>
-          <div class="doll-zoom-wrap" id="doll-zoom-wrap">
-            <span>🔍</span>
-            <input class="doll-zoom" id="doll-zoom" type="range" min="80" max="260" value="120" oninput="updateDollZoom(this.value)" onclick="event.stopPropagation()">
-          </div>
-          <div class="doll-head-hint" id="doll-head-hint">範例：可以放上沒有做家事老公的照片 😏</div>
         </div>
         <!-- simple skin-coloured body (no separate neck) -->
         <svg class="doll-body-svg" viewBox="0 0 100 148" id="doll-body-svg">
@@ -829,6 +829,17 @@ input[type=file]{display:none}
           <ellipse id="doll-sw2" cx="90" cy="32" rx="3" ry="5" fill="rgba(100,180,255,0)"/>
         </svg>
       </div>
+    </div>
+    <!-- photo controls below body (shown before photo placed) -->
+    <div class="doll-photo-controls" id="doll-photo-controls">
+      <div class="doll-head-label" id="doll-head-label">📷 點換照片・拖曳調整位置</div>
+      <div class="doll-head-hint" id="doll-head-hint">範例：可以放上沒有做家事老公的照片 😏</div>
+    </div>
+    <!-- play hint shown after photo placed -->
+    <div class="doll-play-hint" id="doll-play-hint" style="display:none">選擇工具對著開打 👇</div>
+    <!-- reset button shown after photo placed -->
+    <div class="doll-reset-wrap" id="doll-reset-wrap" style="display:none">
+      <button class="doll-reset-btn" onclick="triggerDollUpload(event)">🔄 換張照片</button>
     </div>
     <!-- tools -->
     <div class="doll-tools">
@@ -2061,19 +2072,33 @@ function openDoll() {
   _dollHits = 0; _dollHitting = false; _dollTool = 'hammer'; _dollPooped = false;
   _dollImgX = 0; _dollImgY = 0; _dollImgScale = 1.2; _dollTracked = false;
   var fig = document.getElementById('doll-figure');
-  fig.style.transform = ''; fig.style.filter = '';
+  fig.style.transform = ''; fig.style.filter = ''; fig.style.transition = '';
+  // restore figure in case it was pooped
+  if (fig.querySelector('.doll-poop-state')) {
+    fig.innerHTML = '<div class="doll-stars-wrap" id="doll-stars-wrap">💫 💫 💫</div><div class="doll-head-wrap"><div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)"><span id="doll-face">😐</span><img id="doll-head-img"></div></div><svg class="doll-body-svg" viewBox="0 0 100 148" id="doll-body-svg"><path d="M24 10 Q4 32 8 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-larm"/><path d="M76 10 Q96 32 92 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rarm"/><rect x="20" y="0" width="60" height="62" rx="18" fill="#FFDBB5" id="doll-torso"/><path d="M37 62 Q29 96 22 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-lleg"/><path d="M63 62 Q71 96 78 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rleg"/><circle id="doll-b1" cx="34" cy="22" r="9" fill="rgba(160,60,220,0)"/><circle id="doll-b2" cx="70" cy="38" r="7" fill="rgba(160,60,220,0)"/><circle id="doll-b3" cx="48" cy="52" r="8" fill="rgba(160,60,220,0)"/><ellipse id="doll-sw1" cx="10" cy="18" rx="4" ry="6" fill="rgba(100,180,255,0)"/><ellipse id="doll-sw2" cx="90" cy="32" rx="3" ry="5" fill="rgba(100,180,255,0)"/></svg>';
+  }
   var face = document.getElementById('doll-face');
   if (face) { face.textContent = '😐'; face.style.display = ''; }
-  var lbl2 = document.getElementById('doll-head-label');
-  var hint2 = document.getElementById('doll-head-hint');
-  if (lbl2) lbl2.style.display = '';
-  if (hint2) hint2.style.display = '';
-  document.getElementById('doll-zoom-wrap').style.display = 'none';
+  // reset head photo
+  var headImg = document.getElementById('doll-head-img');
+  if (headImg) { headImg.src = ''; headImg.style.display = 'none'; }
+  // photo controls: show label+hint, hide play-hint and reset
+  document.getElementById('doll-photo-controls').style.display = '';
+  document.getElementById('doll-play-hint').style.display = 'none';
+  document.getElementById('doll-reset-wrap').style.display = 'none';
   document.getElementById('doll-stars-wrap').style.display = 'none';
   document.querySelectorAll('.doll-tool-btn').forEach(function(b){b.classList.remove('on')});
   document.getElementById('doll-tb-hammer').classList.add('on');
   _dollResetSVG();
   document.getElementById('doll-overlay').classList.add('on');
+}
+
+function tryOpenDoll() {
+  if (sessionStorage.getItem('_dollUsed')) {
+    toast('小人已重傷，明天再來 🪆');
+    return;
+  }
+  openDoll();
 }
 
 function _dollResetSVG() {
@@ -2089,20 +2114,21 @@ function _dollResetSVG() {
 
 function closeDoll() {
   document.getElementById('doll-overlay').classList.remove('on');
+  sessionStorage.setItem('_dollUsed', '1');
   if (_dollHits > 0) {
-    // float money emojis across full page
-    var moneys = ['💵','💴','💸','💳','🤑','💵','💸'];
-    moneys.forEach(function(em, i) {
+    // float only 💵 emojis from different positions across full screen
+    var positions = [6,18,30,42,54,66,78,90];
+    positions.forEach(function(pos, i) {
       setTimeout(function() {
         var el = document.createElement('div');
         el.className = 'kuka-heart-rise';
-        el.textContent = em;
-        el.style.left = (8 + i * 13 + Math.random()*6) + '%';
+        el.textContent = '💵';
+        el.style.left = (pos + Math.random()*8) + '%';
         el.style.fontSize = (20 + Math.random()*14) + 'px';
-        el.style.animationDuration = (2.0 + Math.random()*0.8) + 's';
+        el.style.animationDuration = (1.8 + Math.random()*0.9) + 's';
         document.body.appendChild(el);
         setTimeout(function(){ el.remove(); }, 3000);
-      }, i * 100);
+      }, i * 80);
     });
     // farewell text
     setTimeout(function() {
@@ -2112,9 +2138,9 @@ function closeDoll() {
       document.body.appendChild(f);
       setTimeout(function(){ f.remove(); }, 3300);
     }, 180);
-    // scroll to 已結團 section
+    // scroll to 現正開團中 section
     setTimeout(function() {
-      var sec = document.getElementById('ended-sec');
+      var sec = document.getElementById('active-sec');
       if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
     }, 600);
   }
@@ -2137,18 +2163,16 @@ function loadDollPhoto(inp) {
   var r = new FileReader();
   r.onload = function(ev) {
     _dollImgX = 0; _dollImgY = 0;
-    _dollImgScale = parseFloat(document.getElementById('doll-zoom').value) / 100;
+    _dollImgScale = 1.4;
     var img = document.getElementById('doll-head-img');
     img.src = ev.target.result;
     img.style.display = 'block';
     _applyDollImgTransform();
     document.getElementById('doll-face').style.display = 'none';
-    // hide label + hint after photo loaded
-    var lbl = document.getElementById('doll-head-label');
-    var hint = document.getElementById('doll-head-hint');
-    if (lbl) lbl.style.display = 'none';
-    if (hint) hint.style.display = 'none';
-    document.getElementById('doll-zoom-wrap').style.display = 'flex';
+    // hide photo controls, show play-hint and reset button
+    document.getElementById('doll-photo-controls').style.display = 'none';
+    document.getElementById('doll-play-hint').style.display = '';
+    document.getElementById('doll-reset-wrap').style.display = '';
     _initDollDrag(img);
   };
   r.readAsDataURL(inp.files[0]);
