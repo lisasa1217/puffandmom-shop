@@ -194,7 +194,12 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   border-bottom:1px solid var(--rule);
   padding:14px 16px 0;
 }
-.adm-nav-title{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:13px;font-weight:300;font-style:italic;color:var(--ink3);letter-spacing:.5px;margin-bottom:10px}
+.adm-nav-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.adm-nav-title{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:13px;font-weight:300;font-style:italic;color:var(--ink3);letter-spacing:.5px}
+.adm-logout-btn{display:flex;align-items:center;gap:4px;border:none;background:none;font-family:inherit;font-size:10px;color:var(--ink3);cursor:pointer;padding:3px 6px;border-radius:5px;letter-spacing:.3px;transition:color .15s,background .15s}
+.adm-logout-btn:hover{color:#c0392b;background:rgba(192,57,43,.08)}
+.adm-logout-btn:active{opacity:.7}
+.adm-logout-btn svg{width:13px;height:13px;flex-shrink:0}
 .adm-nav-tabs{display:flex;gap:2px}
 .adm-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 10px;border:none;background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.5px;transition:all .15s}
 .adm-tab svg{width:19px;height:19px}
@@ -447,7 +452,13 @@ input[type=file]{display:none}
 
   <!-- Admin sticky top tab bar -->
   <div class="adm-nav">
-    <div class="adm-nav-title">後台管理</div>
+    <div class="adm-nav-title-row">
+      <div class="adm-nav-title">後台管理</div>
+      <button class="adm-logout-btn" onclick="adminLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        登出
+      </button>
+    </div>
     <div class="adm-nav-tabs">
       <button class="adm-tab on" id="adm-tab-profile" onclick="switchAdmTab('profile')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -677,6 +688,7 @@ async function initApp() {
   renderFront();
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
+    startAdminTimeout();
   }
   /* 移除載入遮罩 */
   var veil = document.getElementById('loading-veil');
@@ -1008,12 +1020,53 @@ function submitPw() {
     document.getElementById('tab-bar').style.display = '';
     closePwModal();
     toast('✓ 後台已解鎖');
+    startAdminTimeout();
   } else {
     document.getElementById('pw-modal-err').style.display = 'block';
     document.getElementById('pw-modal-input').value = '';
     document.getElementById('pw-modal-input').focus();
   }
 }
+
+/* ── ADMIN LOGOUT + AUTO-TIMEOUT ── */
+var _adminTimer = null;
+var ADMIN_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+function adminLogout() {
+  clearAdminTimeout();
+  sessionStorage.removeItem('adminUnlocked');
+  document.getElementById('tab-bar').style.display = 'none';
+  goPage('front');
+  toast('已登出後台');
+}
+
+function startAdminTimeout() {
+  clearAdminTimeout();
+  _adminTimer = setTimeout(function() {
+    if (sessionStorage.getItem('adminUnlocked') === '1') {
+      adminLogout();
+      toast('⏱ 閒置超過 30 分鐘，已自動登出後台');
+    }
+  }, ADMIN_TIMEOUT_MS);
+}
+
+function clearAdminTimeout() {
+  if (_adminTimer) { clearTimeout(_adminTimer); _adminTimer = null; }
+}
+
+function resetAdminTimeout() {
+  if (sessionStorage.getItem('adminUnlocked') === '1') {
+    startAdminTimeout();
+  }
+}
+
+// Reset timer on any user activity
+(function() {
+  var events = ['click','touchstart','keydown','scroll'];
+  events.forEach(function(ev) {
+    document.addEventListener(ev, function() { resetAdminTimeout(); }, {passive:true});
+  });
+})();
 
 /* ── CLASSIFY ── */
 function classify(item) {
