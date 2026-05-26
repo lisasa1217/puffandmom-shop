@@ -819,7 +819,7 @@ input[type=file]{display:none}
         <div class="doll-stars-wrap" id="doll-stars-wrap">💫 💫 💫</div>
         <div class="doll-head-wrap">
           <div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)">
-            <span id="doll-face">😐</span>
+            <span id="doll-face">📷</span>
             <img id="doll-head-img">
           </div>
         </div>
@@ -871,7 +871,7 @@ input[type=file]{display:none}
       </div>
     </div>
     <!-- tools -->
-    <div class="doll-tools">
+    <div class="doll-tools" id="doll-tools">
       <button class="doll-tool-btn on" id="doll-tb-hammer" onclick="selectDollTool('hammer',event)">🔨</button>
       <button class="doll-tool-btn" id="doll-tb-fist"   onclick="selectDollTool('fist',event)">👊</button>
       <button class="doll-tool-btn" id="doll-tb-bomb"   onclick="selectDollTool('bomb',event)">💣</button>
@@ -2093,6 +2093,7 @@ var _dollHitting = false;
 var _dollPooped = false;
 var _dollUsed = false;
 var _dollPhotoLocked = false;
+var _dollPhotoPlacing = false;
 var _dollImgX = 0, _dollImgY = 0, _dollImgScale = 1.4;
 var _dollDrag = null, _dollDragMoved = false;
 var SKIN_COLORS = ['#FFDBB5','#F0C8A0','#E0A870','#CC8848','#B06030','#8B3818'];
@@ -2103,14 +2104,18 @@ function openDoll() {
   _dollHits = 0; _dollHitting = false; _dollTool = 'hammer'; _dollPooped = false;
   _dollImgX = 0; _dollImgY = 0; _dollImgScale = 1.4; _dollTracked = false;
   _dollPhotoLocked = false;
+  _dollPhotoPlacing = false;
   var fig = document.getElementById('doll-figure');
   fig.style.transform = ''; fig.style.filter = ''; fig.style.transition = '';
   // restore figure in case it was pooped
   if (fig.querySelector('.doll-poop-state')) {
-    fig.innerHTML = '<div class="doll-stars-wrap" id="doll-stars-wrap">💫 💫 💫</div><div class="doll-head-wrap"><div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)"><span id="doll-face">😐</span><img id="doll-head-img"></div></div><svg class="doll-body-svg" viewBox="0 0 100 148" id="doll-body-svg"><path d="M24 10 Q4 32 8 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-larm"/><path d="M76 10 Q96 32 92 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rarm"/><rect x="20" y="0" width="60" height="62" rx="18" fill="#FFDBB5" id="doll-torso"/><path d="M37 62 Q29 96 22 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-lleg"/><path d="M63 62 Q71 96 78 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rleg"/><circle id="doll-b1" cx="34" cy="22" r="9" fill="rgba(160,60,220,0)"/><circle id="doll-b2" cx="70" cy="38" r="7" fill="rgba(160,60,220,0)"/><circle id="doll-b3" cx="48" cy="52" r="8" fill="rgba(160,60,220,0)"/><ellipse id="doll-sw1" cx="10" cy="18" rx="4" ry="6" fill="rgba(100,180,255,0)"/><ellipse id="doll-sw2" cx="90" cy="32" rx="3" ry="5" fill="rgba(100,180,255,0)"/></svg>';
+    fig.innerHTML = '<div class="doll-stars-wrap" id="doll-stars-wrap">💫 💫 💫</div><div class="doll-head-wrap"><div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)"><span id="doll-face">📷</span><img id="doll-head-img"></div></div><svg class="doll-body-svg" viewBox="0 0 100 148" id="doll-body-svg"><path d="M24 10 Q4 32 8 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-larm"/><path d="M76 10 Q96 32 92 62" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rarm"/><rect x="20" y="0" width="60" height="62" rx="18" fill="#FFDBB5" id="doll-torso"/><path d="M37 62 Q29 96 22 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-lleg"/><path d="M63 62 Q71 96 78 128" stroke="#FFDBB5" stroke-width="20" stroke-linecap="round" fill="none" id="doll-rleg"/><circle id="doll-b1" cx="34" cy="22" r="9" fill="rgba(160,60,220,0)"/><circle id="doll-b2" cx="70" cy="38" r="7" fill="rgba(160,60,220,0)"/><circle id="doll-b3" cx="48" cy="52" r="8" fill="rgba(160,60,220,0)"/><ellipse id="doll-sw1" cx="10" cy="18" rx="4" ry="6" fill="rgba(100,180,255,0)"/><ellipse id="doll-sw2" cx="90" cy="32" rx="3" ry="5" fill="rgba(100,180,255,0)"/></svg>';
   }
   var face = document.getElementById('doll-face');
-  if (face) { face.textContent = '😐'; face.style.display = ''; }
+  if (face) { face.textContent = '📷'; face.style.display = ''; }
+  // unlock tools
+  var tools = document.getElementById('doll-tools');
+  if (tools) { tools.style.opacity = ''; tools.style.pointerEvents = ''; }
   var headImg = document.getElementById('doll-head-img');
   if (headImg) { headImg.src = ''; headImg.style.display = 'none'; }
   // photo controls: show initial label+hint
@@ -2203,6 +2208,10 @@ function loadDollPhoto(inp) {
     _dollImgX = 0; _dollImgY = 0;
     _dollImgScale = 1.4;
     _dollPhotoLocked = false;
+    _dollPhotoPlacing = true;
+    // lock tools while placing
+    var tools = document.getElementById('doll-tools');
+    if (tools) { tools.style.opacity = '.3'; tools.style.pointerEvents = 'none'; }
     var img = document.getElementById('doll-head-img');
     img.src = ev.target.result;
     img.style.display = 'block';
@@ -2224,6 +2233,10 @@ function loadDollPhoto(inp) {
 function confirmDollPhoto(e) {
   if (e) e.stopPropagation();
   _dollPhotoLocked = true;
+  _dollPhotoPlacing = false;
+  // unlock tools
+  var tools = document.getElementById('doll-tools');
+  if (tools) { tools.style.opacity = ''; tools.style.pointerEvents = ''; }
   document.getElementById('doll-photo-controls').style.display = 'none';
   document.getElementById('doll-play-hint').style.display = '';
   document.getElementById('doll-reset-strip').style.display = '';
@@ -2236,6 +2249,10 @@ function confirmDollPhoto(e) {
 function resetDollPhoto(e) {
   if (e) e.stopPropagation();
   _dollPhotoLocked = false;
+  _dollPhotoPlacing = false;
+  // unlock tools on reset (user starts fresh)
+  var tools = document.getElementById('doll-tools');
+  if (tools) { tools.style.opacity = ''; tools.style.pointerEvents = ''; }
   var img = document.getElementById('doll-head-img');
   if (img) { img.src = ''; img.style.display = 'none'; }
   var face = document.getElementById('doll-face');
@@ -2300,7 +2317,7 @@ function _initDollDrag(img) {
 }
 
 function hitDoll(e) {
-  if (_dollHitting || _dollPooped) return;
+  if (_dollHitting || _dollPooped || _dollPhotoPlacing) return;
   _dollHitting = true;
   _dollHits++;
   if (!_dollTracked) { _dollTracked = true; trackClick('doll_hit', null); }
@@ -2372,7 +2389,7 @@ function _dollGoPooo() {
   fig.style.transform = 'scaleY(0.25) scaleX(1.6)';
   fig.style.filter = 'blur(3px)';
   setTimeout(function(){
-    fig.innerHTML = '<div class="doll-poop-state">💩<div class="doll-poop-txt">已成功發洩！🎉</div></div>';
+    fig.innerHTML = '<div class="doll-poop-state">💩<div class="doll-poop-txt">已揍成爛泥 🎉</div></div>';
     fig.style.transform=''; fig.style.filter=''; fig.style.transition='';
   }, 950);
 }
