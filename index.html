@@ -441,9 +441,9 @@ input[type=file]{display:none}
 .doll-head-circle img:active{cursor:grabbing}
 .doll-head-label{font-size:9px;color:var(--ink3);margin:4px 0 2px;letter-spacing:.3px;pointer-events:none;transition:opacity .3s}
 .doll-head-hint{font-size:9px;color:var(--ink3);font-weight:300;margin-bottom:6px;letter-spacing:.2px;font-style:italic;pointer-events:none}
-.doll-zoom-wrap{display:none;align-items:center;gap:6px;margin-bottom:4px}
+.doll-zoom-wrap{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:3px}
 .doll-zoom-wrap span{font-size:10px;color:var(--ink3)}
-.doll-zoom{width:90px;height:3px;accent-color:#FF6B95;cursor:pointer}
+.doll-zoom{width:110px;height:3px;accent-color:#FF6B95;cursor:pointer}
 .doll-body-svg{width:100px;height:148px;overflow:visible;margin-top:-14px}
 .doll-stars-wrap{height:22px;font-size:16px;letter-spacing:4px;display:none;animation:doll-star-spin 1.1s ease-in-out infinite}
 @keyframes doll-star-spin{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
@@ -469,10 +469,15 @@ input[type=file]{display:none}
 .doll-farewell{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:9100;background:rgba(255,107,149,.9);color:#fff;font-size:13px;font-weight:400;letter-spacing:.6px;padding:11px 22px;border-radius:20px;white-space:nowrap;pointer-events:none;animation:kuka-fare 3.2s ease forwards}
 /* photo controls below body */
 .doll-photo-controls{text-align:center;padding:2px 0 0}
-.doll-play-hint{font-size:11px;color:#FF6B95;font-weight:500;letter-spacing:.5px;text-align:center;padding:5px 0 0}
-.doll-reset-wrap{text-align:center;padding:3px 0 0}
-.doll-reset-btn{background:none;border:1px solid var(--rule);border-radius:8px;font-size:11px;color:var(--ink3);padding:5px 14px;cursor:pointer;font-family:inherit;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
-.doll-reset-btn:active{background:var(--rule)}
+.doll-place-ctrl{text-align:center;padding:2px 0 4px}
+.doll-adjust-hint{font-size:9px;color:var(--ink3);margin:2px 0 5px;letter-spacing:.3px}
+.doll-confirm-btn{background:#FF6B95;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:400;padding:8px 20px;cursor:pointer;letter-spacing:.3px;-webkit-tap-highlight-color:transparent;transition:transform .12s,filter .12s}
+.doll-confirm-btn:active{transform:scale(.95);filter:brightness(.9)}
+.doll-play-hint{font-size:11px;color:#FF6B95;font-weight:500;letter-spacing:.5px;text-align:center;padding:5px 0 2px}
+/* reset strip — sits right below header, far from tools */
+.doll-reset-strip{padding:0 16px 2px;display:none;text-align:right}
+.doll-reset-s-btn{background:none;border:1px solid rgba(255,107,149,.35);border-radius:8px;font-size:10px;color:rgba(255,107,149,.85);padding:4px 10px;cursor:pointer;font-family:inherit;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
+.doll-reset-s-btn:active{background:rgba(255,107,149,.1)}
 /* ── pw modal ── */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .pw-modal-overlay.on{opacity:1;pointer-events:all}
@@ -798,6 +803,10 @@ input[type=file]{display:none}
       <div class="doll-top-sub">選工具・用力點擊發洩！</div>
       <button class="doll-close" onclick="closeDoll()">✕</button>
     </div>
+    <!-- reset strip: shown after photo confirmed, tucked under header -->
+    <div class="doll-reset-strip" id="doll-reset-strip">
+      <button class="doll-reset-s-btn" onclick="resetDollPhoto(event)">🔄 換張照片</button>
+    </div>
     <!-- doll hit area -->
     <div class="doll-stage" id="doll-stage" onclick="hitDoll(event)">
       <div class="doll-figure" id="doll-figure">
@@ -830,17 +839,23 @@ input[type=file]{display:none}
         </svg>
       </div>
     </div>
-    <!-- photo controls below body (shown before photo placed) -->
+    <!-- photo controls below body -->
     <div class="doll-photo-controls" id="doll-photo-controls">
-      <div class="doll-head-label" id="doll-head-label">📷 點換照片・拖曳調整位置</div>
+      <!-- initial: before photo uploaded -->
+      <div class="doll-head-label" id="doll-head-label">📷 點頭像換照片</div>
       <div class="doll-head-hint" id="doll-head-hint">範例：可以放上沒有做家事老公的照片 😏</div>
+      <!-- after photo uploaded: zoom + confirm -->
+      <div class="doll-place-ctrl" id="doll-place-ctrl" style="display:none">
+        <div class="doll-zoom-wrap" id="doll-zoom-wrap">
+          <span>🔍</span>
+          <input class="doll-zoom" id="doll-zoom" type="range" min="80" max="260" value="140" oninput="updateDollZoom(this.value)" onclick="event.stopPropagation()">
+        </div>
+        <div class="doll-adjust-hint">拖曳移動 · 拉桿縮放</div>
+        <button class="doll-confirm-btn" onclick="confirmDollPhoto(event)">📍 確認位置，開始開打</button>
+      </div>
     </div>
-    <!-- play hint shown after photo placed -->
+    <!-- play hint: shown after photo confirmed -->
     <div class="doll-play-hint" id="doll-play-hint" style="display:none">選擇工具對著開打 👇</div>
-    <!-- reset button shown after photo placed -->
-    <div class="doll-reset-wrap" id="doll-reset-wrap" style="display:none">
-      <button class="doll-reset-btn" onclick="triggerDollUpload(event)">🔄 換張照片</button>
-    </div>
     <!-- tools -->
     <div class="doll-tools">
       <button class="doll-tool-btn on" id="doll-tb-hammer" onclick="selectDollTool('hammer',event)">🔨</button>
@@ -2062,7 +2077,9 @@ var _dollHits = 0;
 var _dollTracked = false;
 var _dollHitting = false;
 var _dollPooped = false;
-var _dollImgX = 0, _dollImgY = 0, _dollImgScale = 1.2;
+var _dollUsed = false;
+var _dollPhotoLocked = false;
+var _dollImgX = 0, _dollImgY = 0, _dollImgScale = 1.4;
 var _dollDrag = null, _dollDragMoved = false;
 var SKIN_COLORS = ['#FFDBB5','#F0C8A0','#E0A870','#CC8848','#B06030','#8B3818'];
 var DOLL_FACES  = ['😐','😣','😖','😵','😵‍💫','🤯'];
@@ -2070,7 +2087,8 @@ var DOLL_FX     = {hammer:['💥','✨','💥'],fist:['💢','👊','💢'],bomb
 
 function openDoll() {
   _dollHits = 0; _dollHitting = false; _dollTool = 'hammer'; _dollPooped = false;
-  _dollImgX = 0; _dollImgY = 0; _dollImgScale = 1.2; _dollTracked = false;
+  _dollImgX = 0; _dollImgY = 0; _dollImgScale = 1.4; _dollTracked = false;
+  _dollPhotoLocked = false;
   var fig = document.getElementById('doll-figure');
   fig.style.transform = ''; fig.style.filter = ''; fig.style.transition = '';
   // restore figure in case it was pooped
@@ -2079,13 +2097,15 @@ function openDoll() {
   }
   var face = document.getElementById('doll-face');
   if (face) { face.textContent = '😐'; face.style.display = ''; }
-  // reset head photo
   var headImg = document.getElementById('doll-head-img');
   if (headImg) { headImg.src = ''; headImg.style.display = 'none'; }
-  // photo controls: show label+hint, hide play-hint and reset
+  // photo controls: show initial label+hint
   document.getElementById('doll-photo-controls').style.display = '';
+  document.getElementById('doll-head-label').style.display = '';
+  document.getElementById('doll-head-hint').style.display = '';
+  document.getElementById('doll-place-ctrl').style.display = 'none';
   document.getElementById('doll-play-hint').style.display = 'none';
-  document.getElementById('doll-reset-wrap').style.display = 'none';
+  document.getElementById('doll-reset-strip').style.display = 'none';
   document.getElementById('doll-stars-wrap').style.display = 'none';
   document.querySelectorAll('.doll-tool-btn').forEach(function(b){b.classList.remove('on')});
   document.getElementById('doll-tb-hammer').classList.add('on');
@@ -2094,8 +2114,8 @@ function openDoll() {
 }
 
 function tryOpenDoll() {
-  if (sessionStorage.getItem('_dollUsed')) {
-    toast('小人已重傷，明天再來 🪆');
+  if (_dollUsed) {
+    toast('小人已重傷，重整再來 🪆');
     return;
   }
   openDoll();
@@ -2114,7 +2134,7 @@ function _dollResetSVG() {
 
 function closeDoll() {
   document.getElementById('doll-overlay').classList.remove('on');
-  sessionStorage.setItem('_dollUsed', '1');
+  _dollUsed = true;
   if (_dollHits > 0) {
     // float only 💵 emojis from different positions across full screen
     var positions = [6,18,30,42,54,66,78,90];
@@ -2164,18 +2184,48 @@ function loadDollPhoto(inp) {
   r.onload = function(ev) {
     _dollImgX = 0; _dollImgY = 0;
     _dollImgScale = 1.4;
+    _dollPhotoLocked = false;
     var img = document.getElementById('doll-head-img');
     img.src = ev.target.result;
     img.style.display = 'block';
     _applyDollImgTransform();
     document.getElementById('doll-face').style.display = 'none';
-    // hide photo controls, show play-hint and reset button
-    document.getElementById('doll-photo-controls').style.display = 'none';
-    document.getElementById('doll-play-hint').style.display = '';
-    document.getElementById('doll-reset-wrap').style.display = '';
+    // show zoom + confirm controls, hide initial label/hint
+    document.getElementById('doll-photo-controls').style.display = '';
+    document.getElementById('doll-head-label').style.display = 'none';
+    document.getElementById('doll-head-hint').style.display = 'none';
+    document.getElementById('doll-place-ctrl').style.display = '';
+    document.getElementById('doll-play-hint').style.display = 'none';
+    document.getElementById('doll-reset-strip').style.display = 'none';
+    document.getElementById('doll-zoom').value = 140;
     _initDollDrag(img);
   };
   r.readAsDataURL(inp.files[0]);
+}
+
+function confirmDollPhoto(e) {
+  if (e) e.stopPropagation();
+  _dollPhotoLocked = true;
+  document.getElementById('doll-photo-controls').style.display = 'none';
+  document.getElementById('doll-play-hint').style.display = '';
+  document.getElementById('doll-reset-strip').style.display = '';
+}
+
+function resetDollPhoto(e) {
+  if (e) e.stopPropagation();
+  _dollPhotoLocked = false;
+  var img = document.getElementById('doll-head-img');
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  var face = document.getElementById('doll-face');
+  if (face) { face.textContent = DOLL_FACES[Math.min(Math.floor(_dollHits/2), DOLL_FACES.length-1)]; face.style.display = ''; }
+  document.getElementById('doll-photo-controls').style.display = '';
+  document.getElementById('doll-head-label').style.display = '';
+  document.getElementById('doll-head-hint').style.display = '';
+  document.getElementById('doll-place-ctrl').style.display = 'none';
+  document.getElementById('doll-play-hint').style.display = 'none';
+  document.getElementById('doll-reset-strip').style.display = 'none';
+  var fileInp = document.getElementById('doll-file');
+  if (fileInp) { fileInp.value = ''; fileInp.click(); }
 }
 function updateDollZoom(val) {
   _dollImgScale = val / 100;
@@ -2193,11 +2243,12 @@ function _initDollDrag(img) {
   img = document.getElementById('doll-head-img'); // re-get after replace
 
   var onStart = function(cx, cy) {
+    if (_dollPhotoLocked) return;
     _dollDrag = {sx: cx, sy: cy, ix: _dollImgX, iy: _dollImgY};
     _dollDragMoved = false;
   };
   var onMove = function(cx, cy) {
-    if (!_dollDrag) return;
+    if (!_dollDrag || _dollPhotoLocked) return;
     var dx = cx - _dollDrag.sx, dy = cy - _dollDrag.sy;
     if (Math.abs(dx)>3 || Math.abs(dy)>3) _dollDragMoved = true;
     _dollImgX = _dollDrag.ix + dx;
@@ -2205,7 +2256,7 @@ function _initDollDrag(img) {
     _applyDollImgTransform();
   };
   var onEnd = function() {
-    if (!_dollDragMoved) document.getElementById('doll-file').click();
+    if (!_dollPhotoLocked && !_dollDragMoved) document.getElementById('doll-file').click();
     _dollDrag = null;
   };
 
@@ -2276,6 +2327,10 @@ function _dollUpdateAppearance() {
 
 function _dollGoPooo() {
   _dollPooped = true;
+  // hide reset strip so user can't reset after poop
+  var rs = document.getElementById('doll-reset-strip');
+  if (rs) rs.style.display = 'none';
+  document.getElementById('doll-play-hint').style.display = 'none';
   var fig = document.getElementById('doll-figure');
   fig.style.transition = 'transform .9s ease,filter .9s ease';
   fig.style.transform = 'scaleY(0.25) scaleX(1.6)';
