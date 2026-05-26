@@ -701,6 +701,8 @@ input[type=file]{display:none}
       <div class="asec-lbl">商品管理</div>
       <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
       <div class="adm-items" id="adm-items"></div>
+      <div class="adm-arch-sep" id="adm-ended-sep" style="display:none">已結團</div>
+      <div class="adm-items" id="adm-ended-items"></div>
       <div class="adm-arch-sep">下架區</div>
       <div class="adm-arch-zone" id="adm-arch-zone"
            ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
@@ -1665,7 +1667,7 @@ function renderAdmin() {
   renderAdmItems();
 }
 
-function _buildItemCard(item) {
+function _buildItemCard(item, noHandle) {
   var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '🛍️');
   var stLabel;
   if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
@@ -1678,9 +1680,10 @@ function _buildItemCard(item) {
     : (item.openD + ' – ' + item.closeD);
   var el = document.createElement('div');
   el.className = 'adm-icard'; el.id = 'ic' + item.id;
-  el.setAttribute('draggable', item.permanent ? 'false' : 'true');
+  el.setAttribute('draggable', (!item.permanent && !noHandle) ? 'true' : 'false');
   var leadIcon = item.permanent
     ? '<span class="adm-lock-icon">🔒</span>'
+    : noHandle ? ''
     : '<span class="adm-drag-handle">⠿</span>';
   el.innerHTML =
     '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
@@ -1738,9 +1741,11 @@ function _buildItemCard(item) {
 }
 
 function renderAdmItems() {
-  var list = document.getElementById('adm-items'); list.innerHTML = '';
-  var archList = document.getElementById('adm-arch-list'); archList.innerHTML = '';
-  var archHint = document.getElementById('adm-arch-hint');
+  var list       = document.getElementById('adm-items');       list.innerHTML = '';
+  var endedList  = document.getElementById('adm-ended-items'); endedList.innerHTML = '';
+  var endedSep   = document.getElementById('adm-ended-sep');
+  var archList   = document.getElementById('adm-arch-list');   archList.innerHTML = '';
+  var archHint   = document.getElementById('adm-arch-hint');
 
   var archived     = D.items.filter(function(i){ return i.archived; });
   var autoArchived = D.items.filter(function(i){ return !i.archived && !i.permanent && classify(i) === 'auto-archived'; });
@@ -1749,10 +1754,12 @@ function renderAdmItems() {
   var normalNonPerm = normal.filter(function(i){ return !i.permanent; });
   var normalPerm    = normal.filter(function(i){ return  i.permanent; });
 
-  /* draggable non-permanent items */
-  normalNonPerm.forEach(function(item) {
-    var el = _buildItemCard(item);
-    /* Only allow drag when mousedown originates on the ⠿ handle */
+  /* split non-permanent into active/soon/hidden vs ended */
+  var mainItems  = normalNonPerm.filter(function(i){ return classify(i) !== 'ended'; });
+  var endedItems = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; });
+
+  /* helper: attach drag-to-reorder listeners (main list only) */
+  function _attachReorder(item, el) {
     el.addEventListener('mousedown', function(e) {
       var onHandle = e.target && e.target.classList && e.target.classList.contains('adm-drag-handle');
       if (!onHandle) {
@@ -1765,21 +1772,42 @@ function renderAdmItems() {
     el.addEventListener('dragover',  function(e){ admItemDragOver(item, el, e); });
     el.addEventListener('dragleave', function(e){ admItemDragLeave(el, e); });
     el.addEventListener('drop',      function(e){ admItemDrop(item, el, e); });
+    var handle = el.querySelector('.adm-drag-handle');
+    if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e); }, {passive:false});
+  }
+
+  /* ── 商品管理：draggable non-permanent, non-ended items ── */
+  mainItems.forEach(function(item) {
+    var el = _buildItemCard(item);
+    _attachReorder(item, el);
     list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
-    /* touch drag: attach to the handle only */
-    var handle = el.querySelector('.adm-drag-handle');
-    if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e); }, {passive:false});
   });
 
-  /* permanent items — locked at bottom, not draggable */
+  /* ── 商品管理底部：permanent items (locked) ── */
   normalPerm.forEach(function(item) {
     var el = _buildItemCard(item);
     list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
   });
+
+  /* ── 已結團 section ── */
+  if (endedItems.length) {
+    endedSep.style.display = '';
+    endedItems.forEach(function(item) {
+      var el = _buildItemCard(item, true); /* noHandle=true */
+      /* allow drag to archive zone, but NOT reorder */
+      el.addEventListener('dragstart', function(e){ admDragStart(item, el, e); });
+      el.addEventListener('dragend',   function(e){ admDragEnd(el, e); });
+      endedList.appendChild(el);
+      var cw = document.getElementById('czitem-' + item.id);
+      if (cw) czBindDrag(cw, item.id);
+    });
+  } else {
+    endedSep.style.display = 'none';
+  }
 
   /* archive zone: explicitly archived + auto-archived */
   var allArch = archived.concat(autoArchived);
@@ -2471,6 +2499,7 @@ function selectDollTool(tool, e) {
 
 function triggerDollUpload(e) {
   e.stopPropagation();
+  if (_dollPhotoLocked) return;   /* 打擊中：頭鎖定，不開圖檔選擇 */
   document.getElementById('doll-file').click();
 }
 function loadDollPhoto(inp) {
