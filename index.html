@@ -303,8 +303,13 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .savebtn{width:100%;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer}
 .savebtn:active{opacity:.8}.savebtn.g{background:var(--green)}
 .adm-items{display:flex;flex-direction:column;gap:8px}
-.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden;transition:opacity .18s}
+.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden;transition:opacity .18s,border-color .12s}
 .adm-icard.dragging-src{opacity:.38}
+.adm-icard.drag-over-top{border-top:2px solid #FF6B95}
+.adm-icard.drag-over-bot{border-bottom:2px solid #FF6B95}
+.adm-drag-handle{color:var(--ink3);font-size:15px;cursor:grab;padding:0 4px 0 0;flex-shrink:0;user-select:none;-webkit-user-select:none;touch-action:none;line-height:1}
+.adm-drag-handle:active{cursor:grabbing;color:var(--ink2)}
+.adm-lock-icon{font-size:12px;padding:0 4px 0 0;flex-shrink:0;opacity:.35}
 /* archive zone */
 .adm-arch-sep{font-size:9px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:20px 0 10px}
 .adm-arch-sep::before,.adm-arch-sep::after{content:'';flex:1;height:1px;background:var(--rule)}
@@ -317,6 +322,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .adm-arch-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .restore-btn{font-size:10px;color:var(--green-dk);background:none;border:1px solid var(--green);border-radius:5px;padding:3px 9px;cursor:pointer;font-family:inherit;flex-shrink:0;letter-spacing:.3px;-webkit-tap-highlight-color:transparent}
 .restore-btn:active{background:rgba(130,183,204,.15)}
+.delete-arch-btn{font-size:10px;color:#b03a2e;background:none;border:1px solid rgba(176,58,46,.4);border-radius:5px;padding:3px 7px;cursor:pointer;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.delete-arch-btn:active{background:rgba(176,58,46,.08)}
 /* permanent badge */
 .perm-badge{display:inline-flex;align-items:center;background:rgba(130,183,204,.15);color:var(--green-dk);font-size:9px;padding:2px 6px;border-radius:4px;font-weight:400;letter-spacing:.5px;margin-left:4px}
 .adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
@@ -330,7 +337,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .adm-iform{display:none;padding:0 14px 14px;border-top:1px solid var(--rule)}
 .adm-iform.on{display:block;padding-top:13px}
 .hint-box{background:var(--bg);border-radius:7px;padding:9px 11px;font-size:10px;color:var(--ink3);line-height:1.7;margin-bottom:11px}
-.addbtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border:1.5px dashed var(--rule);border-radius:12px;background:none;color:var(--ink3);font-size:13px;font-family:inherit;cursor:pointer;margin-top:9px;font-weight:300}
+.addbtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:12px;border:1.5px dashed var(--rule);border-radius:12px;background:none;color:var(--ink3);font-size:13px;font-family:inherit;cursor:pointer;margin-top:0;margin-bottom:9px;font-weight:300}
 input[type=file]{display:none}
 
 /* footer */
@@ -691,8 +698,8 @@ input[type=file]{display:none}
   <div class="adm-panel" id="adm-panel-items">
     <div class="asec">
       <div class="asec-lbl">商品管理</div>
-      <div class="adm-items" id="adm-items"></div>
       <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
+      <div class="adm-items" id="adm-items"></div>
       <div class="adm-arch-sep">下架區</div>
       <div class="adm-arch-zone" id="adm-arch-zone"
            ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
@@ -1375,7 +1382,7 @@ function classify(item) {
   var closeTs = new Date(item.closeD); closeTs.setHours(23,59,59,0);
   var daysToOpen = Math.ceil((open - now) / 86400000);
   var daysSinceClose = Math.floor((now - closeD) / 86400000);
-  if (daysSinceClose > 14) return 'hidden';
+  if (daysSinceClose > 30) return 'auto-archived';
   if (closeD < now) return 'ended';
   if (open <= now && closeTs >= new Date()) return 'active';
   if (daysToOpen <= 7 && daysToOpen > 0) return 'soon';
@@ -1663,20 +1670,24 @@ function _buildItemCard(item) {
   if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
   else {
     var st = classify(item);
-    stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[st] || '—';
+    stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[st] || '—';
   }
   var subText = item.permanent
     ? '常駐優惠'
     : (item.openD + ' – ' + item.closeD);
   var el = document.createElement('div');
   el.className = 'adm-icard'; el.id = 'ic' + item.id;
-  el.setAttribute('draggable','true');
+  el.setAttribute('draggable', item.permanent ? 'false' : 'true');
+  var leadIcon = item.permanent
+    ? '<span class="adm-lock-icon">🔒</span>'
+    : '<span class="adm-drag-handle">⠿</span>';
   el.innerHTML =
     '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
+      leadIcon +
       '<div class="adm-ithumb">' + th + '</div>' +
       '<div class="adm-iinfo">' +
         '<div class="adm-iname">' + item.name + (item.permanent ? '<span class="perm-badge" style="margin-left:5px">常駐優惠</span>' : '') + '</div>' +
-        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? '常駐' : ({soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
+        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? '常駐' : ({soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
       '</div>' +
       '<div class="adm-ibtns">' +
         '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
@@ -1719,7 +1730,7 @@ function _buildItemCard(item) {
         '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.permanent ? '' : item.openD) + '"></div>' +
         '<div class="fld" style="flex:1"><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
       '</div>' +
-      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後14天→已結團 ／ 勾選常駐優惠→永久顯示</div>' +
+      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後30天→自動下架 ／ 勾選常駐優惠→永久顯示</div>' +
       '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
     '</div>';
   return el;
@@ -1729,27 +1740,50 @@ function renderAdmItems() {
   var list = document.getElementById('adm-items'); list.innerHTML = '';
   var archList = document.getElementById('adm-arch-list'); archList.innerHTML = '';
   var archHint = document.getElementById('adm-arch-hint');
-  var archived = D.items.filter(function(i){ return i.archived; });
-  var normal   = D.items.filter(function(i){ return !i.archived; });
 
-  normal.forEach(function(item) {
+  var archived     = D.items.filter(function(i){ return i.archived; });
+  var autoArchived = D.items.filter(function(i){ return !i.archived && !i.permanent && classify(i) === 'auto-archived'; });
+  var autoArchivedIds = autoArchived.map(function(i){ return i.id; });
+  var normal       = D.items.filter(function(i){ return !i.archived && autoArchivedIds.indexOf(i.id) === -1; });
+  var normalNonPerm = normal.filter(function(i){ return !i.permanent; });
+  var normalPerm    = normal.filter(function(i){ return  i.permanent; });
+
+  /* draggable non-permanent items */
+  normalNonPerm.forEach(function(item) {
     var el = _buildItemCard(item);
-    el.addEventListener('dragstart', function(e){ _admDragId = item.id; el.classList.add('dragging-src'); });
-    el.addEventListener('dragend',   function(e){ el.classList.remove('dragging-src'); document.getElementById('adm-arch-zone').classList.remove('drag-active'); });
+    el.addEventListener('dragstart', function(e){ admDragStart(item, el, e); });
+    el.addEventListener('dragend',   function(e){ admDragEnd(el, e); });
+    el.addEventListener('dragover',  function(e){ admItemDragOver(item, el, e); });
+    el.addEventListener('dragleave', function(e){ admItemDragLeave(el, e); });
+    el.addEventListener('drop',      function(e){ admItemDrop(item, el, e); });
+    list.appendChild(el);
+    var cw = document.getElementById('czitem-' + item.id);
+    if (cw) czBindDrag(cw, item.id);
+    /* touch drag: attach to the handle only */
+    var handle = el.querySelector('.adm-drag-handle');
+    if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e); }, {passive:false});
+  });
+
+  /* permanent items — locked at bottom, not draggable */
+  normalPerm.forEach(function(item) {
+    var el = _buildItemCard(item);
     list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
   });
 
-  if (archived.length) {
+  /* archive zone: explicitly archived + auto-archived */
+  var allArch = archived.concat(autoArchived);
+  if (allArch.length) {
     archHint.style.display = 'none';
-    archived.forEach(function(item) {
+    allArch.forEach(function(item) {
       var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
         '<span class="adm-arch-name">' + item.name + '</span>' +
-        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')">🔄 恢復</button>';
+        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')">🔄 恢復</button>' +
+        '<button class="delete-arch-btn" onclick="delItem(' + item.id + ')">🗑️</button>';
       archList.appendChild(row);
     });
   } else {
@@ -1766,8 +1800,121 @@ function togglePermanent(id) {
   document.getElementById('fdates-' + id).style.display = on ? 'none' : 'flex';
 }
 
+/* ── DRAG-SORT (desktop HTML5) ── */
+var _admDragId  = null;   /* id being dragged (used by archive-zone drop) */
+var _admDragSrc = null;   /* id being dragged for reorder */
+
+function admDragStart(item, el, e) {
+  _admDragId  = item.id;
+  _admDragSrc = item.id;
+  el.classList.add('dragging-src');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function admDragEnd(el, e) {
+  el.classList.remove('dragging-src');
+  document.querySelectorAll('.adm-icard').forEach(function(c){ c.classList.remove('drag-over-top','drag-over-bot'); });
+  document.getElementById('adm-arch-zone').classList.remove('drag-active');
+  _admDragSrc = null;
+  _admDragId  = null;
+}
+function admItemDragOver(item, el, e) {
+  if (!_admDragSrc || _admDragSrc === item.id || item.permanent) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var rect = el.getBoundingClientRect();
+  el.classList.remove('drag-over-top','drag-over-bot');
+  if (e.clientY < rect.top + rect.height / 2) el.classList.add('drag-over-top');
+  else el.classList.add('drag-over-bot');
+}
+function admItemDragLeave(el, e) { el.classList.remove('drag-over-top','drag-over-bot'); }
+function admItemDrop(item, el, e) {
+  e.preventDefault();
+  el.classList.remove('drag-over-top','drag-over-bot');
+  if (!_admDragSrc || _admDragSrc === item.id || item.permanent) return;
+  var srcItem = D.items.find(function(i){ return i.id === _admDragSrc; });
+  if (!srcItem || srcItem.permanent) return;
+  var rect = el.getBoundingClientRect();
+  var before = e.clientY < rect.top + rect.height / 2;
+  _doReorder(srcItem, item, before);
+}
+
+/* ── DRAG-SORT (touch) ── */
+var _tDrag = {id:null, el:null, clone:null, offsetY:0, insertTarget:null, insertBefore:true};
+function admTouchStart(item, el, e) {
+  if (item.permanent) return;
+  e.preventDefault();
+  var t = e.touches[0];
+  var rect = el.getBoundingClientRect();
+  _tDrag.id = item.id; _tDrag.el = el;
+  _tDrag.offsetY = t.clientY - rect.top;
+  _tDrag.insertTarget = null;
+  var clone = el.cloneNode(true);
+  clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+    'width:' + rect.width + 'px;opacity:.88;z-index:9999;pointer-events:none;' +
+    'transform:scale(1.02);box-shadow:0 8px 28px rgba(0,0,0,.18);transition:none;border-radius:12px;';
+  document.body.appendChild(clone);
+  _tDrag.clone = clone;
+  el.style.opacity = '.3';
+}
+(function() {
+  document.addEventListener('touchmove', function(e) {
+    if (!_tDrag.id) return;
+    e.preventDefault();
+    var t = e.touches[0];
+    _tDrag.clone.style.top = (t.clientY - _tDrag.offsetY) + 'px';
+    var cards = document.querySelectorAll('#adm-items .adm-icard:not(.dragging-src)');
+    var found = null, foundBefore = true;
+    cards.forEach(function(c) {
+      c.classList.remove('drag-over-top','drag-over-bot');
+      if (c.getAttribute('draggable') === 'false') return;
+      var r = c.getBoundingClientRect();
+      if (t.clientY >= r.top && t.clientY <= r.bottom) {
+        var cId = parseInt(c.id.replace('ic',''));
+        if (cId !== _tDrag.id) {
+          found = c;
+          foundBefore = t.clientY < r.top + r.height / 2;
+          c.classList.add(foundBefore ? 'drag-over-top' : 'drag-over-bot');
+        }
+      }
+    });
+    _tDrag.insertTarget = found;
+    _tDrag.insertBefore = foundBefore;
+  }, {passive:false});
+  document.addEventListener('touchend', function() {
+    if (!_tDrag.id) return;
+    var srcItem   = D.items.find(function(i){ return i.id === _tDrag.id; });
+    var tgt       = _tDrag.insertTarget;
+    var insertB   = _tDrag.insertBefore;
+    if (_tDrag.clone) { _tDrag.clone.remove(); }
+    if (_tDrag.el)    { _tDrag.el.style.opacity = ''; }
+    document.querySelectorAll('.adm-icard').forEach(function(c){ c.classList.remove('drag-over-top','drag-over-bot'); });
+    _tDrag = {id:null, el:null, clone:null, offsetY:0, insertTarget:null, insertBefore:true};
+    if (srcItem && tgt) {
+      var tgtId = parseInt(tgt.id.replace('ic',''));
+      var tgtItem = D.items.find(function(i){ return i.id === tgtId; });
+      if (tgtItem && !tgtItem.permanent) _doReorder(srcItem, tgtItem, insertB);
+    }
+  });
+})();
+
+function _doReorder(srcItem, tgtItem, before) {
+  var arr = D.items;
+  var si = arr.indexOf(srcItem);
+  arr.splice(si, 1);
+  var ti = arr.indexOf(tgtItem);
+  arr.splice(before ? ti : ti + 1, 0, srcItem);
+  saveSortOrder();
+  renderAdmItems();
+  renderFront();
+}
+async function saveSortOrder() {
+  var tasks = D.items.filter(function(i){ return !i.archived; }).map(function(item, idx){
+    return sb.from('items').update({ sort_order: idx }).eq('id', item.id);
+  });
+  await Promise.all(tasks);
+}
+
 /* ── ARCHIVE ── */
-var _admDragId = null;
 function archDragOver(e) { e.preventDefault(); document.getElementById('adm-arch-zone').classList.add('drag-active'); }
 function archDragLeave(e) { document.getElementById('adm-arch-zone').classList.remove('drag-active'); }
 function archDrop(e) {
