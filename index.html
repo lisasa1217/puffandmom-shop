@@ -416,9 +416,9 @@ input[type=file]{display:none}
 /* farewell hearts */
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
-/* ── 小人退散 FAB ── */
-.doll-fab{position:fixed;right:0;top:54%;z-index:88;display:flex;flex-direction:column;align-items:center;background:#FF8FAB;border:none;border-radius:22px 0 0 22px;padding:10px 6px 10px 9px;cursor:pointer;box-shadow:-2px 2px 12px rgba(0,0,0,.14);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite}
-.doll-fab:hover{transform:translateX(-3px);filter:brightness(1.06)}.doll-fab:active{filter:brightness(.88);transform:translateX(-1px) scale(.95)}
+/* ── 小人退散 FAB (left side, below kuka) ── */
+.doll-fab{position:fixed;left:0;top:54%;z-index:88;display:flex;flex-direction:column;align-items:center;background:#FF8FAB;border:none;border-radius:0 22px 22px 0;padding:10px 9px 10px 6px;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.14);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite 0.6s}
+.doll-fab:hover{transform:translateX(3px);filter:brightness(1.06)}.doll-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
 @keyframes doll-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .doll-fab-icon{font-size:19px;line-height:1;margin-bottom:4px}
 .doll-fab-lbl{font-size:9px;font-weight:500;color:#fff;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
@@ -432,15 +432,22 @@ input[type=file]{display:none}
 .doll-top-sub{font-size:10px;color:rgba(255,255,255,.85);letter-spacing:.8px;margin-top:2px;font-weight:300}
 .doll-close{position:absolute;top:11px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(255,255,255,.7);line-height:1;padding:2px}
 /* doll figure */
-.doll-stage{padding:14px 20px 4px;cursor:crosshair;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-.doll-figure{display:flex;flex-direction:column;align-items:center;position:relative}
-.doll-head-circle{width:70px;height:70px;border-radius:50%;background:#FFDBB5;border:2.5px solid #C8956A;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer;position:relative;flex-shrink:0;transition:box-shadow .15s}
+.doll-stage{padding:10px 20px 4px;cursor:crosshair;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.doll-figure{display:flex;flex-direction:column;align-items:center;position:relative;transition:transform .7s ease,filter .7s ease}
+.doll-head-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.doll-head-circle{width:76px;height:76px;border-radius:50%;background:#FFDBB5;border:2.5px solid #C8956A;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;position:relative;flex-shrink:0;transition:box-shadow .15s}
 .doll-head-circle:hover{box-shadow:0 0 0 3px rgba(255,107,149,.4)}
-.doll-head-circle img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.doll-head-label{font-size:9px;color:var(--ink3);margin:3px 0 0;letter-spacing:.3px;pointer-events:none}
-.doll-body-svg{width:110px;height:138px;overflow:visible;margin-top:-2px}
-.doll-stars-wrap{height:22px;font-size:16px;letter-spacing:4px;display:none;animation:doll-star-spin 1.2s linear infinite}
-@keyframes doll-star-spin{0%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}100%{transform:rotate(-10deg)}}
+.doll-head-circle img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center;display:none}
+.doll-head-label{font-size:9px;color:var(--ink3);margin:4px 0 2px;letter-spacing:.3px;pointer-events:none;transition:opacity .3s}
+.doll-zoom-wrap{display:none;align-items:center;gap:6px;margin-bottom:4px}
+.doll-zoom-wrap span{font-size:10px;color:var(--ink3)}
+.doll-zoom{width:90px;height:3px;accent-color:#FF6B95;cursor:pointer}
+.doll-body-svg{width:120px;height:215px;overflow:visible;margin-top:-6px}
+.doll-stars-wrap{height:22px;font-size:16px;letter-spacing:4px;display:none;animation:doll-star-spin 1.1s ease-in-out infinite}
+@keyframes doll-star-spin{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+/* poop final state */
+.doll-poop-state{font-size:70px;margin:10px auto;display:flex;flex-direction:column;align-items:center;animation:kuka-pop .6s ease}
+.doll-poop-txt{font-size:12px;color:var(--ink3);font-weight:300;margin-top:6px;letter-spacing:.5px}
 /* shake animations */
 .doll-figure.shake-hammer{animation:sh-hammer .42s ease}
 .doll-figure.shake-fist  {animation:sh-fist   .38s ease}
@@ -787,21 +794,58 @@ input[type=file]{display:none}
     <div class="doll-stage" id="doll-stage" onclick="hitDoll(event)">
       <div class="doll-figure" id="doll-figure">
         <div class="doll-stars-wrap" id="doll-stars-wrap">💫 💫 💫</div>
-        <div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)">
-          <span id="doll-face">😐</span>
-          <img id="doll-head-img" style="display:none">
+        <div class="doll-head-wrap">
+          <div class="doll-head-circle" id="doll-head-circle" onclick="triggerDollUpload(event)">
+            <span id="doll-face">😐</span>
+            <img id="doll-head-img">
+          </div>
+          <div class="doll-head-label" id="doll-head-label">📷 點頭像換照片</div>
+          <div class="doll-zoom-wrap" id="doll-zoom-wrap">
+            <span>🔍</span>
+            <input class="doll-zoom" id="doll-zoom" type="range" min="100" max="260" value="140" oninput="updateDollZoom(this.value)" onclick="event.stopPropagation()">
+          </div>
         </div>
-        <div class="doll-head-label">📷 點頭像換照片</div>
-        <svg class="doll-body-svg" viewBox="0 0 100 138">
-          <rect x="42" y="0" width="16" height="12" rx="5" fill="#FFDBB5"/>
-          <rect x="20" y="12" width="60" height="54" rx="13" id="doll-torso" fill="#82B7CC"/>
-          <path d="M20 22 Q2 42 6 66" stroke="#82B7CC" stroke-width="16" stroke-linecap="round" fill="none" id="doll-larm"/>
-          <path d="M80 22 Q98 42 94 66" stroke="#82B7CC" stroke-width="16" stroke-linecap="round" fill="none" id="doll-rarm"/>
-          <path d="M38 66 Q30 98 22 126" stroke="#5A9AB5" stroke-width="16" stroke-linecap="round" fill="none" id="doll-lleg"/>
-          <path d="M62 66 Q70 98 78 126" stroke="#5A9AB5" stroke-width="16" stroke-linecap="round" fill="none" id="doll-rleg"/>
-          <circle id="doll-b1" cx="36" cy="34" r="9" fill="rgba(160,60,220,0)"/>
-          <circle id="doll-b2" cx="72" cy="48" r="7" fill="rgba(160,60,220,0)"/>
-          <circle id="doll-b3" cx="46" cy="58" r="8" fill="rgba(160,60,220,0)"/>
+        <!-- proper character SVG -->
+        <svg class="doll-body-svg" viewBox="0 0 120 215" id="doll-body-svg">
+          <!-- neck -->
+          <rect x="51" y="0" width="18" height="16" rx="6" fill="#FFDBB5" id="doll-neck"/>
+          <!-- left arm (skin behind shirt) -->
+          <path d="M30 24 Q8 50 12 88" stroke="#FFDBB5" stroke-width="22" stroke-linecap="round" fill="none" id="doll-larm"/>
+          <!-- right arm (skin behind shirt) -->
+          <path d="M90 24 Q112 50 108 88" stroke="#FFDBB5" stroke-width="22" stroke-linecap="round" fill="none" id="doll-rarm"/>
+          <!-- shirt (tank top) -->
+          <rect x="26" y="16" width="68" height="68" rx="16" fill="#222" id="doll-torso"/>
+          <!-- tank top shoulder straps -->
+          <rect x="36" y="16" width="18" height="22" rx="5" fill="#222"/>
+          <rect x="66" y="16" width="18" height="22" rx="5" fill="#222"/>
+          <!-- skin gap between straps (chest) -->
+          <rect x="54" y="16" width="12" height="28" fill="#FFDBB5"/>
+          <!-- waistband -->
+          <rect x="24" y="80" width="72" height="14" rx="5" fill="#111" id="doll-waist"/>
+          <!-- drawstring -->
+          <path d="M50 88 Q60 94 70 88" stroke="#bbb" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- shorts -->
+          <rect x="24" y="90" width="72" height="54" rx="10" fill="#1E1E1E" id="doll-shorts"/>
+          <!-- shorts side stripes -->
+          <rect x="24" y="90" width="7" height="54" rx="3" fill="rgba(255,255,255,.45)"/>
+          <rect x="89" y="90" width="7" height="54" rx="3" fill="rgba(255,255,255,.45)"/>
+          <!-- left leg -->
+          <path d="M46 144 Q38 178 30 206" stroke="#FFDBB5" stroke-width="26" stroke-linecap="round" fill="none" id="doll-lleg"/>
+          <!-- right leg -->
+          <path d="M74 144 Q82 178 90 206" stroke="#FFDBB5" stroke-width="26" stroke-linecap="round" fill="none" id="doll-rleg"/>
+          <!-- left flip flop -->
+          <ellipse cx="29" cy="210" rx="22" ry="9" fill="#111"/>
+          <path d="M18 204 Q29 198 40 204" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- right flip flop -->
+          <ellipse cx="91" cy="210" rx="22" ry="9" fill="#111"/>
+          <path d="M80 204 Q91 198 102 204" stroke="#555" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- bruise overlays -->
+          <circle id="doll-b1" cx="42" cy="38" r="11" fill="rgba(160,60,220,0)"/>
+          <circle id="doll-b2" cx="83" cy="55" r="9"  fill="rgba(160,60,220,0)"/>
+          <circle id="doll-b3" cx="56" cy="72" r="10" fill="rgba(160,60,220,0)"/>
+          <!-- sweat drops (damage) -->
+          <ellipse id="doll-sw1" cx="18" cy="30" rx="5" ry="7" fill="rgba(100,180,255,0)" rx="4"/>
+          <ellipse id="doll-sw2" cx="102" cy="45" rx="4" ry="6" fill="rgba(100,180,255,0)"/>
         </svg>
       </div>
     </div>
@@ -2020,25 +2064,44 @@ function startKukaDraw() {
 }
 
 /* ── 小人退散 ── */
+/* ── 小人退散 ── */
 var _dollTool = 'hammer';
 var _dollHits = 0;
 var _dollHitting = false;
-var DOLL_COLORS = ['#82B7CC','#7BAAB8','#8B9EC8','#9B80C8','#A860C8','#8B3AB8'];
-var DOLL_DARK   = ['#5A9AB5','#5A8FA8','#7A8AB8','#8870B8','#9040B8','#7B28A8'];
-var DOLL_FACES  = ['😐','😣','😖','😵','😵‍💫','🤯'];
-var DOLL_FX     = {hammer:['💥','✨','💥'],fist:['💢','👊','💢'],bomb:['💥','💥','🌟','💥']};
+var _dollPooped = false;
+var SKIN_COLORS  = ['#FFDBB5','#F5C8A0','#E8B080','#D08060','#C06040','#994020'];
+var SHIRT_COLORS = ['#222','#333','#553','#664433','#774422','#883300'];
+var DOLL_FACES   = ['😐','😣','😖','😵','😵‍💫','🤯'];
+var DOLL_FX      = {hammer:['💥','✨','💥'],fist:['💢','👊','💢'],bomb:['💥','💥','🌟','💥']};
 
 function openDoll() {
-  _dollHits = 0; _dollHitting = false; _dollTool = 'hammer';
-  document.getElementById('doll-face').textContent = '😐';
-  document.getElementById('doll-head-img').style.display = 'none';
-  document.getElementById('doll-face').style.display = '';
+  _dollHits = 0; _dollHitting = false; _dollTool = 'hammer'; _dollPooped = false;
+  // restore figure HTML if it was replaced
+  var fig = document.getElementById('doll-figure');
+  fig.style.transform = ''; fig.style.filter = '';
+  // restore face & head
+  var face = document.getElementById('doll-face');
+  if (face) face.textContent = '😐';
+  var img = document.getElementById('doll-head-img');
+  if (img) { img.style.transform = 'scale(1.4)'; }
   document.getElementById('doll-stars-wrap').style.display = 'none';
   document.querySelectorAll('.doll-tool-btn').forEach(function(b){b.classList.remove('on')});
   document.getElementById('doll-tb-hammer').classList.add('on');
-  _dollSetColors(0);
-  ['doll-b1','doll-b2','doll-b3'].forEach(function(id){document.getElementById(id).setAttribute('fill','rgba(160,60,220,0)')});
+  _dollResetSVG();
   document.getElementById('doll-overlay').classList.add('on');
+}
+
+function _dollResetSVG() {
+  var s = document.getElementById('doll-body-svg');
+  if (!s) return;
+  var set = function(id,attr,val){ var el=document.getElementById(id); if(el) el.setAttribute(attr,val); };
+  set('doll-neck','fill','#FFDBB5');
+  set('doll-larm','stroke','#FFDBB5'); set('doll-rarm','stroke','#FFDBB5');
+  set('doll-torso','fill','#222');
+  set('doll-lleg','stroke','#FFDBB5'); set('doll-rleg','stroke','#FFDBB5');
+  ['doll-b1','doll-b2','doll-b3'].forEach(function(id){ set(id,'fill','rgba(160,60,220,0)'); });
+  set('doll-sw1','fill','rgba(100,180,255,0)'); set('doll-sw2','fill','rgba(100,180,255,0)');
+  s.style.transform = '';
 }
 
 function closeDoll() {
@@ -2069,75 +2132,103 @@ function loadDollPhoto(inp) {
   var r = new FileReader();
   r.onload = function(ev) {
     var img = document.getElementById('doll-head-img');
-    img.src = ev.target.result; img.style.display = 'block';
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    img.style.transform = 'scale(' + (document.getElementById('doll-zoom').value/100) + ')';
     document.getElementById('doll-face').style.display = 'none';
+    // hide upload hint, show zoom slider
+    var lbl = document.getElementById('doll-head-label');
+    if (lbl) lbl.style.opacity = '0';
+    setTimeout(function(){ if(lbl) lbl.style.display='none'; }, 350);
+    document.getElementById('doll-zoom-wrap').style.display = 'flex';
   };
   r.readAsDataURL(inp.files[0]);
 }
+function updateDollZoom(val) {
+  var img = document.getElementById('doll-head-img');
+  if (img) img.style.transform = 'scale(' + val/100 + ')';
+}
 
 function hitDoll(e) {
-  if (_dollHitting) return;
+  if (_dollHitting || _dollPooped) return;
   _dollHitting = true;
   _dollHits++;
-  // spawn hit emoji at tap position
+  // 💥 fx at tap
   var fxArr = DOLL_FX[_dollTool];
   var emoji = fxArr[Math.floor(Math.random() * fxArr.length)];
-  var fx = document.createElement('div');
-  fx.className = 'doll-hit-fx';
-  fx.style.fontSize = (_dollTool === 'bomb' ? '36' : '28') + 'px';
-  fx.style.left = (e.clientX - 18) + 'px';
-  fx.style.top  = (e.clientY - 18) + 'px';
-  fx.textContent = emoji;
-  document.body.appendChild(fx);
-  // bomb spawns extra fx
+  var spawnFx = function(em, cx, cy, sz) {
+    var fx = document.createElement('div');
+    fx.className = 'doll-hit-fx';
+    fx.style.fontSize = sz + 'px';
+    fx.style.left = cx + 'px'; fx.style.top = cy + 'px';
+    fx.textContent = em;
+    document.body.appendChild(fx);
+    setTimeout(function(){ fx.remove(); }, 700);
+  };
+  spawnFx(emoji, e.clientX - 18, e.clientY - 18, _dollTool === 'bomb' ? 38 : 28);
   if (_dollTool === 'bomb') {
-    [[-24,10],[20,-8]].forEach(function(off, i) {
-      setTimeout(function() {
-        var fx2 = document.createElement('div');
-        fx2.className = 'doll-hit-fx';
-        fx2.style.fontSize = '22px';
-        fx2.style.left = (e.clientX + off[0]) + 'px';
-        fx2.style.top  = (e.clientY + off[1]) + 'px';
-        fx2.textContent = '💥';
-        document.body.appendChild(fx2);
-        setTimeout(function(){ fx2.remove(); }, 700);
-      }, (i+1)*120);
+    [[-28,8],[22,-10],[0,20]].forEach(function(off,i){
+      setTimeout(function(){ spawnFx('💥', e.clientX+off[0], e.clientY+off[1], 20); }, (i+1)*110);
     });
   }
-  setTimeout(function(){ fx.remove(); }, 700);
   // shake figure
   var fig = document.getElementById('doll-figure');
   var cls = 'shake-' + _dollTool;
   fig.classList.add(cls);
-  var dur = _dollTool === 'bomb' ? 540 : _dollTool === 'fist' ? 400 : 450;
-  setTimeout(function(){ fig.classList.remove(cls); _dollHitting = false; }, dur);
-  // update look
+  var dur = {bomb:540, fist:400, hammer:450}[_dollTool];
+  setTimeout(function(){
+    fig.classList.remove(cls);
+    _dollHitting = false;
+    // poop at 13+ hits
+    if (_dollHits >= 13) { _dollGoPooo(); }
+  }, dur);
   _dollUpdateAppearance();
-}
-
-function _dollSetColors(idx) {
-  var c = DOLL_COLORS[Math.min(idx, DOLL_COLORS.length-1)];
-  var d = DOLL_DARK[Math.min(idx, DOLL_DARK.length-1)];
-  document.getElementById('doll-torso').setAttribute('fill', c);
-  document.getElementById('doll-larm').setAttribute('stroke', c);
-  document.getElementById('doll-rarm').setAttribute('stroke', c);
-  document.getElementById('doll-lleg').setAttribute('stroke', d);
-  document.getElementById('doll-rleg').setAttribute('stroke', d);
 }
 
 function _dollUpdateAppearance() {
   var h = _dollHits;
-  // face
-  var fi = Math.min(Math.floor(h / 2), DOLL_FACES.length - 1);
-  document.getElementById('doll-face').textContent = DOLL_FACES[fi];
-  // color bruise progression
-  _dollSetColors(Math.floor(h / 2));
-  // bruise circles
-  if (h >= 3) document.getElementById('doll-b1').setAttribute('fill','rgba(160,60,220,'+Math.min((h-2)*0.09,.45)+')');
-  if (h >= 5) document.getElementById('doll-b2').setAttribute('fill','rgba(160,60,220,'+Math.min((h-4)*0.09,.4)+')');
-  if (h >= 7) document.getElementById('doll-b3').setAttribute('fill','rgba(160,60,220,'+Math.min((h-6)*0.09,.4)+')');
+  var fi = Math.min(Math.floor(h/2), DOLL_FACES.length-1);
+  var face = document.getElementById('doll-face');
+  if (face) face.textContent = DOLL_FACES[fi];
+  // skin gets darker/more damaged
+  var si = Math.min(Math.floor(h/2), SKIN_COLORS.length-1);
+  var skinC = SKIN_COLORS[si];
+  var set = function(id,attr,val){ var el=document.getElementById(id); if(el) el.setAttribute(attr,val); };
+  set('doll-neck','fill',skinC); set('doll-larm','stroke',skinC); set('doll-rarm','stroke',skinC);
+  set('doll-lleg','stroke',skinC); set('doll-rleg','stroke',skinC);
+  // shirt changes
+  var shC = SHIRT_COLORS[Math.min(Math.floor(h/2), SHIRT_COLORS.length-1)];
+  set('doll-torso','fill',shC);
+  // bruises appear progressively
+  if(h>=3) set('doll-b1','fill','rgba(160,60,220,'+Math.min((h-2)*0.1,.55)+')');
+  if(h>=5) set('doll-b2','fill','rgba(160,60,220,'+Math.min((h-4)*0.1,.5)+')');
+  if(h>=7) set('doll-b3','fill','rgba(160,60,220,'+Math.min((h-6)*0.1,.5)+')');
+  // sweat drops appear
+  if(h>=4) set('doll-sw1','fill','rgba(100,180,255,'+Math.min((h-3)*0.12,.6)+')');
+  if(h>=6) set('doll-sw2','fill','rgba(100,180,255,'+Math.min((h-5)*0.12,.55)+')');
   // dizzy stars
-  if (h >= 4) document.getElementById('doll-stars-wrap').style.display = '';
+  if(h>=4) document.getElementById('doll-stars-wrap').style.display='';
+  // body starts squishing/deforming
+  var svg = document.getElementById('doll-body-svg');
+  if (svg && h >= 8) {
+    var squish = 1 + (h-7)*0.04;
+    var sqY = 1 - (h-7)*0.025;
+    svg.style.transform = 'scaleX('+Math.min(squish,1.35)+') scaleY('+Math.max(sqY,.72)+')';
+  }
+}
+
+function _dollGoPooo() {
+  _dollPooped = true;
+  var fig = document.getElementById('doll-figure');
+  // melt down animation
+  fig.style.transition = 'transform .9s ease, filter .9s ease';
+  fig.style.transform = 'scaleY(0.25) scaleX(1.6)';
+  fig.style.filter = 'blur(3px)';
+  setTimeout(function() {
+    fig.innerHTML =
+      '<div class="doll-poop-state">💩<div class="doll-poop-txt">已成功發洩！🎉</div></div>';
+    fig.style.transform = ''; fig.style.filter = ''; fig.style.transition = '';
+  }, 950);
 }
 
 initApp();
