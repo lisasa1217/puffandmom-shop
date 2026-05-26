@@ -864,11 +864,10 @@ input[type=file]{display:none}
     <div class="doll-play-hint" id="doll-play-hint" style="display:none">選擇工具對著開打 👇</div>
     <!-- health bar: shown after photo confirmed -->
     <div id="doll-hp-bar-wrap" style="display:none">
-      <div class="doll-hp-label">血量條 — 打到歸零變大便 💩</div>
       <div class="doll-hp-wrap">
-        <span class="doll-hp-icon">❤️</span>
-        <div class="doll-hp-track"><div class="doll-hp-fill" id="doll-hp-fill"></div></div>
         <span class="doll-hp-icon">💩</span>
+        <div class="doll-hp-track"><div class="doll-hp-fill" id="doll-hp-fill" style="width:0%;background:#E8DDD5"></div></div>
+        <span class="doll-hp-icon">❤️</span>
       </div>
     </div>
     <!-- tools -->
@@ -2123,7 +2122,7 @@ function openDoll() {
   document.getElementById('doll-reset-strip').style.display = 'none';
   document.getElementById('doll-hp-bar-wrap').style.display = 'none';
   var fill0 = document.getElementById('doll-hp-fill');
-  if (fill0) { fill0.style.width = '100%'; fill0.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
+  if (fill0) { fill0.style.width = '0%'; fill0.style.background = '#E8DDD5'; }
   document.getElementById('doll-stars-wrap').style.display = 'none';
   document.querySelectorAll('.doll-tool-btn').forEach(function(b){b.classList.remove('on')});
   document.getElementById('doll-tb-hammer').classList.add('on');
@@ -2173,9 +2172,9 @@ function closeDoll() {
       var f = document.createElement('div');
       f.className = 'doll-farewell';
       f.textContent = '💳 來購物解解悶！';
-      f.style.animationDuration = '4.8s';
+      f.style.animationDuration = '5.2s';
       document.body.appendChild(f);
-      setTimeout(function(){ f.remove(); }, 4900);
+      setTimeout(function(){ f.remove(); }, 5300);
     }, 180);
     // scroll to 現正開團中 section
     setTimeout(function() {
@@ -2231,7 +2230,7 @@ function confirmDollPhoto(e) {
   // show health bar
   document.getElementById('doll-hp-bar-wrap').style.display = '';
   var fill = document.getElementById('doll-hp-fill');
-  if (fill) { fill.style.width = '100%'; fill.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
+  if (fill) { fill.style.width = '0%'; fill.style.background = '#E8DDD5'; }
 }
 
 function resetDollPhoto(e) {
@@ -2249,7 +2248,7 @@ function resetDollPhoto(e) {
   document.getElementById('doll-reset-strip').style.display = 'none';
   document.getElementById('doll-hp-bar-wrap').style.display = 'none';
   var fill1 = document.getElementById('doll-hp-fill');
-  if (fill1) { fill1.style.width = '100%'; fill1.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)'; }
+  if (fill1) { fill1.style.width = '0%'; fill1.style.background = '#E8DDD5'; }
   var fileInp = document.getElementById('doll-file');
   if (fileInp) { fileInp.value = ''; fileInp.click(); }
 }
@@ -2349,15 +2348,15 @@ function _dollUpdateAppearance() {
   if (svg && h>=8) {
     svg.style.transform = 'scaleX('+Math.min(1+(h-7)*0.04,1.35)+') scaleY('+Math.max(1-(h-7)*0.025,.72)+')';
   }
-  // update health bar
+  // update damage bar (fills up from 0→100% as hits increase toward 13)
   var fill = document.getElementById('doll-hp-fill');
   if (fill) {
-    var pct = Math.max(0, (13 - h) / 13 * 100);
+    var pct = Math.min(h, 13) / 13 * 100;
     fill.style.width = pct + '%';
-    if (pct <= 0)       fill.style.background = '#333';
-    else if (pct < 25)  fill.style.background = 'linear-gradient(90deg,#8B1A1A,#CC2200)';
-    else if (pct < 55)  fill.style.background = 'linear-gradient(90deg,#D4742A,#FF7722)';
-    else                fill.style.background = 'linear-gradient(90deg,#FF6B95,#FF3366)';
+    if (pct >= 100)     fill.style.background = 'linear-gradient(90deg,#3B1A00,#5C2E00)';
+    else if (pct >= 70) fill.style.background = 'linear-gradient(90deg,#6B3318,#8B4513)';
+    else if (pct >= 40) fill.style.background = 'linear-gradient(90deg,#AA6622,#CC8844)';
+    else                fill.style.background = 'linear-gradient(90deg,#DDAA88,#CC9966)';
   }
 }
 
