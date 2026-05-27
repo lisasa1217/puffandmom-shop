@@ -2479,9 +2479,9 @@ function openDoll() {
   }
   var face = document.getElementById('doll-face');
   if (face) { face.textContent = '📷'; face.style.display = ''; }
-  // unlock tools
+  /* lock tools until photo is confirmed */
   var tools = document.getElementById('doll-tools');
-  if (tools) { tools.style.opacity = ''; tools.style.pointerEvents = ''; }
+  if (tools) { tools.style.opacity = '.3'; tools.style.pointerEvents = 'none'; }
   var headImg = document.getElementById('doll-head-img');
   if (headImg) { headImg.src = ''; headImg.style.display = 'none'; }
   // photo controls: show initial label+hint
@@ -2547,15 +2547,17 @@ function closeDoll() {
       document.body.appendChild(f);
       setTimeout(function(){ f.remove(); }, 5100);
     }, 180);
-    // scroll to 現正開團中 section + animate title in
+    // scroll to 現正開團中 title (offset for fixed ig-strip header)
     setTimeout(function() {
       var sec = document.getElementById('active-sec');
       if (sec) {
-        sec.scrollIntoView({behavior:'smooth', block:'start'});
+        var headerH = 57; /* ig-strip fixed header height */
+        var top = sec.getBoundingClientRect().top + window.pageYOffset - headerH;
+        window.scrollTo({top: top, behavior: 'smooth'});
         var head = sec.querySelector('.sec-head');
         if (head) {
           head.classList.remove('fu');
-          void head.offsetWidth; /* force reflow to restart animation */
+          void head.offsetWidth;
           head.classList.add('fu');
         }
       }
@@ -2692,7 +2694,7 @@ function _initDollDrag(img) {
 }
 
 function hitDoll(e) {
-  if (_dollHitting || _dollPooped || _dollPhotoPlacing) return;
+  if (_dollHitting || _dollPooped || _dollPhotoPlacing || !_dollPhotoLocked) return;
   _dollHitting = true;
   _dollHits++;
   if (!_dollTracked) { _dollTracked = true; trackClick('doll_hit', null); }
