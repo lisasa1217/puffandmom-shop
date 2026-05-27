@@ -122,7 +122,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--rule);display:flex;flex-direction:column}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:0;right:12px;z-index:4;background:rgba(140,124,108,.88);color:#F3E0A7;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.acard-note{position:absolute;top:0;right:12px;z-index:4;background:#4A3528;color:#F3E0A7;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .note-pop{position:fixed;background:rgba(46,46,46,.93);color:#f2f2f0;font-size:11px;font-weight:400;letter-spacing:.4px;line-height:1.65;padding:8px 13px;border-radius:9px;max-width:190px;word-break:break-word;z-index:9910;box-shadow:0 4px 18px rgba(0,0,0,.22);pointer-events:none;animation:notepop-in .14s ease}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
@@ -2327,9 +2327,17 @@ var _avaTapped = false;
 function _avaJingle() {
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var noteHz = {'F#3':185.00,'G#3':207.65,'A3':220.00,'B3':246.94,'C#4':277.18,'D4':293.66};
-    var seq = ['D4','D4','B3','C#4','D4','C#4','C#4','D4','C#4','G#3','F#3','D4','D4','C#4','D4','D4','C#4','B3','A3'];
-    var melody = seq.map(function(n,i){ return {f:noteHz[n], t:i*0.13, dur:0.28}; });
+    // 輕快五聲音階小跳躍 C5-E5-G5-A5-G5-E5-G5-C6
+    var melody = [
+      {f:523.25,t:0,   dur:0.18},
+      {f:659.25,t:0.14,dur:0.18},
+      {f:783.99,t:0.28,dur:0.18},
+      {f:880.00,t:0.42,dur:0.18},
+      {f:783.99,t:0.54,dur:0.14},
+      {f:659.25,t:0.65,dur:0.14},
+      {f:783.99,t:0.76,dur:0.14},
+      {f:1046.50,t:0.87,dur:0.38}
+    ];
     melody.forEach(function(note) {
       var o = ctx.createOscillator();
       var g = ctx.createGain();
@@ -2337,7 +2345,7 @@ function _avaJingle() {
       o.type = 'sine'; o.frequency.value = note.f;
       var t = ctx.currentTime + note.t;
       g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.18, t + 0.012);
+      g.gain.linearRampToValueAtTime(0.17, t + 0.01);
       g.gain.exponentialRampToValueAtTime(0.001, t + note.dur);
       o.start(t); o.stop(t + note.dur);
     });
