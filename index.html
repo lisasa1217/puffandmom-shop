@@ -104,7 +104,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .soon-row{background:var(--card);display:flex;align-items:center;padding:14px 20px;gap:14px;border-bottom:1px solid var(--rule)}
 .soon-date-col{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0}
 .soon-mo{font-size:9px;color:var(--ink3);font-weight:300}
-.soon-day{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:24px;font-weight:300;line-height:1;color:var(--ink)}
+.soon-day{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:24px;font-weight:300;line-height:1;color:var(--ink)}
 .soon-info{flex:1;min-width:0}
 .soon-name{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
 .soon-cd{display:flex;gap:3px;align-items:center}
@@ -148,7 +148,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img-btn a:hover,.acard-img-btn button:hover{transform:translateY(-2px);background:rgba(255,253,245,.28)}
 .acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93)}
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
-.acard-name{font-family:'Noto Serif TC',serif;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acard-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:12px;font-weight:400;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.16);border:none;border-radius:4px;padding:4px 9px;font-size:11px;color:var(--green-dk);letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
 .acard-date svg{width:10px;height:10px;color:var(--green-dk);flex-shrink:0}
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
@@ -158,7 +158,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .disc-chip:hover{background:rgba(130,183,204,.13);border-color:var(--green)}
 .disc-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
 .disc-label{font-size:8px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3)}
-.disc-code{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:13px;letter-spacing:1.5px;color:var(--ink)}
+.disc-code{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:12px;letter-spacing:1.2px;color:var(--ink)}
 .disc-copy{font-size:9px;color:var(--ink3)}
 .active-empty{grid-column:span 2;padding:20px;text-align:center;font-size:12px;color:var(--ink3);font-weight:300}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
@@ -384,7 +384,7 @@ input[type=file]{display:none}
 .sheet{width:100%;max-width:430px;background:var(--card);border-radius:20px 20px 0 0;padding:20px 24px calc(44px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .3s cubic-bezier(.3,1,.2,1)}
 .overlay.on .sheet{transform:translateY(0)}
 .sh-handle{width:28px;height:3px;background:var(--rule);border-radius:2px;margin:0 auto 20px}
-.sh-name{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:20px;font-weight:300;margin-bottom:6px;font-style:italic}
+.sh-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:18px;font-weight:400;margin-bottom:6px;letter-spacing:.3px}
 .sh-desc{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:20px;font-weight:300}
 .sh-acts{display:flex;flex-direction:column;gap:8px}
 .sh-a{display:block;text-align:center;padding:13px;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer;border:none;text-decoration:none}
@@ -2547,10 +2547,18 @@ function closeDoll() {
       document.body.appendChild(f);
       setTimeout(function(){ f.remove(); }, 5100);
     }, 180);
-    // scroll to 現正開團中 section
+    // scroll to 現正開團中 section + animate title in
     setTimeout(function() {
       var sec = document.getElementById('active-sec');
-      if (sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+      if (sec) {
+        sec.scrollIntoView({behavior:'smooth', block:'start'});
+        var head = sec.querySelector('.sec-head');
+        if (head) {
+          head.classList.remove('fu');
+          void head.offsetWidth; /* force reflow to restart animation */
+          head.classList.add('fu');
+        }
+      }
     }, 600);
   }
 }
