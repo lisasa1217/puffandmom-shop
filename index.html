@@ -728,7 +728,7 @@ input[type=file]{display:none}
   <!-- Panel: 流量 -->
   <div class="adm-panel" id="adm-panel-stats">
     <div class="asec">
-      <div class="asec-lbl">點擊流量統計</div>
+      <div class="asec-lbl">點擊流量統計 <span style="font-size:9px;color:var(--ink3);font-weight:300;letter-spacing:.5px">本月</span></div>
       <div id="stats-content"><div class="stat-empty">載入中…</div></div>
     </div>
   </div>
@@ -1585,7 +1585,12 @@ async function loadStats() {
   var el = document.getElementById('stats-content'); if (!el) return;
   el.innerHTML = '<div class="stat-empty">載入中…</div>';
   try {
-    var res = await sb.from('clicks').select('event_type,item_id').order('id',{ascending:false}).limit(2000);
+    /* 只顯示本月資料，每月 1 號自動重置 */
+    var now = new Date();
+    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    var res = await sb.from('clicks').select('event_type,item_id')
+      .gte('created_at', monthStart)
+      .order('id',{ascending:false}).limit(2000);
     var data = res.data || [];
     var cnt = {buy:0,ig_detail:0,calendar:0,disc_copy:0,line:0,ig_follow:0,doll_hit:0};
     var byItem = {};
@@ -2310,6 +2315,10 @@ function go(pg) {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('pg-' + pg).classList.add('on');
   document.getElementById('tb-' + pg).classList.add('on');
+  /* hide floating FABs in admin, show on front */
+  var inAdm = pg === 'admin';
+  document.querySelector('.kuka-fab').style.display = inAdm ? 'none' : '';
+  document.querySelector('.doll-fab').style.display = inAdm ? 'none' : '';
   if (pg === 'front') renderFront();
   if (pg === 'admin') { switchAdmTab('profile'); renderAdmin(); }
 }
@@ -2721,8 +2730,46 @@ function _initDollDrag(img) {
   });
 }
 
+function _dollHitSound(tool) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var now = ctx.currentTime;
+    if (tool === 'bomb') {
+      /* boom: low sine sweep + noise burst */
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(110, now); o.frequency.exponentialRampToValueAtTime(28, now+0.35);
+      g.gain.setValueAtTime(0.45, now); g.gain.exponentialRampToValueAtTime(0.001, now+0.42);
+      o.start(now); o.stop(now+0.42);
+      var buf = ctx.createBuffer(1, ctx.sampleRate*0.18, ctx.sampleRate);
+      var d = buf.getChannelData(0); for (var i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      var ns = ctx.createBufferSource(), ng = ctx.createGain();
+      ns.buffer = buf; ns.connect(ng); ng.connect(ctx.destination);
+      ng.gain.setValueAtTime(0.28, now); ng.gain.exponentialRampToValueAtTime(0.001, now+0.18);
+      ns.start(now);
+    } else if (tool === 'hammer') {
+      /* clang: sawtooth sweep */
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(420, now); o.frequency.exponentialRampToValueAtTime(70, now+0.22);
+      g.gain.setValueAtTime(0.22, now); g.gain.exponentialRampToValueAtTime(0.001, now+0.26);
+      o.start(now); o.stop(now+0.26);
+    } else {
+      /* fist thump: low sine punch */
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(180, now); o.frequency.exponentialRampToValueAtTime(45, now+0.16);
+      g.gain.setValueAtTime(0.35, now); g.gain.exponentialRampToValueAtTime(0.001, now+0.18);
+      o.start(now); o.stop(now+0.18);
+    }
+  } catch(ex) {}
+}
 function hitDoll(e) {
   if (_dollHitting || _dollPooped || _dollPhotoPlacing || !_dollPhotoLocked) return;
+  _dollHitSound(_dollTool);
   _dollHitting = true;
   _dollHits++;
   if (!_dollTracked) { _dollTracked = true; trackClick('doll_hit', null); }
