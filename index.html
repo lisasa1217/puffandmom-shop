@@ -1501,7 +1501,7 @@ function renderActive(items, permanentItems) {
     var buyTrack = item.link ? ' onclick="trackClick(\'buy\',' + item.id + ')"' : '';
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
-    var noteH = item.note ? '<div class="acard-note" onclick="showNotePop(event,' + JSON.stringify(item.note) + ')">' + item.note + '</div>' : '';
+    var noteH = item.note ? '<div class="acard-note" data-note="' + item.note.replace(/"/g,'&quot;') + '" onclick="showNotePop(event)">' + item.note + '</div>' : '';
     el.innerHTML =
       '<div class="acard-img">' +
         imgH + noteH +
@@ -1618,9 +1618,10 @@ function addToCalendar(id) {
 }
 /* ── NOTE TAG POPUP ── */
 var _notePop = null;
-function showNotePop(e, text) {
+function showNotePop(e) {
   e.stopPropagation();
   if (_notePop) { _notePop.remove(); _notePop = null; }
+  var text = e.currentTarget.dataset.note || e.currentTarget.textContent;
   var pop = document.createElement('div');
   pop.className = 'note-pop';
   pop.textContent = text;
