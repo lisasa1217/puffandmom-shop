@@ -122,7 +122,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--rule);display:flex;flex-direction:column}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:12px;right:0;z-index:4;background:var(--yellow);color:#5A3800;font-size:8px;font-weight:500;padding:4px 10px 4px 9px;border-radius:3px 0 0 3px;letter-spacing:.7px;max-width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;box-shadow:-2px 2px 6px rgba(0,0,0,.14);-webkit-tap-highlight-color:transparent}
+.acard-note{position:absolute;top:10px;right:10px;z-index:4;background:rgba(140,124,108,.88);color:#F3E0A7;font-size:9px;font-weight:400;padding:3px 9px;border-radius:20px;letter-spacing:.5px;max-width:82px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .note-pop{position:fixed;background:rgba(46,46,46,.93);color:#f2f2f0;font-size:11px;font-weight:400;letter-spacing:.4px;line-height:1.65;padding:8px 13px;border-radius:9px;max-width:190px;word-break:break-word;z-index:9910;box-shadow:0 4px 18px rgba(0,0,0,.22);pointer-events:none;animation:notepop-in .14s ease}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
@@ -149,8 +149,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93)}
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'DM Sans','Noto Serif TC',sans-serif;font-size:12px;font-weight:400;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.acard-date{display:inline-flex;align-items:center;gap:5px;background:#82B7CC;border:none;border-radius:4px;padding:4px 9px;font-size:11px;color:#F3E0A7;letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
-.acard-date svg{width:10px;height:10px;color:#F3E0A7;flex-shrink:0}
+.acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.15);border:1px solid rgba(130,183,204,.35);border-radius:6px;padding:3px 8px;font-size:10px;color:#4d7d94;letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
+.acard-date svg{width:9px;height:9px;color:#4d7d94;flex-shrink:0}
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
 .detail-btn:active{background:var(--bg)}
 .detail-btn svg{width:9px;height:9px}
@@ -330,7 +330,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .delete-arch-btn{font-size:10px;color:#b03a2e;background:none;border:1px solid rgba(176,58,46,.4);border-radius:5px;padding:3px 7px;cursor:pointer;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .delete-arch-btn:active{background:rgba(176,58,46,.08)}
 /* permanent badge */
-.perm-badge{display:inline-flex;align-items:center;background:#82B7CC;color:#F3E0A7;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500;letter-spacing:.5px;margin-left:4px}
+.perm-badge{display:inline-flex;align-items:center;background:rgba(243,224,167,.45);border:1px solid rgba(200,170,90,.35);color:#7a5a20;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:400;letter-spacing:.5px;margin-left:4px}
 .adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
 .adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .adm-ithumb img{width:100%;height:100%;object-fit:cover}
@@ -2324,7 +2324,26 @@ function toast(msg) {
 var _avaHearts = ['🩷','💛','🩵','💕','✨','🌸','💝'];
 var _avaIdx = 0;
 var _avaTapped = false;
+function _avaJingle() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // short 4-note sparkle: E5 G5 A5 C6
+    var notes = [659.25, 783.99, 880, 1046.50];
+    notes.forEach(function(freq, i) {
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = freq;
+      var t = ctx.currentTime + i * 0.1;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.22, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      o.start(t); o.stop(t + 0.22);
+    });
+  } catch(e) {}
+}
 function avaHeart(e) {
+  _avaJingle();
   // fade out hint after first tap
   if (!_avaTapped) {
     _avaTapped = true;
