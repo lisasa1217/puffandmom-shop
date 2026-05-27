@@ -1963,8 +1963,9 @@ function archDrop(e) {
 async function archiveItem(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   item.archived = true; item.permanent = false;
-  item.openD = '1970-01-01'; item.closeD = '1970-01-01';
-  var res = await sb.from('items').update({ open_d: '1970-01-01', close_d: '1970-01-01' }).eq('id', id);
+  item.openD = '1970-01-01';
+  /* close_d intentionally NOT changed — original date preserved for restoration */
+  var res = await sb.from('items').update({ open_d: '1970-01-01' }).eq('id', id);
   if (res.error) { toast('❌ 下架失敗'); return; }
   toast('📦 已下架');
   renderAdmItems();
@@ -1973,13 +1974,29 @@ async function archiveItem(id) {
 
 async function restoreItem(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
-  var today = new Date().toISOString().slice(0,10);
-  var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
+  var openDate, closeDate, msg;
+
+  /* New-style archive: close_d was preserved (≠ '1970-01-01') → restore to original dates */
+  if (item.archived && item.closeD && item.closeD !== '1970-01-01') {
+    closeDate = item.closeD;
+    /* open_d = close_d when close is in the past (keeps classify correct),
+       or today when close is in the future (makes it active) */
+    var closeMs = new Date(closeDate).setHours(0,0,0,0);
+    var nowMs   = new Date().setHours(0,0,0,0);
+    openDate = closeMs <= nowMs ? closeDate : new Date().toISOString().slice(0,10);
+    msg = '✓ 已恢復（保留原始日期）';
+  } else {
+    /* Old-style archive (both dates wiped) or auto-archived → set fresh dates */
+    openDate  = new Date().toISOString().slice(0,10);
+    closeDate = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
+    msg = '✓ 已恢復，請重新確認日期';
+  }
+
   item.archived = false; item.permanent = false;
-  item.openD = today; item.closeD = close;
-  var res = await sb.from('items').update({ open_d: today, close_d: close }).eq('id', id);
+  item.openD = openDate; item.closeD = closeDate;
+  var res = await sb.from('items').update({ open_d: openDate, close_d: closeDate }).eq('id', id);
   if (res.error) { toast('❌ 恢復失敗'); return; }
-  toast('✓ 已恢復，請重新確認日期');
+  toast(msg);
   renderAdmItems();
   renderFront();
   setTimeout(function(){ var f = document.getElementById('if' + id); if (f) f.classList.add('on'); }, 80);
