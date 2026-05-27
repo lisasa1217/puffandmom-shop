@@ -1501,7 +1501,7 @@ function renderActive(items, permanentItems) {
     var buyTrack = item.link ? ' onclick="trackClick(\'buy\',' + item.id + ')"' : '';
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
-    var noteH = item.note ? '<div class="acard-note" data-note="' + item.note.replace(/"/g,'&quot;') + '" onclick="showNotePop(event)">' + item.note + '</div>' : '';
+    var noteH = item.note ? '<div class="acard-note" data-note="' + item.note.replace(/"/g,'&quot;') + '">' + item.note + '</div>' : '';
     el.innerHTML =
       '<div class="acard-img">' +
         imgH + noteH +
@@ -1519,6 +1519,18 @@ function renderActive(items, permanentItems) {
       (function(iid) {
         el.querySelector('.acard-img-btn a').onclick = function(e) { e.preventDefault(); openSheet(iid); };
       })(item.id);
+    }
+    /* note badge: hover on desktop, click on touch */
+    if (item.note) {
+      var badge = el.querySelector('.acard-note');
+      if (badge) {
+        if (_noteHover) {
+          badge.addEventListener('mouseenter', showNotePop);
+          badge.addEventListener('mouseleave', hideNotePop);
+        } else {
+          badge.addEventListener('click', function(e) { e.stopPropagation(); showNotePop(e); });
+        }
+      }
     }
     grid.appendChild(el);
   };
@@ -1617,17 +1629,17 @@ function addToCalendar(id) {
   toast('✓ 行事曆提醒已加入！開團當天 10:30 通知你');
 }
 /* ── NOTE TAG POPUP ── */
-var _notePop = null;
+var _notePop  = null;
+var _noteHover = window.matchMedia('(hover:hover)').matches; /* true = mouse device */
 function showNotePop(e) {
-  e.stopPropagation();
   if (_notePop) { _notePop.remove(); _notePop = null; }
-  var text = e.currentTarget.dataset.note || e.currentTarget.textContent;
-  var pop = document.createElement('div');
+  var badge = e.currentTarget;
+  var text  = badge.dataset.note || badge.textContent;
+  var pop   = document.createElement('div');
   pop.className = 'note-pop';
   pop.textContent = text;
   document.body.appendChild(pop);
-  /* position: below the badge, right-aligned to screen edge */
-  var rect = e.currentTarget.getBoundingClientRect();
+  var rect = badge.getBoundingClientRect();
   var maxW = 190;
   var left = Math.min(rect.right - maxW, window.innerWidth - maxW - 8);
   pop.style.top  = (rect.bottom + 7) + 'px';
@@ -1635,7 +1647,10 @@ function showNotePop(e) {
   _notePop = pop;
 }
 function hideNotePop() { if (_notePop) { _notePop.remove(); _notePop = null; } }
-document.addEventListener('click', hideNotePop);
+/* dismiss on click elsewhere, any scroll, or any touch-move */
+document.addEventListener('click',     hideNotePop);
+document.addEventListener('scroll',    hideNotePop, {passive:true, capture:true});
+document.addEventListener('touchmove', hideNotePop, {passive:true});
 
 function copyDisc(e, code, itemId) {
   e.stopPropagation();
