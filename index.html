@@ -9,7 +9,7 @@
 <meta property="og:url" content="https://puffandmom-picks.vercel.app">
 <meta property="og:image" content="https://puffandmom-picks.vercel.app/og.svg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23C3CE6A'/><text x='50' y='68' font-size='52' text-anchor='middle'>🌿</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@200;300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@200;300;400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -91,14 +91,14 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
-.hero-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:26px;font-weight:300;letter-spacing:4px;text-align:center;margin-bottom:6px}
+.hero-name{font-family:'Noto Sans TC','DM Sans',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;text-align:center;margin-bottom:6px}
 .hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
 .hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
 .hero-bio{font-family:'Noto Serif TC',serif;font-size:13px;font-weight:200;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
 
 .sec-head{padding:32px 20px 20px;display:flex;align-items:center;gap:12px}
 .sec-h-line{flex:1;height:1px;background:var(--rule)}
-.sec-h-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);font-weight:400;white-space:nowrap}
+.sec-h-title{font-size:16px;letter-spacing:.5px;color:var(--ink);font-weight:700;white-space:nowrap;font-family:'Noto Sans TC','DM Sans',sans-serif}
 
 .soon-list{display:flex;flex-direction:column}
 .soon-row{background:var(--card);display:flex;align-items:center;padding:14px 20px;gap:14px;border-bottom:1px solid var(--rule)}
@@ -106,7 +106,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .soon-mo{font-size:9px;color:var(--ink3);font-weight:300}
 .soon-day{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:24px;font-weight:300;line-height:1;color:var(--ink)}
 .soon-info{flex:1;min-width:0}
-.soon-name{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.soon-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;font-family:'Noto Sans TC','DM Sans',sans-serif}
 .soon-cd{display:flex;gap:3px;align-items:center}
 .cd-unit{display:flex;flex-direction:column;align-items:center;background:var(--yellow);border-radius:4px;padding:3px 6px;min-width:28px}
 .cd-n{font-size:12px;font-weight:600;color:#8B6000;line-height:1}
@@ -148,7 +148,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img-btn a:hover,.acard-img-btn button:hover{transform:translateY(-2px);background:rgba(255,253,245,.28)}
 .acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93)}
 .acard-body{padding:9px 11px 12px;display:flex;flex-direction:column;flex:1}
-.acard-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:12px;font-weight:400;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acard-name{font-family:'Noto Sans TC','DM Sans',sans-serif;font-size:13px;font-weight:500;line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.16);border:none;border-radius:4px;padding:4px 9px;font-size:11px;color:var(--green-dk);letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
 .acard-date svg{width:10px;height:10px;color:var(--green-dk);flex-shrink:0}
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
@@ -173,7 +173,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .ended-list{display:flex;flex-direction:column}
 .ended-row{background:var(--card);display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule)}
-.ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ended-name{flex:1;font-size:13px;color:var(--ink2);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Noto Sans TC','DM Sans',sans-serif}
 .ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap;animation:cs-nudge 3s ease-in-out infinite}
 @keyframes cs-nudge{0%,85%,100%{transform:translateX(0)}88%{transform:translateX(3px)}92%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
 
@@ -384,7 +384,7 @@ input[type=file]{display:none}
 .sheet{width:100%;max-width:430px;background:var(--card);border-radius:20px 20px 0 0;padding:20px 24px calc(44px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .3s cubic-bezier(.3,1,.2,1)}
 .overlay.on .sheet{transform:translateY(0)}
 .sh-handle{width:28px;height:3px;background:var(--rule);border-radius:2px;margin:0 auto 20px}
-.sh-name{font-family:'DM Sans','Noto Sans TC',sans-serif;font-size:18px;font-weight:400;margin-bottom:6px;letter-spacing:.3px}
+.sh-name{font-family:'Noto Sans TC','DM Sans',sans-serif;font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:.2px}
 .sh-desc{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:20px;font-weight:300}
 .sh-acts{display:flex;flex-direction:column;gap:8px}
 .sh-a{display:block;text-align:center;padding:13px;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer;border:none;text-decoration:none}
