@@ -123,6 +123,13 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .acard-note{position:absolute;top:0;right:12px;z-index:4;background:#4A3528;color:#F3E0A7;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.acard-note.note-red{background:#C0392B;color:#F5D46B;animation:note-urgent 1.5s ease-in-out infinite}
+@keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
+.note-color-pick{display:flex;gap:8px;margin-top:4px}
+.ncp-opt{cursor:pointer;display:inline-flex}
+.ncp-opt input[type=radio]{display:none}
+.ncp-opt span{display:inline-block;padding:3px 13px;border-radius:20px;font-size:11px;font-weight:500;border:2px solid transparent;transition:border-color .15s,opacity .15s;opacity:.65}
+.ncp-opt input[type=radio]:checked ~ span{border-color:var(--ink);opacity:1}
 .note-pop{position:fixed;background:rgba(46,46,46,.93);color:#f2f2f0;font-size:11px;font-weight:400;letter-spacing:.4px;line-height:1.65;padding:8px 13px;border-radius:9px;max-width:190px;word-break:break-word;z-index:9910;box-shadow:0 4px 18px rgba(0,0,0,.22);pointer-events:none;animation:notepop-in .14s ease}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
 .acard-img-btn{
@@ -1515,7 +1522,8 @@ function renderActive(items, permanentItems) {
     var buyTrack = item.link ? ' onclick="trackClick(\'buy\',' + item.id + ')"' : '';
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
-    var noteH = item.note ? '<div class="acard-note" data-note="' + item.note.replace(/"/g,'&quot;') + '">' + item.note + '</div>' : '';
+    var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
+    var noteH = _nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '';
     el.innerHTML =
       '<div class="acard-img">' +
         imgH + noteH +
@@ -1627,6 +1635,7 @@ function confirmClearOldClicks() {
   cutoff.setMonth(cutoff.getMonth() - 3);
   var label = cutoff.getFullYear() + '/' + (cutoff.getMonth()+1) + '/' + cutoff.getDate();
   var box = document.createElement('div');
+  box.id = 'clear-old-overlay';
   box.style.cssText = 'position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:9800;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)';
   box.innerHTML =
     '<div style="background:var(--card);border-radius:16px;padding:26px 22px 20px;width:280px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)">' +
@@ -1636,7 +1645,7 @@ function confirmClearOldClicks() {
         label + ' 以前的點擊紀錄<br>將永久刪除，無法復原。' +
       '</div>' +
       '<div style="display:flex;gap:8px">' +
-        '<button onclick="this.closest(\'div[style]\').remove()" style="flex:1;padding:11px;border-radius:9px;border:none;background:var(--bg);font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink2)">取消</button>' +
+        '<button onclick="document.getElementById(\'clear-old-overlay\').remove()" style="flex:1;padding:11px;border-radius:9px;border:none;background:var(--bg);font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink2)">取消</button>' +
         '<button onclick="_doClearOldClicks(this)" style="flex:1;padding:11px;border-radius:9px;border:none;background:#b03a2e;color:#fff;font-family:inherit;font-size:13px;cursor:pointer;font-weight:500">確認刪除</button>' +
       '</div>' +
     '</div>';
@@ -1652,7 +1661,7 @@ async function _doClearOldClicks(btn) {
     if (res.error) { toast('❌ 刪除失敗'); }
     else { toast('✓ 舊紀錄已清除'); loadStats(); }
   } catch(e) { toast('❌ 刪除失敗'); }
-  btn.closest('div[style]').remove();
+  var ov = document.getElementById('clear-old-overlay'); if (ov) ov.remove();
 }
 
 function addToCalendar(id) {
@@ -1808,7 +1817,18 @@ function _buildItemCard(item, noHandle) {
       '</div>' +
       '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
       '<div class="fld"><label>Emoji（無圖片時）</label><input id="fe' + item.id + '" value="' + (item.emoji || '') + '" placeholder="🛍️" style="max-width:70px"></div>' +
-      '<div class="fld"><label>備註標籤（圖片角落顯示，例如：限時優惠、買一送一）</label><input id="fnote' + item.id + '" value="' + (item.note || '') + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12"></div>' +
+      (function(){
+        var nr = item.note || '';
+        var nRed = nr.startsWith('[red]');
+        var nVal = nRed ? nr.slice(5) : nr;
+        return '<div class="fld"><label>備註標籤（圖片角落顯示）</label>' +
+          '<div class="note-color-pick">' +
+            '<label class="ncp-opt"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:#4A3528;color:#F3E0A7">咖色</span></label>' +
+            '<label class="ncp-opt"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#C0392B;color:#F5D46B">紅色 🚨</span></label>' +
+          '</div>' +
+          '<input id="fnote' + item.id + '" value="' + nVal + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12">' +
+        '</div>';
+      })() +
       '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
       '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
       '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
@@ -2099,7 +2119,9 @@ async function saveItem(id) {
   if (applyBtn && applyBtn.style.display !== 'none') cropApply(id);
   item.name     = document.getElementById('fn' + id).value;
   item.emoji    = document.getElementById('fe' + id).value;
-  item.note     = document.getElementById('fnote' + id).value;
+  var ncpEl = document.querySelector('input[name="ncp-' + id + '"]:checked');
+  var notePrefix = (ncpEl && ncpEl.value === 'red') ? '[red]' : '';
+  item.note = notePrefix + (document.getElementById('fnote' + id).value || '');
   item.desc     = document.getElementById('fd' + id).value;
   item.link     = document.getElementById('fl' + id).value;
   item.igUrl    = document.getElementById('fig' + id).value;
