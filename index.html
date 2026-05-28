@@ -111,14 +111,15 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
-.hero-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;font-style:italic;letter-spacing:2px;text-align:center;margin-bottom:6px}
+.hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px}
 .hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
 .hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
-.hero-bio{font-family:'Noto Serif TC',serif;font-size:13px;font-weight:200;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
+.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
 
 .sec-head{padding:36px 20px 18px;display:flex;align-items:center;gap:14px}
 .sec-h-line{flex:1;height:1px;background:var(--rule)}
-.sec-h-title{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:3px;color:var(--ink2);font-weight:400;font-style:italic;white-space:nowrap;text-transform:uppercase}
+.sec-h-title{font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:2px;color:var(--ink3);font-weight:400;white-space:nowrap;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sec-h-en{font-family:'Cormorant Garamond',serif;font-size:9px;font-weight:300;font-style:italic;color:var(--ink3);letter-spacing:2.5px;opacity:.65;text-transform:lowercase;display:block}
 
 .soon-list{display:flex;flex-direction:column;gap:8px;padding:0 14px 4px}
 .soon-row{background:var(--white);display:flex;align-items:center;padding:14px 16px;gap:14px;border-radius:12px;box-shadow:0 2px 14px rgba(0,0,0,.06),0 0 0 0.5px rgba(0,0,0,.04)}
@@ -177,16 +178,16 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93)}
 .acard-body{padding:10px 13px 14px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'Noto Sans TC',sans-serif;font-size:11.5px;font-weight:300;line-height:1.65;color:var(--ink2);margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.15);border:1px solid rgba(130,183,204,.35);border-radius:6px;padding:3px 8px;font-size:10px;color:#4d7d94;letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
+.acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.15);border:none;border-radius:6px;padding:3px 8px;font-size:10px;color:#4d7d94;letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
 .acard-date svg{width:9px;height:9px;color:#4d7d94;flex-shrink:0}
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
 .detail-btn:active{background:var(--bg)}
 .detail-btn svg{width:9px;height:9px}
-.disc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:2px 7px;cursor:pointer;margin-bottom:5px;align-self:flex-start;transition:background .15s,border-color .15s}
+.disc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:3px 8px;cursor:pointer;margin-bottom:5px;align-self:flex-start;transition:background .15s,border-color .15s}
 .disc-chip:hover{background:rgba(130,183,204,.13);border-color:var(--green)}
 .disc-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
 .disc-label{font-size:8px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3)}
-.disc-code{font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:2px;color:var(--ink);font-weight:600}
+.disc-code{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1.5px;color:var(--ink);font-weight:500}
 .disc-copy{font-size:9px;color:var(--ink3)}
 .active-empty{grid-column:span 2;padding:20px;text-align:center;font-size:12px;color:var(--ink3);font-weight:300}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
@@ -360,7 +361,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .delete-arch-btn{font-size:10px;color:#b03a2e;background:none;border:1px solid rgba(176,58,46,.4);border-radius:5px;padding:3px 7px;cursor:pointer;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .delete-arch-btn:active{background:rgba(176,58,46,.08)}
 /* permanent badge */
-.perm-badge{display:inline-flex;align-items:center;background:rgba(243,224,167,.45);border:1px solid rgba(200,170,90,.35);color:#7a5a20;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:400;letter-spacing:.5px;margin-left:4px}
+.perm-badge{display:inline-flex;align-items:center;background:rgba(243,224,167,.45);border:none;color:#7a5a20;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:400;letter-spacing:.5px;margin-left:4px}
 .adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
 .adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .adm-ithumb img{width:100%;height:100%;object-fit:cover}
@@ -427,19 +428,21 @@ input[type=file]{display:none}
 .kuka-fab{
   position:fixed;left:0;top:26%;z-index:88;
   display:flex;flex-direction:column;align-items:center;
-  background:#F3E0A7;
-  border:none;border-radius:0 22px 22px 0;
-  padding:10px 9px 10px 6px;
-  cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.12);
+  background:var(--white);
+  border:none;border-radius:0 18px 18px 0;
+  padding:10px 9px 10px 0;
+  cursor:pointer;
+  box-shadow:2px 2px 14px rgba(0,0,0,.1);
+  border-left:3px solid var(--yellow);
   -webkit-tap-highlight-color:transparent;
   transition:transform .18s,filter .18s;
   animation:kuka-fab-bob 3s ease-in-out infinite;
 }
-.kuka-fab:hover{transform:translateX(3px);filter:brightness(1.06)}
-.kuka-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
+.kuka-fab:hover{transform:translateX(3px);filter:brightness(1.04)}
+.kuka-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 @keyframes kuka-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.kuka-fab-icon{font-size:20px;line-height:1;margin-bottom:4px}
-.kuka-fab-lbl{font-size:11px;font-weight:500;color:#82B7CC;letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
+.kuka-fab-icon{font-size:20px;line-height:1;margin-bottom:4px;margin-left:8px}
+.kuka-fab-lbl{font-size:11px;font-weight:500;color:var(--ink2);letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:6px}
 /* ── 每日誇誇 modal ── */
 .kuka-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:450;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .kuka-overlay.on{opacity:1;pointer-events:all}
@@ -475,11 +478,11 @@ input[type=file]{display:none}
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
 /* ── 小人退散 FAB (left side, below kuka) ── */
-.doll-fab{position:fixed;left:0;top:40%;z-index:88;display:flex;flex-direction:column;align-items:center;background:#8C7C6C;border:none;border-radius:0 22px 22px 0;padding:10px 9px 10px 6px;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.14);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite 0.6s}
-.doll-fab:hover{transform:translateX(3px);filter:brightness(1.06)}.doll-fab:active{filter:brightness(.88);transform:translateX(1px) scale(.95)}
+.doll-fab{position:fixed;left:0;top:40%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 18px 18px 0;padding:10px 9px 10px 0;cursor:pointer;box-shadow:2px 2px 14px rgba(0,0,0,.1);border-left:3px solid var(--green);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite 0.6s}
+.doll-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.doll-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 @keyframes doll-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.doll-fab-icon{font-size:19px;line-height:1;margin-bottom:4px}
-.doll-fab-lbl{font-size:11px;font-weight:500;color:#F3E0A7;letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2}
+.doll-fab-icon{font-size:19px;line-height:1;margin-bottom:4px;margin-left:8px}
+.doll-fab-lbl{font-size:11px;font-weight:500;color:var(--ink2);letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:6px}
 /* ── 小人退散 modal ── */
 .doll-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .doll-overlay.on{opacity:1;pointer-events:all}
@@ -649,17 +652,17 @@ input[type=file]{display:none}
   </div>
 
   <div id="soon-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團</span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團<span class="sec-h-en">coming soon</span></span><span class="sec-h-line"></span></div>
     <div class="soon-list" id="soon-list"></div>
   </div>
 
   <div id="active-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中</span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中<span class="sec-h-en">now open</span></span><span class="sec-h-line"></span></div>
     <div class="active-grid" id="active-grid"></div>
   </div>
 
   <div id="ended-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">已結團</span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">已結團<span class="sec-h-en">ended</span></span><span class="sec-h-line"></span></div>
     <div class="ended-list" id="ended-list"></div>
   </div>
 
