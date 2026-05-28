@@ -2575,9 +2575,9 @@ function startKukaDraw() {
   bamboo.textContent = '🎋';
   var box = document.getElementById('kuka-box');
   box.classList.add('kuka-spinning');
-  // shake 竹筒 for ~0.95s then reveal
+  // shake 竹筒 for 1.4s then reveal
   var ticks = 0;
-  var maxTicks = 12;
+  var maxTicks = 18;
   var ticker = setInterval(function() {
     ticks++;
     if (bamboo) bamboo.textContent = ticks % 2 === 0 ? '🎋' : '✨';
@@ -2694,9 +2694,9 @@ function closeDoll() {
       var f = document.createElement('div');
       f.className = 'doll-farewell';
       f.textContent = '💳 來購物解解悶！';
-      f.style.animationDuration = '5.0s';
+      f.style.animationDuration = '4.5s';
       document.body.appendChild(f);
-      setTimeout(function(){ f.remove(); }, 5100);
+      setTimeout(function(){ f.remove(); }, 4600);
     }, 180);
     // scroll to 現正開團中 title (offset for fixed ig-strip header)
     setTimeout(function() {
