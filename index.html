@@ -98,8 +98,15 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .hero{
   display:flex;flex-direction:column;align-items:center;
-  padding:88px 28px 110px;
-  background:url('hero-bg.PNG') center top / cover no-repeat;
+  padding:200px 28px 64px;
+  background:
+    linear-gradient(to bottom,
+      transparent 30%,
+      rgba(237,231,216,.45) 52%,
+      rgba(237,231,216,.88) 70%,
+      var(--bg) 90%
+    ),
+    url('hero-bg.PNG') center -120px / 100% auto no-repeat;
   border-bottom:1px solid rgba(130,183,204,.3);
   position:relative;overflow:hidden;
 }
@@ -141,9 +148,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
 .hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px}
-.hero-handle{font-size:10px;color:rgba(46,46,46,.5);letter-spacing:3px;font-weight:300;margin-bottom:16px}
+.hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
 .hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
-.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:rgba(46,46,46,.7);max-width:280px;white-space:pre-line}
+.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
 
 .sec-head{padding:36px 20px 18px;display:flex;align-items:center;gap:14px}
 .sec-h-line{flex:1;height:1px;background:var(--rule)}
