@@ -98,54 +98,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .hero{
   display:flex;flex-direction:column;align-items:center;
-  padding:92px 28px 110px;
-  background:none;
+  padding:88px 28px 110px;
+  background:url('hero-bg.PNG') center top / cover no-repeat;
   border-bottom:1px solid rgba(130,183,204,.3);
-  position:relative;overflow:hidden;isolation:isolate;
-}
-/* ── Hero scene: blue wall + lamps + yellow tile shelf ── */
-.hero-deco{position:absolute;inset:0;z-index:-1;overflow:hidden;
-  background:
-    radial-gradient(ellipse 48% 30% at 50% 17%,rgba(255,252,195,.40) 0%,transparent 100%),
-    #C8DDE8;
-}
-/* Yellow tile shelf */
-.hero-shelf{
-  position:absolute;bottom:0;left:0;right:0;height:120px;
-  background:
-    repeating-linear-gradient(to right,rgba(255,255,255,.32) 0,rgba(255,255,255,.32) 1.5px,transparent 1.5px,transparent 44px),
-    repeating-linear-gradient(to bottom,rgba(255,255,255,.32) 0,rgba(255,255,255,.32) 1.5px,transparent 1.5px,transparent 44px),
-    #F5E289;
-}
-.hero-shelf::before{
-  content:'';position:absolute;top:-14px;left:0;right:0;height:18px;
-  background:linear-gradient(to bottom,#ECDA74,#E4D065);
-  box-shadow:0 5px 16px rgba(0,0,0,.1);
-}
-/* Pendant lamp */
-.hlamp{position:absolute;top:0;display:flex;flex-direction:column;align-items:center}
-.hlamp-l{left:15%}.hlamp-c{left:50%;transform:translateX(-50%)}.hlamp-r{right:15%}
-.hlamp-cap{width:12px;height:7px;background:#D4AA3A;border-radius:6px 6px 0 0;flex-shrink:0}
-.hlamp-cable{width:3px;border-radius:0 0 2px 2px;background:linear-gradient(to bottom,#D4AA3A,#BF9520);flex-shrink:0}
-.hlamp-l .hlamp-cable{height:50px}.hlamp-c .hlamp-cable{height:38px}.hlamp-r .hlamp-cable{height:56px}
-.hlamp-dome{
-  width:54px;height:34px;flex-shrink:0;position:relative;
-  background:linear-gradient(145deg,#F2D04E 0%,#E0BC35 48%,#C4A018 100%);
-  border-radius:54px 54px 0 0;
-  box-shadow:inset 0 -6px 12px rgba(0,0,0,.14),0 4px 12px rgba(190,155,25,.28);
-}
-.hlamp-dome::after{
-  content:'';position:absolute;bottom:1px;left:50%;transform:translateX(-50%);
-  width:30px;height:12px;
-  background:radial-gradient(ellipse at 50% 50%,rgba(255,255,225,1) 0%,rgba(255,248,165,.55) 65%,transparent 100%);
-  border-radius:50%;
-}
-/* light cone */
-.hlamp-cone{
-  position:absolute;top:100%;left:50%;transform:translateX(-50%);
-  width:140px;height:180px;
-  background:radial-gradient(ellipse 82% 100% at 50% 0%,rgba(255,252,195,.38) 0%,transparent 68%);
-  pointer-events:none;
+  position:relative;overflow:hidden;
 }
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
@@ -669,22 +625,6 @@ input[type=file]{display:none}
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
   </a>
   <div class="hero">
-    <!-- Scene: lamps + tile shelf -->
-    <div class="hero-deco" aria-hidden="true">
-      <div class="hlamp hlamp-l">
-        <div class="hlamp-cap"></div><div class="hlamp-cable"></div>
-        <div class="hlamp-dome"><div class="hlamp-cone"></div></div>
-      </div>
-      <div class="hlamp hlamp-c">
-        <div class="hlamp-cap"></div><div class="hlamp-cable"></div>
-        <div class="hlamp-dome"><div class="hlamp-cone"></div></div>
-      </div>
-      <div class="hlamp hlamp-r">
-        <div class="hlamp-cap"></div><div class="hlamp-cable"></div>
-        <div class="hlamp-dome"><div class="hlamp-cone"></div></div>
-      </div>
-      <div class="hero-shelf"></div>
-    </div>
     <div class="ava-wrap" onclick="avaHeart(event)">
       <div class="ava-inner" id="f-ava"></div>
       <div class="ava-tap-badge" id="ava-tap-badge">👆</div>
