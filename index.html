@@ -98,30 +98,29 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .hero{
   display:flex;flex-direction:column;align-items:center;
-  padding:240px 28px 64px;
-  border-bottom:1px solid rgba(130,183,204,.3);
+  padding:200px 28px 64px;
   position:relative;overflow:hidden;
   isolation:isolate;
 }
-/* 燈：藍色背景，圓弧底部（往下凸弧，兩側露磁磚） */
+/* 藍色燈區：1.PNG，cover 填滿，圓弧底部往下凸 */
 .hero::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;
-  height:450px;
-  background:url('lamp.PNG') center -50px / 100% auto no-repeat;
+  height:680px;
+  background:url('1.PNG') center top / cover no-repeat;
   border-radius:0 0 50% 50% / 0 0 40px 40px;
   z-index:-1;
 }
-/* 磁磚：從弧形開始出現，底部漸出接頁面底色 */
-.hero::after{
-  content:'';
-  position:absolute;
-  left:0;right:0;top:410px;bottom:0;
-  background:url('tile.PNG') center top / 100% auto repeat-y;
-  -webkit-mask-image:linear-gradient(to bottom,black calc(100% - 80px),transparent 100%);
-  mask-image:linear-gradient(to bottom,black calc(100% - 80px),transparent 100%);
-  z-index:-2;
+/* 不再使用磁磚 ::after */
+.hero::after{content:none}
+/* 冰淇淋桌面 */
+.ice-scene{
+  height:286px;
+  background:url('2.PNG') center top / 100% auto no-repeat;
+  margin-top:-40px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,black 40px,black calc(100% - 100px),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,black 40px,black calc(100% - 100px),transparent 100%);
 }
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
@@ -131,9 +130,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .hero-swipe-track{display:flex;transition:transform .38s cubic-bezier(.4,0,.2,1);user-select:none;-webkit-user-select:none}
 .hero-swipe-slide{width:100%;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
 .hero-swipe-dots{display:flex;gap:6px;justify-content:center;margin-top:16px}
-.hsdot{height:5px;width:5px;border-radius:3px;background:rgba(0,0,0,.18);cursor:pointer;transition:background .25s,width .25s}
-.hsdot.on{background:#82B7CC;width:14px}
-.swipe-hint{font-size:10px;color:var(--ink3);letter-spacing:.5px;margin-top:12px;display:flex;align-items:center;gap:4px;opacity:1;transition:opacity .6s;animation:swipe-nudge 1.8s ease-in-out 1.2s 2}
+.hsdot{height:5px;width:5px;border-radius:3px;background:rgba(255,255,255,.38);cursor:pointer;transition:background .25s,width .25s}
+.hsdot.on{background:rgba(255,255,255,.9);width:14px}
+.swipe-hint{font-size:10px;color:rgba(45,68,88,.75);letter-spacing:.5px;margin-top:12px;display:flex;align-items:center;gap:4px;opacity:1;transition:opacity .6s;animation:swipe-nudge 1.8s ease-in-out 1.2s 2}
 .swipe-hint.gone{opacity:0;pointer-events:none}
 @keyframes swipe-nudge{0%,100%{transform:translateX(0)}40%{transform:translateX(-6px)}}
 /* personality spectrum */
@@ -146,12 +145,12 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .spec-sub{font-size:10px;color:var(--ink3);font-weight:300;line-height:1.65;margin-bottom:6px;letter-spacing:.3px;font-family:'Noto Serif TC',serif}
 .spec-bar-bg{height:3px;border-radius:3px;background:rgba(0,0,0,.06);overflow:hidden}
 .spec-bar-fill{height:100%;border-radius:3px;width:0;transition:width 1s cubic-bezier(.34,1.56,.64,1)}
-.ava-wrap{width:86px;height:86px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 8px 22px rgba(255,210,40,.45)) drop-shadow(0 2px 8px rgba(0,0,0,.14));animation:lamp-wake 1.1s cubic-bezier(.4,0,.2,1) .6s both}
+.ava-wrap{width:86px;height:86px;border-radius:50%;background:#fff;padding:3px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 8px 22px rgba(255,210,40,.55)) drop-shadow(0 2px 8px rgba(0,0,0,.18));animation:lamp-wake 1.1s cubic-bezier(.4,0,.2,1) .6s both}
 .ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--card);transition:transform .18s}
 .ava-wrap:active .ava-inner{transform:scale(.92)}
 .ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
 /* ping ring */
-.ava-wrap::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--yellow);opacity:0;animation:ava-ping 3.5s ease-out infinite}
+.ava-wrap::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(255,255,255,.8);opacity:0;animation:ava-ping 3.5s ease-out infinite}
 @keyframes ava-ping{0%{opacity:.55;transform:scale(1)}70%{opacity:0;transform:scale(1.5)}100%{opacity:0;transform:scale(1.5)}}
 @keyframes notepop-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 /* tap badge on avatar */
@@ -160,10 +159,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
-.hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px}
-.hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
-.hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 46px}
-.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
+.hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px;color:#2D4458}
+.hero-handle{font-size:10px;color:#5A8099;letter-spacing:3px;font-weight:300;margin-bottom:16px}
+.hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
+.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:#2D4458;max-width:280px;white-space:pre-line}
 
 .sec-head{padding:36px 20px 18px;display:flex;align-items:center;gap:14px}
 .sec-h-line{flex:1;height:1px;background:var(--rule)}
@@ -699,6 +698,7 @@ input[type=file]{display:none}
       </div>
     </div>
   </div>
+  <div class="ice-scene"></div>
 
   <div id="soon-sec">
     <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團<span class="sec-h-en">coming soon</span></span><span class="sec-h-line"></span></div>
