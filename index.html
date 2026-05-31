@@ -3203,20 +3203,22 @@ function _djInit() {
   var ctx = cv.getContext('2d');
   ctx.scale(dpr, dpr);
   if (_DJ && _DJ.raf) cancelAnimationFrame(_DJ.raf);
-  var startWY = H * 0.72;
+  var R = 15;
+  var platWY = H * 0.72;       // world Y of the first platform's top edge
+  var charWY = platWY - R;     // character centre sits exactly on top of platform
   _DJ = {
     cv:cv, ctx:ctx, W:W, H:H, running:true, over:false, score:0, frame:0, raf:null,
-    wx:W/2, wy:startWY, vx:0, vy:0, R:15, faceR:true,
-    camY: startWY - H * 0.72,
-    highestWY:startWY, startWY:startWY,
+    wx:W/2, wy:charWY, vx:0, vy:0, R:R, faceR:true,
+    camY: charWY - H * 0.42,   // camera: character appears ~42% from top
+    highestWY:charWY, startWY:charWY,
     rocket:false, rocketT:0,
     leftDown:false, rightDown:false,
     platforms:[], monsters:[], blackholes:[], bullets:[], particles:[],
-    genY:startWY, genN:0,
+    genY:platWY, genN:0,
     JV:-13.5, SV:-24, GRAV:0.38, MAX_VX:4.2
   };
-  _DJ.platforms.push({wx:W/2-42, wy:startWY+6, w:84, h:11, type:'normal', vx:0, broken:false, spring:false, springAnim:0, hasRocket:false});
-  _DJ.genY = startWY + 6 - 92;
+  _DJ.platforms.push({wx:W/2-42, wy:platWY, w:84, h:11, type:'normal', vx:0, broken:false, spring:false, springAnim:0, hasRocket:false});
+  _DJ.genY = platWY - 92;
   for (var si = 0; si < 18; si++) _djGenPlatform();
   _djLoop();
 
