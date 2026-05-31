@@ -103,20 +103,21 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   position:relative;overflow:hidden;
   isolation:isolate;
 }
-/* 燈：藍色背景，精確到 handle 底部硬切 */
+/* 燈：藍色背景，圓弧底部（往下凸弧，兩側露磁磚） */
 .hero::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;
-  height:430px;
+  height:450px;
   background:url('lamp.PNG') center -50px / 100% auto no-repeat;
+  border-radius:0 0 50% 50% / 0 0 40px 40px;
   z-index:-1;
 }
-/* 磁磚：硬接藍色區底部，底部漸出接頁面底色 */
+/* 磁磚：從弧形開始出現，底部漸出接頁面底色 */
 .hero::after{
   content:'';
   position:absolute;
-  left:0;right:0;top:430px;bottom:0;
+  left:0;right:0;top:410px;bottom:0;
   background:url('tile.PNG') center top / 100% auto repeat-y;
   -webkit-mask-image:linear-gradient(to bottom,black calc(100% - 80px),transparent 100%);
   mask-image:linear-gradient(to bottom,black calc(100% - 80px),transparent 100%);
@@ -161,7 +162,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
 .hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px}
 .hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
-.hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
+.hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 46px}
 .hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
 
 .sec-head{padding:36px 20px 18px;display:flex;align-items:center;gap:14px}
