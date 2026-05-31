@@ -98,29 +98,28 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .hero{
   display:flex;flex-direction:column;align-items:center;
-  padding:200px 28px 64px;
+  padding:200px 28px 20px;
   position:relative;overflow:hidden;
   isolation:isolate;
 }
-/* 藍色燈區：1.PNG，cover 填滿，圓弧底部往下凸 */
+/* 藍色燈區：1.PNG，填滿整個 hero，無圓弧 */
 .hero::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;
-  height:680px;
-  background:url('1.PNG') center top / cover no-repeat;
-  border-radius:0 0 50% 50% / 0 0 40px 40px;
+  height:100%;
+  background:var(--green) url('1.PNG') center -30px / 97% auto no-repeat;
   z-index:-1;
 }
 /* 不再使用磁磚 ::after */
 .hero::after{content:none}
-/* 冰淇淋桌面 */
+/* 冰淇淋桌面：往上拉，與藍色區自然融合 */
 .ice-scene{
   height:286px;
   background:url('2.PNG') center top / 100% auto no-repeat;
-  margin-top:-40px;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,black 40px,black calc(100% - 100px),transparent 100%);
-  mask-image:linear-gradient(to bottom,transparent 0,black 40px,black calc(100% - 100px),transparent 100%);
+  margin-top:-110px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,black 90px,black calc(100% - 80px),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,black 90px,black calc(100% - 80px),transparent 100%);
 }
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
