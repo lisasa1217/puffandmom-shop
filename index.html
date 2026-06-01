@@ -360,7 +360,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .restore-btn:active{background:rgba(130,183,204,.15)}
 .delete-arch-btn{font-size:10px;color:#b03a2e;background:none;border:1px solid rgba(176,58,46,.4);border-radius:5px;padding:3px 7px;cursor:pointer;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .delete-arch-btn:active{background:rgba(176,58,46,.08)}
-/* permanent badge */
+/* permanent badge + end-perm btn */
+.adm-end-perm-btn{width:100%;padding:10px;background:rgba(245,212,107,.12);border:1px solid rgba(212,168,40,.4);border-radius:9px;font-family:inherit;font-size:12px;color:#8B6400;cursor:pointer;margin-bottom:8px;letter-spacing:.3px;text-align:center;-webkit-tap-highlight-color:transparent}
+.adm-end-perm-btn:active{background:rgba(245,212,107,.28)}
 .perm-badge{display:inline-flex;align-items:center;background:rgba(243,224,167,.45);border:none;color:#7a5a20;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:400;letter-spacing:.5px;margin-left:4px}
 .adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
 .adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -1596,8 +1598,11 @@ function renderFront() {
   var soon = [], active = [], ended = [], permanent = [];
   D.items.forEach(function(i) {
     if (i.archived) return;
-    if (i.permanent) { permanent.push(i); return; }
     var st = classify(i);
+    if (i.permanent) {
+      if (st === 'soon') { soon.push(i); return; } // countdown before open date
+      permanent.push(i); return;                   // active permanent (no end date)
+    }
     if (st === 'soon')        soon.push(i);
     else if (st === 'active') active.push(i);
     else if (st === 'ended')  ended.push(i);
@@ -1930,7 +1935,7 @@ function _buildItemCard(item, noHandle) {
     stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[st] || '—';
   }
   var subText = item.permanent
-    ? '常駐優惠'
+    ? ('常駐優惠' + (item.openD && item.openD !== '2000-01-01' ? '・' + item.openD + ' 起' : ''))
     : (item.openD + ' – ' + item.closeD);
   var el = document.createElement('div');
   el.className = 'adm-icard'; el.id = 'ic' + item.id;
@@ -1994,11 +1999,12 @@ function _buildItemCard(item, noHandle) {
       '<div class="sw-row"><span>常駐優惠（不設時效，常駐顯示於開團區底部）</span>' +
         '<label class="sw"><input type="checkbox" id="fperm-' + item.id + '"' + (item.permanent ? ' checked' : '') + ' onchange="togglePermanent(' + item.id + ')"><span class="sw-sl"></span></label>' +
       '</div>' +
-      '<div id="fdates-' + item.id + '" style="display:' + (item.permanent ? 'none' : 'flex') + ';gap:8px">' +
-        '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.permanent ? '' : item.openD) + '"></div>' +
-        '<div class="fld" style="flex:1"><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
+      '<div style="display:flex;gap:8px">' +
+        '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.openD === '2000-01-01' ? '' : item.openD) + '"></div>' +
+        '<div class="fld" style="flex:1" id="fclose-' + item.id + '"' + (item.permanent ? ' style="display:none"' : '') + '><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
       '</div>' +
-      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後30天→自動下架 ／ 勾選常駐優惠→永久顯示</div>' +
+      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後30天→自動下架 ／ 常駐優惠可設開始日</div>' +
+      (item.permanent ? '<button class="adm-end-perm-btn" onclick="endPermanentItem(' + item.id + ')">🏁 手動結束開團 → 移至已結團</button>' : '') +
       '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
     '</div>';
   return el;
@@ -2022,8 +2028,9 @@ function renderAdmItems() {
   var mainItems  = normalNonPerm.filter(function(i){ return classify(i) !== 'ended'; });
   var endedItems = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; });
 
-  /* helper: attach drag-to-reorder listeners (main list only) */
-  function _attachReorder(item, el) {
+  /* helper: attach drag-to-reorder listeners */
+  function _attachReorder(item, el, section) {
+    section = section || 'main';
     el.addEventListener('mousedown', function(e) {
       var onHandle = e.target && e.target.classList && e.target.classList.contains('adm-drag-handle');
       if (!onHandle) {
@@ -2031,19 +2038,19 @@ function renderAdmItems() {
         document.addEventListener('mouseup', function() { el.setAttribute('draggable','true'); }, {once:true});
       }
     });
-    el.addEventListener('dragstart', function(e){ admDragStart(item, el, e); });
+    el.addEventListener('dragstart', function(e){ admDragStart(item, el, e, section); });
     el.addEventListener('dragend',   function(e){ admDragEnd(el, e); });
-    el.addEventListener('dragover',  function(e){ admItemDragOver(item, el, e); });
+    el.addEventListener('dragover',  function(e){ admItemDragOver(item, el, e, section); });
     el.addEventListener('dragleave', function(e){ admItemDragLeave(el, e); });
-    el.addEventListener('drop',      function(e){ admItemDrop(item, el, e); });
+    el.addEventListener('drop',      function(e){ admItemDrop(item, el, e, section); });
     var handle = el.querySelector('.adm-drag-handle');
-    if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e); }, {passive:false});
+    if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e, section); }, {passive:false});
   }
 
   /* ── 商品管理：draggable non-permanent, non-ended items ── */
   mainItems.forEach(function(item) {
     var el = _buildItemCard(item);
-    _attachReorder(item, el);
+    _attachReorder(item, el, 'main');
     list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
@@ -2057,14 +2064,12 @@ function renderAdmItems() {
     if (cw) czBindDrag(cw, item.id);
   });
 
-  /* ── 已結團 section ── */
+  /* ── 已結團 section（可拖曳排序） ── */
   if (endedItems.length) {
     endedSep.style.display = '';
     endedItems.forEach(function(item) {
-      var el = _buildItemCard(item, true); /* noHandle=true */
-      /* allow drag to archive zone, but NOT reorder */
-      el.addEventListener('dragstart', function(e){ admDragStart(item, el, e); });
-      el.addEventListener('dragend',   function(e){ admDragEnd(el, e); });
+      var el = _buildItemCard(item); /* drag handle shown */
+      _attachReorder(item, el, 'ended'); /* reorder within ended + archive-zone drag */
       endedList.appendChild(el);
       var cw = document.getElementById('czitem-' + item.id);
       if (cw) czBindDrag(cw, item.id);
@@ -2098,16 +2103,19 @@ function toggleDisc(id) {
 }
 function togglePermanent(id) {
   var on = document.getElementById('fperm-' + id).checked;
-  document.getElementById('fdates-' + id).style.display = on ? 'none' : 'flex';
+  var cw = document.getElementById('fclose-' + id);
+  if (cw) cw.style.display = on ? 'none' : '';
 }
 
 /* ── DRAG-SORT (desktop HTML5) ── */
-var _admDragId  = null;   /* id being dragged (used by archive-zone drop) */
-var _admDragSrc = null;   /* id being dragged for reorder */
+var _admDragId      = null;   /* id being dragged (archive-zone drop) */
+var _admDragSrc     = null;   /* id being dragged for reorder */
+var _admDragSection = null;   /* 'main' or 'ended' */
 
-function admDragStart(item, el, e) {
-  _admDragId  = item.id;
-  _admDragSrc = item.id;
+function admDragStart(item, el, e, section) {
+  _admDragId      = item.id;
+  _admDragSrc     = item.id;
+  _admDragSection = section || 'main';
   el.classList.add('dragging-src');
   e.dataTransfer.effectAllowed = 'move';
 }
@@ -2115,11 +2123,11 @@ function admDragEnd(el, e) {
   el.classList.remove('dragging-src');
   document.querySelectorAll('.adm-icard').forEach(function(c){ c.classList.remove('drag-over-top','drag-over-bot'); });
   document.getElementById('adm-arch-zone').classList.remove('drag-active');
-  _admDragSrc = null;
-  _admDragId  = null;
+  _admDragSrc = null; _admDragId = null; _admDragSection = null;
 }
-function admItemDragOver(item, el, e) {
+function admItemDragOver(item, el, e, section) {
   if (!_admDragSrc || _admDragSrc === item.id || item.permanent) return;
+  if (_admDragSection !== (section || 'main')) return; /* block cross-section */
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
   var rect = el.getBoundingClientRect();
@@ -2128,10 +2136,11 @@ function admItemDragOver(item, el, e) {
   else el.classList.add('drag-over-bot');
 }
 function admItemDragLeave(el, e) { el.classList.remove('drag-over-top','drag-over-bot'); }
-function admItemDrop(item, el, e) {
+function admItemDrop(item, el, e, section) {
   e.preventDefault();
   el.classList.remove('drag-over-top','drag-over-bot');
   if (!_admDragSrc || _admDragSrc === item.id || item.permanent) return;
+  if (_admDragSection !== (section || 'main')) return; /* block cross-section */
   var srcItem = D.items.find(function(i){ return i.id === _admDragSrc; });
   if (!srcItem || srcItem.permanent) return;
   var rect = el.getBoundingClientRect();
@@ -2140,13 +2149,13 @@ function admItemDrop(item, el, e) {
 }
 
 /* ── DRAG-SORT (touch) ── */
-var _tDrag = {id:null, el:null, clone:null, offsetY:0, insertTarget:null, insertBefore:true};
-function admTouchStart(item, el, e) {
+var _tDrag = {id:null, el:null, clone:null, offsetY:0, insertTarget:null, insertBefore:true, section:'main'};
+function admTouchStart(item, el, e, section) {
   if (item.permanent) return;
   e.preventDefault();
   var t = e.touches[0];
   var rect = el.getBoundingClientRect();
-  _tDrag.id = item.id; _tDrag.el = el;
+  _tDrag.id = item.id; _tDrag.el = el; _tDrag.section = section || 'main';
   _tDrag.offsetY = t.clientY - rect.top;
   _tDrag.insertTarget = null;
   var clone = el.cloneNode(true);
@@ -2163,7 +2172,8 @@ function admTouchStart(item, el, e) {
     e.preventDefault();
     var t = e.touches[0];
     _tDrag.clone.style.top = (t.clientY - _tDrag.offsetY) + 'px';
-    var cards = document.querySelectorAll('#adm-items .adm-icard:not(.dragging-src)');
+    var _listId = _tDrag.section === 'ended' ? 'adm-ended-items' : 'adm-items';
+    var cards = document.querySelectorAll('#' + _listId + ' .adm-icard:not(.dragging-src)');
     var found = null, foundBefore = true;
     cards.forEach(function(c) {
       c.classList.remove('drag-over-top','drag-over-bot');
@@ -2236,6 +2246,17 @@ async function archiveItem(id) {
   renderFront();
 }
 
+async function endPermanentItem(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  var today = new Date().toISOString().slice(0, 10);
+  item.permanent = false;
+  item.closeD = today;
+  var res = await sb.from('items').update({ close_d: today }).eq('id', id);
+  if (res.error) { toast('❌ 操作失敗'); return; }
+  toast('✓ 已手動結團，移至已結團區');
+  renderAdmItems(); renderFront();
+}
+
 async function restoreItem(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   var openDate, closeDate, msg;
@@ -2282,7 +2303,7 @@ async function saveItem(id) {
   var isPerm = document.getElementById('fperm-' + id).checked;
   item.permanent = isPerm;
   if (isPerm) {
-    item.openD = '2000-01-01';
+    item.openD  = document.getElementById('fo' + id).value || new Date().toISOString().slice(0,10);
     item.closeD = '2099-12-31';
   } else {
     item.openD  = document.getElementById('fo' + id).value;
