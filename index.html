@@ -3224,28 +3224,10 @@ function openStairGame() {
   var cv = document.getElementById('stair-canvas');
   if (!cv._djBound) {
     cv._djBound = true;
-    /* tap = shoot；若傾斜未啟用則同時判斷左右方向 */
+    /* 手機：點螢幕任意位置 = 發射子彈，移動完全靠傾斜 */
     cv.addEventListener('touchstart', function(e) {
       if (!_DJ || _DJ.over) return;
       _djShoot();
-      if (!_DJ.tiltEnabled) {
-        _DJ.leftDown = false; _DJ.rightDown = false;
-        for (var i = 0; i < e.touches.length; i++) {
-          var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
-          if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
-        }
-      }
-    }, {passive:true});
-    cv.addEventListener('touchmove', function(e) {
-      if (!_DJ || _DJ.over || _DJ.tiltEnabled) return;
-      _DJ.leftDown = false; _DJ.rightDown = false;
-      for (var i = 0; i < e.touches.length; i++) {
-        var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
-        if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
-      }
-    }, {passive:true});
-    cv.addEventListener('touchend', function() {
-      if (_DJ) { _DJ.leftDown = false; _DJ.rightDown = false; }
     }, {passive:true});
     /* 桌機：按下發射，左右半邊控制方向 */
     cv.addEventListener('mousedown', function(e) {
@@ -3312,7 +3294,7 @@ function _djInit() {
     highestWY:charWY, startWY:charWY,
     rocket:false, rocketT:0,
     leftDown:false, rightDown:false,
-    tiltEnabled:_djTiltActive, tiltX:0, lastShot:0,
+    tiltEnabled:_djTiltActive, tiltX:0, lastShot:0, hintAlpha:1,
     platforms:[], monsters:[], blackholes:[], bullets:[], particles:[],
     genY:platWY, genN:0,
     JV:-13.5, SV:-24, GRAV:0.38, MAX_VX:4.2
@@ -3430,6 +3412,21 @@ function _djUpdate() {
   });
   // particles
   dj.particles = dj.particles.filter(function(p){ p.wx+=p.vx; p.wy+=p.vy; p.vy+=0.25; p.life--; return p.life>0; });
+  // bullets: move up + hit monsters
+  dj.bullets = dj.bullets.filter(function(b) {
+    b.wy -= 12;
+    for (var i = 0; i < dj.monsters.length; i++) {
+      var m = dj.monsters[i]; if (!m.alive) continue;
+      if (Math.abs(b.wx-m.wx) < 18 && Math.abs(b.wy-m.wy) < 18) {
+        m.alive = false; b.dead = true;
+        _djParticle(m.wx, m.wy, '#F5D46B', 12); dj.score += 8;
+      }
+    }
+    return !b.dead && b.wy > dj.camY - 120;
+  });
+  // hint fade
+  if (dj.hintAlpha > 0 && (dj.score > 0 || dj.frame > 160))
+    dj.hintAlpha = Math.max(0, dj.hintAlpha - 0.018);
   // cull
   var cullY = dj.camY + dj.H + 160;
   dj.platforms  = dj.platforms.filter(function(p){ return p.wy < cullY; });
@@ -3540,6 +3537,34 @@ function _djDraw() {
   });
   ctx.globalAlpha = 1;
 
+  // Bullets
+  ctx.globalAlpha = 1;
+  dj.bullets.forEach(function(b) {
+    var by = b.wy - dj.camY;
+    if (by < -10 || by > H+10) return;
+    ctx.fillStyle = 'rgba(255,220,60,0.38)';
+    ctx.beginPath(); ctx.arc(b.wx, by, 7, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#F5D46B';
+    ctx.beginPath(); ctx.arc(b.wx, by, 4, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Opening hint overlay
+  if (dj.hintAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = dj.hintAlpha;
+    ctx.fillStyle = 'rgba(10,10,30,0.52)';
+    _djRR(ctx, W*.1, H*.5, W*.8, H*.22, 18); ctx.fill();
+    ctx.textAlign = 'center';
+    ctx.font = '28px serif'; ctx.fillStyle = '#fff';
+    ctx.fillText('←  📱  →', W/2, H*0.585);
+    ctx.font = '13px Noto\ Sans\ TC, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillText('左右傾斜手機移動', W/2, H*0.635);
+    ctx.fillStyle = 'rgba(245,212,107,0.9)';
+    ctx.fillText('點螢幕發射子彈 💛', W/2, H*0.67);
+    ctx.restore();
+  }
+
   // Character (alien)
   _djDrawAlien(ctx, dj.wx, dj.wy - dj.camY, dj);
 
@@ -3566,20 +3591,7 @@ function _djDraw() {
   ctx.restore();
 
   // Tap hints
-  if (dj.score < 4 && !dj.over) {
-    ctx.save(); ctx.textAlign='center';
-    ctx.font='12px Noto\ Sans\ TC, sans-serif';
-    ctx.fillStyle='rgba(255,255,255,0.22)';
-    if (dj.tiltEnabled) {
-      ctx.fillText('傾斜手機左右移動', W/2, H*.82);
-      ctx.fillText('點螢幕 發射子彈 💛', W/2, H*.87);
-    } else {
-      ctx.fillText('← 左',W*.25,H*.85); ctx.fillText('右 →',W*.75,H*.85);
-      ctx.font='11px Noto\ Sans\ TC, sans-serif';
-      ctx.fillText('點螢幕 發射子彈 💛', W/2, H*.91);
-    }
-    ctx.restore();
-  }
+  /* 開場提示已由 hintAlpha overlay 負責，這裡不再重複 */
 
   // Game over
   if (dj.over) {
