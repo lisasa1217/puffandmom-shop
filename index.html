@@ -1847,13 +1847,21 @@ function addToCalendar(id) {
     'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:開團提醒：' + item.name,'END:VALARM',
     'END:VEVENT','END:VCALENDAR'
   ].join('\r\n');
-  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = 'puffandmom-' + item.name.slice(0,10) + '.ics';
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-  toast('✓ 行事曆提醒已加入！開團當天 10:30 通知你');
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    /* iOS Safari：用 data URI 開新分頁，Safari 會跳出「加入行事曆」 */
+    window.open('data:text/calendar;charset=utf-8,' + encodeURIComponent(ics));
+    toast('請在新分頁點「加入行事曆」📅');
+  } else {
+    /* Desktop / Android：blob 下載 */
+    var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'puffandmom-' + item.name.slice(0,10) + '.ics';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    toast('✓ 行事曆提醒已加入！開團當天 10:30 通知你');
+  }
 }
 /* ── NOTE TAG POPUP ── */
 var _notePop  = null;
