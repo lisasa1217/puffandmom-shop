@@ -595,6 +595,8 @@ input[type=file]{display:none}
 .stair-back-btn{background:rgba(255,255,255,.1);border:none;border-radius:10px;color:#fff;font-size:14px;padding:7px 14px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;letter-spacing:.2px}
 .stair-back-btn:active{background:rgba(255,255,255,.2)}
 .stair-header-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:#F3E0A7;font-weight:300;letter-spacing:.8px}
+.stair-tilt-btn{background:rgba(130,183,204,.16);border:1px solid rgba(130,183,204,.42);border-radius:10px;color:#82B7CC;font-size:11px;padding:6px 10px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;letter-spacing:.2px;white-space:nowrap}
+.stair-tilt-btn:active{background:rgba(130,183,204,.32)}
 .stair-lb-btn{margin-left:auto;background:rgba(245,212,107,.14);border:1px solid rgba(245,212,107,.38);border-radius:10px;color:#F5D46B;font-size:12px;padding:7px 12px;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent;letter-spacing:.3px}
 .stair-lb-btn:active{background:rgba(245,212,107,.25)}
 #stair-canvas{flex:1;display:block;width:100%;touch-action:none;cursor:pointer}
@@ -1075,6 +1077,7 @@ input[type=file]{display:none}
   <div class="stair-header">
     <button class="stair-back-btn" onclick="closeStairGame()">← 返回</button>
     <span class="stair-header-title">外星人跳跳 👽</span>
+    <button class="stair-tilt-btn" id="stair-tilt-btn" onclick="djRequestTilt()" style="display:none">📱 傾斜控制</button>
     <button class="stair-lb-btn" onclick="stairToggleLb()">🏆 排行榜</button>
   </div>
   <canvas id="stair-canvas"></canvas>
@@ -3163,6 +3166,54 @@ function openStairFromHub() {
    外星人跳跳 (Doodle Jump style)
 ═══════════════════════════════════════ */
 var _DJ = null;
+var _djTiltActive = false; // 傾斜控制是否已授權
+
+/* ── 傾斜控制 ── */
+function _djOnTilt(e) {
+  if (!_DJ || _DJ.over) return;
+  var gamma = Math.max(-50, Math.min(50, e.gamma || 0));
+  var dead = 4, sign = gamma >= 0 ? 1 : -1, abs = Math.abs(gamma);
+  _DJ.tiltX = abs < dead ? 0 : sign * (abs - dead) / 40;
+}
+function _djTryAutoTilt() {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    /* iOS 13+ 需要使用者手動點按鈕授權 */
+    var tb = document.getElementById('stair-tilt-btn');
+    if (tb) tb.style.display = '';
+  } else {
+    /* Android / 桌機：直接啟用 */
+    window.addEventListener('deviceorientation', _djOnTilt);
+    _djTiltActive = true;
+    _djMarkTiltEnabled();
+  }
+}
+function djRequestTilt() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then(function(s) {
+      if (s === 'granted') {
+        window.addEventListener('deviceorientation', _djOnTilt);
+        _djTiltActive = true;
+        if (_DJ) _DJ.tiltEnabled = true;
+        _djMarkTiltEnabled();
+      }
+    }).catch(function(){});
+  }
+}
+function _djMarkTiltEnabled() {
+  var tb = document.getElementById('stair-tilt-btn');
+  if (tb) { tb.textContent = '📱 傾斜中'; tb.style.opacity = '.45'; tb.style.pointerEvents = 'none'; }
+}
+
+/* ── 射擊 ── */
+function _djShoot() {
+  if (!_DJ || _DJ.over) return;
+  var now = Date.now();
+  if (now - _DJ.lastShot < 350) return;
+  _DJ.lastShot = now;
+  _DJ.bullets.push({wx:_DJ.wx, wy:_DJ.wy - _DJ.R - 8, dead:false});
+}
 
 function openStairGame() {
   var overlay = document.getElementById('stair-overlay');
@@ -3173,16 +3224,20 @@ function openStairGame() {
   var cv = document.getElementById('stair-canvas');
   if (!cv._djBound) {
     cv._djBound = true;
+    /* tap = shoot；若傾斜未啟用則同時判斷左右方向 */
     cv.addEventListener('touchstart', function(e) {
       if (!_DJ || _DJ.over) return;
-      _DJ.leftDown = false; _DJ.rightDown = false;
-      for (var i = 0; i < e.touches.length; i++) {
-        var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
-        if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
+      _djShoot();
+      if (!_DJ.tiltEnabled) {
+        _DJ.leftDown = false; _DJ.rightDown = false;
+        for (var i = 0; i < e.touches.length; i++) {
+          var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
+          if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
+        }
       }
     }, {passive:true});
     cv.addEventListener('touchmove', function(e) {
-      if (!_DJ || _DJ.over) return;
+      if (!_DJ || _DJ.over || _DJ.tiltEnabled) return;
       _DJ.leftDown = false; _DJ.rightDown = false;
       for (var i = 0; i < e.touches.length; i++) {
         var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
@@ -3192,22 +3247,31 @@ function openStairGame() {
     cv.addEventListener('touchend', function() {
       if (_DJ) { _DJ.leftDown = false; _DJ.rightDown = false; }
     }, {passive:true});
+    /* 桌機：按下發射，左右半邊控制方向 */
     cv.addEventListener('mousedown', function(e) {
       if (!_DJ || _DJ.over) return;
-      var tx = e.clientX - cv.getBoundingClientRect().left;
-      if (tx < _DJ.W / 2) { _DJ.leftDown = true; _DJ.rightDown = false; }
-      else { _DJ.rightDown = true; _DJ.leftDown = false; }
+      _djShoot();
+      if (!_DJ.tiltEnabled) {
+        var tx = e.clientX - cv.getBoundingClientRect().left;
+        if (tx < _DJ.W / 2) { _DJ.leftDown = true; _DJ.rightDown = false; }
+        else { _DJ.rightDown = true; _DJ.leftDown = false; }
+      }
     });
     window.addEventListener('mouseup', function() {
       if (_DJ) { _DJ.leftDown = false; _DJ.rightDown = false; }
     });
   }
+  _djTryAutoTilt();
   setTimeout(_djInit, 90);
 }
 
 function closeStairGame() {
   document.getElementById('stair-overlay').classList.remove('on');
   if (_DJ) { _DJ.running = false; if (_DJ.raf) cancelAnimationFrame(_DJ.raf); _DJ = null; }
+  window.removeEventListener('deviceorientation', _djOnTilt);
+  _djTiltActive = false;
+  var tb = document.getElementById('stair-tilt-btn');
+  if (tb) { tb.style.display = 'none'; tb.textContent = '📱 傾斜控制'; tb.style.opacity = ''; tb.style.pointerEvents = ''; }
 }
 
 function stairToggleLb() {
@@ -3244,10 +3308,11 @@ function _djInit() {
   _DJ = {
     cv:cv, ctx:ctx, W:W, H:H, running:true, over:false, score:0, frame:0, raf:null,
     wx:W/2, wy:charWY, vx:0, vy:0, R:R, faceR:true,
-    camY: charWY - H * 0.42,   // camera: character appears ~42% from top
+    camY: charWY - H * 0.42,
     highestWY:charWY, startWY:charWY,
     rocket:false, rocketT:0,
     leftDown:false, rightDown:false,
+    tiltEnabled:_djTiltActive, tiltX:0, lastShot:0,
     platforms:[], monsters:[], blackholes:[], bullets:[], particles:[],
     genY:platWY, genN:0,
     JV:-13.5, SV:-24, GRAV:0.38, MAX_VX:4.2
@@ -3303,9 +3368,16 @@ function _djUpdate() {
   } else {
     dj.vy += dj.GRAV;
   }
-  if (dj.leftDown)       dj.vx = Math.max(dj.vx - 0.6, -dj.MAX_VX);
-  else if (dj.rightDown) dj.vx = Math.min(dj.vx + 0.6,  dj.MAX_VX);
-  else                   dj.vx *= 0.86;
+  if (dj.tiltEnabled) {
+    var tgt = (dj.tiltX || 0) * dj.MAX_VX * 1.5;
+    dj.vx += (tgt - dj.vx) * 0.16;
+    if (dj.vx >  dj.MAX_VX) dj.vx =  dj.MAX_VX;
+    if (dj.vx < -dj.MAX_VX) dj.vx = -dj.MAX_VX;
+  } else {
+    if (dj.leftDown)       dj.vx = Math.max(dj.vx - 0.6, -dj.MAX_VX);
+    else if (dj.rightDown) dj.vx = Math.min(dj.vx + 0.6,  dj.MAX_VX);
+    else                   dj.vx *= 0.86;
+  }
   if (Math.abs(dj.vx) > 0.08) dj.faceR = dj.vx > 0;
   dj.wx += dj.vx; dj.wy += dj.vy;
   if (dj.wx < -dj.R) dj.wx = dj.W + dj.R;
@@ -3497,8 +3569,15 @@ function _djDraw() {
   if (dj.score < 4 && !dj.over) {
     ctx.save(); ctx.textAlign='center';
     ctx.font='12px Noto\ Sans\ TC, sans-serif';
-    ctx.fillStyle='rgba(255,255,255,0.2)';
-    ctx.fillText('← 左',W*.25,H*.85); ctx.fillText('右 →',W*.75,H*.85);
+    ctx.fillStyle='rgba(255,255,255,0.22)';
+    if (dj.tiltEnabled) {
+      ctx.fillText('傾斜手機左右移動', W/2, H*.82);
+      ctx.fillText('點螢幕 發射子彈 💛', W/2, H*.87);
+    } else {
+      ctx.fillText('← 左',W*.25,H*.85); ctx.fillText('右 →',W*.75,H*.85);
+      ctx.font='11px Noto\ Sans\ TC, sans-serif';
+      ctx.fillText('點螢幕 發射子彈 💛', W/2, H*.91);
+    }
     ctx.restore();
   }
 
