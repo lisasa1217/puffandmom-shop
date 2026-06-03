@@ -206,11 +206,28 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .clear-old-btn{display:block;width:100%;margin-top:18px;padding:10px;border-radius:9px;border:1px solid rgba(192,57,43,.3);background:none;font-family:inherit;font-size:12px;color:#b03a2e;cursor:pointer;letter-spacing:.3px;transition:background .15s}
 .clear-old-btn:active{background:rgba(192,57,43,.06)}
 
-.ended-list{display:flex;flex-direction:column}
+.ended-list{display:flex;flex-direction:column;max-height:0;overflow:hidden;transition:max-height .38s ease}
+.ended-list.open{max-height:3200px;transition:max-height .5s ease}
 .ended-row{background:var(--card);display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule)}
 .ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap;animation:cs-nudge 3s ease-in-out infinite}
-@keyframes cs-nudge{0%,85%,100%{transform:translateX(0)}88%{transform:translateX(3px)}92%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
+.ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap}
+/* 已結團 header 按鈕 */
+.ended-sec-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ended-sec-head:active{opacity:.8}
+.ended-toggle-arrow{font-size:11px;color:var(--ink3);transition:transform .28s;flex-shrink:0;display:inline-block}
+.ended-toggle-arrow.open{transform:rotate(180deg)}
+.ended-cs-tag{background:rgba(130,183,204,.12);border:1px solid rgba(90,154,181,.3);border-radius:20px;font-size:10px;color:var(--green-dk);padding:3px 9px;cursor:pointer;font-family:inherit;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;line-height:1.4}
+.ended-cs-tag:active{background:rgba(130,183,204,.25)}
+.ended-count{font-size:10px;color:var(--ink3);opacity:.65;margin-left:2px}
+/* 找客服彈出視窗 */
+.cs-hint-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.cs-hint-overlay.on{opacity:1;pointer-events:all}
+.cs-hint-box{background:var(--card);border-radius:20px;padding:26px 22px 20px;width:300px;text-align:center;box-shadow:0 10px 44px rgba(0,0,0,.22);transform:scale(.88);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.cs-hint-overlay.on .cs-hint-box{transform:scale(1)}
+.cs-hint-icon{font-size:28px;margin-bottom:10px}
+.cs-hint-text{font-size:13px;color:var(--ink2);line-height:1.9;font-weight:300;letter-spacing:.3px}
+.cs-hint-close{margin-top:18px;background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-family:inherit;font-size:13px;cursor:pointer;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
+.cs-hint-close:active{filter:brightness(.85)}
 
 .community{background:var(--white);padding:28px 20px 26px;border-top:1px solid var(--rule);margin-top:8px}
 .comm-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;text-align:center}
@@ -717,8 +734,26 @@ input[type=file]{display:none}
   </div>
 
   <div id="ended-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">已結團<span class="sec-h-en">ended</span></span><span class="sec-h-line"></span></div>
+    <div class="sec-head ended-sec-head" onclick="toggleEndedSec()">
+      <span class="sec-h-line"></span>
+      <span class="sec-h-title">
+        已結團<span class="ended-count" id="ended-count"></span>
+        <span class="sec-h-en">ended</span>
+      </span>
+      <button class="ended-cs-tag" onclick="showCSHint(event)">💬 找客服</button>
+      <span class="ended-toggle-arrow" id="ended-toggle-arrow">▼</span>
+      <span class="sec-h-line"></span>
+    </div>
     <div class="ended-list" id="ended-list"></div>
+  </div>
+
+  <!-- 找客服提示視窗 -->
+  <div class="cs-hint-overlay" id="cs-hint-overlay" onclick="closeCSHint()">
+    <div class="cs-hint-box">
+      <div class="cs-hint-icon">🩵</div>
+      <div class="cs-hint-text">若與客服溝通後仍有疑問或需要協助，歡迎保留對話截圖私訊我，我會再幫您一起了解與追蹤處理🩵</div>
+      <button class="cs-hint-close" onclick="closeCSHint()">了解，謝謝</button>
+    </div>
   </div>
 
   <div id="community-block" class="community">
@@ -1728,8 +1763,25 @@ function renderActive(items, permanentItems) {
   permanentItems.forEach(function(item, idx) { buildCard(item, items.length + idx, true); });
 }
 
+var _endedOpen = false;
+function toggleEndedSec() {
+  _endedOpen = !_endedOpen;
+  document.getElementById('ended-list').classList.toggle('open', _endedOpen);
+  var arrow = document.getElementById('ended-toggle-arrow');
+  if (arrow) arrow.classList.toggle('open', _endedOpen);
+}
+function showCSHint(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('cs-hint-overlay').classList.add('on');
+}
+function closeCSHint() {
+  document.getElementById('cs-hint-overlay').classList.remove('on');
+}
+
 function renderEnded(items) {
   var list = document.getElementById('ended-list'); list.innerHTML = '';
+  var cnt = document.getElementById('ended-count');
+  if (cnt) cnt.textContent = items.length ? '（' + items.length + '）' : '';
   items.forEach(function(item, idx) {
     var url = item.link || '#';
     var el = document.createElement('div');
