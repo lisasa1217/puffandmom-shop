@@ -215,6 +215,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ended-cs-tag{background:none;border:none;font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:2px;color:var(--ink3);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;font-weight:400}
 .ended-cs-tag:active{opacity:.65}
 .ended-count{font-size:10px;color:var(--ink3);opacity:.65;margin-left:2px;font-family:inherit;letter-spacing:.5px}
+.ended-info-btn{background:none;border:1.2px solid var(--rule);border-radius:50%;width:16px;height:16px;font-size:9px;color:var(--ink3);cursor:pointer;padding:0;line-height:1;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;flex-shrink:0;vertical-align:middle;-webkit-tap-highlight-color:transparent;font-family:serif;font-style:italic;font-weight:600}
+.ended-info-btn:active{background:var(--bg)}
 /* 找客服彈出視窗 */
 .cs-hint-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .cs-hint-overlay.on{opacity:1;pointer-events:all}
@@ -445,7 +447,7 @@ input[type=file]{display:none}
 /* password modal */
 /* ── 每日誇誇 FAB ── */
 .kuka-fab{
-  position:fixed;left:0;top:26%;z-index:88;
+  position:fixed;left:0;top:17%;z-index:88;
   display:flex;flex-direction:column;align-items:center;
   background:var(--white);
   border:none;border-radius:0 18px 18px 0;
@@ -497,11 +499,16 @@ input[type=file]{display:none}
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
 /* ── 小人退散 FAB (left side, below kuka) ── */
-.doll-fab{position:fixed;left:0;top:40%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 18px 18px 0;padding:10px 9px 10px 0;cursor:pointer;box-shadow:2px 2px 14px rgba(0,0,0,.1);border-left:3px solid var(--green);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite 0.6s}
+.doll-fab{position:fixed;left:0;top:30%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 18px 18px 0;padding:10px 9px 10px 0;cursor:pointer;box-shadow:2px 2px 14px rgba(0,0,0,.1);border-left:3px solid var(--green);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;animation:doll-fab-bob 2.4s ease-in-out infinite 0.6s}
 .doll-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.doll-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 @keyframes doll-fab-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .doll-fab-icon{font-size:19px;line-height:1;margin-bottom:4px;margin-left:8px}
 .doll-fab-lbl{font-size:11px;font-weight:500;color:var(--ink2);letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:6px}
+/* ── 團購客服 FAB ── */
+.cs-fab{position:fixed;left:0;top:43%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 18px 18px 0;padding:10px 9px 10px 0;cursor:pointer;box-shadow:2px 2px 14px rgba(0,0,0,.1);border-left:3px solid #E8897A;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s}
+.cs-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.cs-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
+.cs-fab-icon{font-size:19px;line-height:1;margin-bottom:4px;margin-left:8px}
+.cs-fab-lbl{font-size:11px;font-weight:500;color:var(--ink2);letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:6px}
 /* ── 小人退散 modal ── */
 .doll-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .doll-overlay.on{opacity:1;pointer-events:all}
@@ -730,9 +737,12 @@ input[type=file]{display:none}
   </div>
 
   <div id="ended-sec">
-    <div class="sec-head">
+    <div class="sec-head" style="cursor:pointer" onclick="toggleEndedSec()">
       <span class="sec-h-line"></span>
-      <button class="ended-cs-tag" onclick="showCSHint()">💬 已結團找客服<span class="ended-count" id="ended-count"></span></button>
+      <span style="display:inline-flex;align-items:center;white-space:nowrap">
+        <span class="ended-cs-tag">💬 已結團找客服<span class="ended-count" id="ended-count"></span></span>
+        <button class="ended-info-btn" onclick="showCSHint(event)">i</button>
+      </span>
       <span class="sec-h-line"></span>
     </div>
     <div class="ended-list" id="ended-list"></div>
@@ -743,7 +753,7 @@ input[type=file]{display:none}
     <div class="cs-hint-box">
       <div class="cs-hint-icon">💡</div>
       <div class="cs-hint-text">若與客服溝通後仍有疑問或需要協助，歡迎保留對話截圖私訊我，我會再幫您一起了解與追蹤處理🩵</div>
-      <button class="cs-hint-close" onclick="closeCSHintAndExpand()">了解，謝謝</button>
+      <button class="cs-hint-close" onclick="closeCSHint()">了解，謝謝</button>
     </div>
   </div>
 
@@ -995,6 +1005,12 @@ input[type=file]{display:none}
 <button class="doll-fab" onclick="openGameHub()" aria-label="懷舊遊戲">
   <span class="doll-fab-icon">🕹️</span>
   <span class="doll-fab-lbl">懷舊遊戲</span>
+</button>
+
+<!-- 團購客服 FAB -->
+<button class="cs-fab" onclick="scrollToEnded()" aria-label="團購客服">
+  <span class="cs-fab-icon">🛒</span>
+  <span class="cs-fab-lbl">團購客服</span>
 </button>
 
 <!-- 小人退散 modal -->
@@ -1755,16 +1771,26 @@ function renderActive(items, permanentItems) {
 }
 
 var _endedOpen = false;
-function showCSHint() {
+function toggleEndedSec() {
+  _endedOpen = !_endedOpen;
+  document.getElementById('ended-list').classList.toggle('open', _endedOpen);
+}
+function showCSHint(e) {
+  if (e) e.stopPropagation();
   document.getElementById('cs-hint-overlay').classList.add('on');
 }
 function closeCSHint() {
   document.getElementById('cs-hint-overlay').classList.remove('on');
 }
-function closeCSHintAndExpand() {
-  closeCSHint();
+function scrollToEnded() {
+  /* 展開已結團區並滾動過去 */
   _endedOpen = true;
   document.getElementById('ended-list').classList.add('open');
+  var sec = document.getElementById('ended-sec');
+  if (sec) {
+    var top = sec.getBoundingClientRect().top + window.pageYOffset - 70;
+    window.scrollTo({top: top, behavior: 'smooth'});
+  }
 }
 
 function renderEnded(items) {
@@ -2609,6 +2635,7 @@ function go(pg) {
   var inAdm = pg === 'admin';
   document.querySelector('.kuka-fab').style.display = inAdm ? 'none' : '';
   document.querySelector('.doll-fab').style.display = inAdm ? 'none' : '';
+  var csfab = document.querySelector('.cs-fab'); if(csfab) csfab.style.display = inAdm ? 'none' : '';
   if (pg === 'front') renderFront();
   if (pg === 'admin') { switchAdmTab('profile'); renderAdmin(); }
 }
