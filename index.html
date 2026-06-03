@@ -1077,7 +1077,6 @@ input[type=file]{display:none}
   <div class="stair-header">
     <button class="stair-back-btn" onclick="closeStairGame()">← 返回</button>
     <span class="stair-header-title">外星人跳跳 👽</span>
-    <button class="stair-tilt-btn" id="stair-tilt-btn" onclick="djRequestTilt()" style="display:none">📱 傾斜控制</button>
     <button class="stair-lb-btn" onclick="stairToggleLb()">🏆 排行榜</button>
   </div>
   <canvas id="stair-canvas"></canvas>
@@ -3166,94 +3165,50 @@ function openStairFromHub() {
    外星人跳跳 (Doodle Jump style)
 ═══════════════════════════════════════ */
 var _DJ = null;
-var _djTiltActive = false; // 傾斜控制是否已授權
-
-/* ── 傾斜控制 ── */
-function _djOnTilt(e) {
-  if (!_DJ || _DJ.over) return;
-  var gamma = Math.max(-50, Math.min(50, e.gamma || 0));
-  var dead = 4, sign = gamma >= 0 ? 1 : -1, abs = Math.abs(gamma);
-  _DJ.tiltX = abs < dead ? 0 : sign * (abs - dead) / 40;
-}
-function _djTryAutoTilt() {
-  if (typeof DeviceOrientationEvent === 'undefined') return;
-  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-    /* iOS 13+ 需要使用者手動點按鈕授權 */
-    var tb = document.getElementById('stair-tilt-btn');
-    if (tb) tb.style.display = '';
-  } else {
-    /* Android / 桌機：直接啟用 */
-    window.addEventListener('deviceorientation', _djOnTilt);
-    _djTiltActive = true;
-    _djMarkTiltEnabled();
-  }
-}
-function djRequestTilt() {
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission().then(function(s) {
-      if (s === 'granted') {
-        window.addEventListener('deviceorientation', _djOnTilt);
-        _djTiltActive = true;
-        if (_DJ) _DJ.tiltEnabled = true;
-        _djMarkTiltEnabled();
-      }
-    }).catch(function(){});
-  }
-}
-function _djMarkTiltEnabled() {
-  var tb = document.getElementById('stair-tilt-btn');
-  if (tb) { tb.textContent = '📱 傾斜中'; tb.style.opacity = '.45'; tb.style.pointerEvents = 'none'; }
-}
-
-/* ── 射擊 ── */
-function _djShoot() {
-  if (!_DJ || _DJ.over) return;
-  var now = Date.now();
-  if (now - _DJ.lastShot < 350) return;
-  _DJ.lastShot = now;
-  _DJ.bullets.push({wx:_DJ.wx, wy:_DJ.wy - _DJ.R - 8, dead:false});
-}
 
 function openStairGame() {
   var overlay = document.getElementById('stair-overlay');
   overlay.classList.add('on');
   document.getElementById('stair-lb-panel').style.display = 'none';
-
-  /* bind input once */
   var cv = document.getElementById('stair-canvas');
   if (!cv._djBound) {
     cv._djBound = true;
-    /* 手機：點螢幕任意位置 = 發射子彈，移動完全靠傾斜 */
+    /* 手機：左半邊 = 左移，右半邊 = 右移 */
     cv.addEventListener('touchstart', function(e) {
       if (!_DJ || _DJ.over) return;
-      _djShoot();
+      _DJ.leftDown = false; _DJ.rightDown = false;
+      for (var i = 0; i < e.touches.length; i++) {
+        var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
+        if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
+      }
     }, {passive:true});
-    /* 桌機：按下發射，左右半邊控制方向 */
+    cv.addEventListener('touchmove', function(e) {
+      if (!_DJ || _DJ.over) return;
+      _DJ.leftDown = false; _DJ.rightDown = false;
+      for (var i = 0; i < e.touches.length; i++) {
+        var tx = e.touches[i].clientX - cv.getBoundingClientRect().left;
+        if (tx < _DJ.W / 2) _DJ.leftDown = true; else _DJ.rightDown = true;
+      }
+    }, {passive:true});
+    cv.addEventListener('touchend', function() {
+      if (_DJ) { _DJ.leftDown = false; _DJ.rightDown = false; }
+    }, {passive:true});
     cv.addEventListener('mousedown', function(e) {
       if (!_DJ || _DJ.over) return;
-      _djShoot();
-      if (!_DJ.tiltEnabled) {
-        var tx = e.clientX - cv.getBoundingClientRect().left;
-        if (tx < _DJ.W / 2) { _DJ.leftDown = true; _DJ.rightDown = false; }
-        else { _DJ.rightDown = true; _DJ.leftDown = false; }
-      }
+      var tx = e.clientX - cv.getBoundingClientRect().left;
+      if (tx < _DJ.W / 2) { _DJ.leftDown = true; _DJ.rightDown = false; }
+      else { _DJ.rightDown = true; _DJ.leftDown = false; }
     });
     window.addEventListener('mouseup', function() {
       if (_DJ) { _DJ.leftDown = false; _DJ.rightDown = false; }
     });
   }
-  _djTryAutoTilt();
   setTimeout(_djInit, 90);
 }
 
 function closeStairGame() {
   document.getElementById('stair-overlay').classList.remove('on');
   if (_DJ) { _DJ.running = false; if (_DJ.raf) cancelAnimationFrame(_DJ.raf); _DJ = null; }
-  window.removeEventListener('deviceorientation', _djOnTilt);
-  _djTiltActive = false;
-  var tb = document.getElementById('stair-tilt-btn');
-  if (tb) { tb.style.display = 'none'; tb.textContent = '📱 傾斜控制'; tb.style.opacity = ''; tb.style.pointerEvents = ''; }
 }
 
 function stairToggleLb() {
@@ -3294,8 +3249,10 @@ function _djInit() {
     highestWY:charWY, startWY:charWY,
     rocket:false, rocketT:0,
     leftDown:false, rightDown:false,
-    tiltEnabled:_djTiltActive, tiltX:0, lastShot:0, hintAlpha:1,
-    platforms:[], monsters:[], blackholes:[], bullets:[], particles:[],
+    invincible:false, invincibleT:0, INVINCIBLE_MAX:300,
+    suckingIn:false, suckBH:null, suckT:0,
+    hintAlpha:1,
+    platforms:[], monsters:[], blackholes:[], stars:[], particles:[],
     genY:platWY, genN:0,
     JV:-13.5, SV:-24, GRAV:0.38, MAX_VX:4.2
   };
@@ -3330,6 +3287,10 @@ function _djGenPlatform() {
   if (n > 24 && Math.random() < 0.07) {
     dj.blackholes.push({wx:28+Math.random()*(dj.W-56), wy:y-gap*0.55, r:20, rot:0});
   }
+  /* ⭐ 無敵星星（n>5，約15%）*/
+  if (n > 5 && Math.random() < 0.15) {
+    dj.stars.push({wx:plat.wx+plat.w/2, wy:plat.wy-30, anim:0, collected:false});
+  }
 }
 
 /* ── game loop ── */
@@ -3350,16 +3311,24 @@ function _djUpdate() {
   } else {
     dj.vy += dj.GRAV;
   }
-  if (dj.tiltEnabled) {
-    var tgt = (dj.tiltX || 0) * dj.MAX_VX * 1.5;
-    dj.vx += (tgt - dj.vx) * 0.16;
-    if (dj.vx >  dj.MAX_VX) dj.vx =  dj.MAX_VX;
-    if (dj.vx < -dj.MAX_VX) dj.vx = -dj.MAX_VX;
-  } else {
-    if (dj.leftDown)       dj.vx = Math.max(dj.vx - 0.6, -dj.MAX_VX);
-    else if (dj.rightDown) dj.vx = Math.min(dj.vx + 0.6,  dj.MAX_VX);
-    else                   dj.vx *= 0.86;
+  // 無敵計時
+  if (dj.invincible) {
+    dj.invincibleT++;
+    if (dj.invincibleT >= dj.INVINCIBLE_MAX) { dj.invincible = false; dj.invincibleT = 0; }
   }
+  // 吸入動畫（正在被黑洞吸入）
+  if (dj.suckingIn) {
+    dj.suckT++;
+    var bh = dj.suckBH;
+    dj.wx += (bh.wx - dj.wx) * 0.18;
+    dj.wy += (bh.wy - dj.wy) * 0.18;
+    dj.vx = 0; dj.vy = 0;
+    if (dj.suckT > 50) { dj.suckingIn = false; _djGameOver(); }
+    return; // 跳過一般物理
+  }
+  if (dj.leftDown)       dj.vx = Math.max(dj.vx - 0.6, -dj.MAX_VX);
+  else if (dj.rightDown) dj.vx = Math.min(dj.vx + 0.6,  dj.MAX_VX);
+  else                   dj.vx *= 0.86;
   if (Math.abs(dj.vx) > 0.08) dj.faceR = dj.vx > 0;
   dj.wx += dj.vx; dj.wy += dj.vy;
   if (dj.wx < -dj.R) dj.wx = dj.W + dj.R;
@@ -3397,22 +3366,41 @@ function _djUpdate() {
     if (!m.alive) { m.dieAnim = Math.min(m.dieAnim + 1, 30); return; }
     m.wx += m.vx; m.frame++;
     if (m.wx < m.x0) { m.vx = Math.abs(m.vx); } if (m.wx > m.x1) { m.vx = -Math.abs(m.vx); }
-    if (dj.vy > 0 && Math.abs(dj.wx - m.wx) < 18 && Math.abs(dj.wy - m.wy) < 20) {
-      m.alive = false; dj.vy = dj.JV * 0.7; _djParticle(m.wx, m.wy, '#FF6B9D', 12); dj.score += 8;
-    } else if (Math.abs(dj.wx - m.wx) < 14 && Math.abs(dj.wy - m.wy) < 14) {
-      if (!dj.over) _djGameOver();
+    if (Math.abs(dj.wx - m.wx) < 18 && Math.abs(dj.wy - m.wy) < 20) {
+      if (dj.invincible || dj.vy > 0) {
+        // 無敵或踩頭：消滅怪物
+        m.alive = false; if (dj.vy > 0) dj.vy = dj.JV * 0.7;
+        _djParticle(m.wx, m.wy, '#FF6B9D', 12); dj.score += 8;
+      } else if (!dj.over) {
+        _djGameOver();
+      }
     }
   });
   // black holes
   dj.blackholes.forEach(function(bh) {
     bh.rot += 0.04;
     var dx = dj.wx - bh.wx, dy = dj.wy - bh.wy, dist = Math.sqrt(dx*dx+dy*dy);
-    if (dist < bh.r + 60 && dist > 0) { var f = 1.2*(1-dist/(bh.r+60)); dj.vx -= (dx/dist)*f; dj.vy -= (dy/dist)*f; }
-    if (dist < bh.r && !dj.over) _djGameOver();
+    if (!dj.invincible && dist < bh.r + 60 && dist > 0) { var f = 1.2*(1-dist/(bh.r+60)); dj.vx -= (dx/dist)*f; dj.vy -= (dy/dist)*f; }
+    if (!dj.invincible && dist < bh.r && !dj.over && !dj.suckingIn) {
+      dj.suckingIn = true; dj.suckBH = bh; dj.suckT = 0; // 開始吸入動畫
+    }
   });
   // particles
   dj.particles = dj.particles.filter(function(p){ p.wx+=p.vx; p.wy+=p.vy; p.vy+=0.25; p.life--; return p.life>0; });
-  // bullets: move up + hit monsters
+  // stars: float + collect
+  dj.stars.forEach(function(s) {
+    if (s.collected) return;
+    s.anim++;
+    s.wy += Math.sin(s.anim * 0.07) * 0.3; // 上下飄動
+    if (Math.abs(dj.wx - s.wx) < 22 && Math.abs(dj.wy - s.wy) < 22) {
+      s.collected = true;
+      dj.invincible = true; dj.invincibleT = 0;
+      _djParticle(s.wx, s.wy, '#F5D46B', 16);
+      _djParticle(s.wx, s.wy, '#fff', 10);
+    }
+  });
+  dj.stars = dj.stars.filter(function(s){ return !s.collected && s.wy < dj.camY + dj.H + 100; });
+  // bullets (legacy placeholder)
   dj.bullets = dj.bullets.filter(function(b) {
     b.wy -= 12;
     for (var i = 0; i < dj.monsters.length; i++) {
@@ -3432,6 +3420,7 @@ function _djUpdate() {
   dj.platforms  = dj.platforms.filter(function(p){ return p.wy < cullY; });
   dj.monsters   = dj.monsters.filter(function(m){ return m.wy < cullY; });
   dj.blackholes = dj.blackholes.filter(function(b){ return b.wy < cullY; });
+  dj.stars      = dj.stars.filter(function(s){ return s.wy < cullY; });
   while (dj.genY > dj.camY - 260) _djGenPlatform();
   if (!dj.over && dj.wy - dj.camY > dj.H + 70) _djGameOver();
 }
@@ -3537,16 +3526,48 @@ function _djDraw() {
   });
   ctx.globalAlpha = 1;
 
-  // Bullets
   ctx.globalAlpha = 1;
-  dj.bullets.forEach(function(b) {
-    var by = b.wy - dj.camY;
-    if (by < -10 || by > H+10) return;
-    ctx.fillStyle = 'rgba(255,220,60,0.38)';
-    ctx.beginPath(); ctx.arc(b.wx, by, 7, 0, Math.PI*2); ctx.fill();
+
+  // Stars ⭐
+  dj.stars.forEach(function(s) {
+    if (s.collected) return;
+    var sy = s.wy - dj.camY;
+    if (sy < -20 || sy > H+20) return;
+    // 外圈光暈
+    ctx.globalAlpha = 0.35 + 0.15*Math.sin(s.anim*0.1);
     ctx.fillStyle = '#F5D46B';
-    ctx.beginPath(); ctx.arc(b.wx, by, 4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s.wx, sy, 14, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    _djDrawStar(ctx, s.wx, sy, 10, s.anim);
   });
+
+  // Character — 吸入縮小 or 正常
+  var cx = dj.wx, cy = dj.wy - dj.camY;
+  if (dj.suckingIn) {
+    var sc = Math.max(0.05, 1 - dj.suckT / 50);
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(sc, sc);
+    _djDrawAlien(ctx, 0, 0, dj);
+    ctx.restore();
+  } else if (dj.invincible) {
+    // 無敵：閃爍金色光環
+    var prog = dj.invincibleT / dj.INVINCIBLE_MAX;
+    var flash = prog > 0.7 ? (dj.frame % 8 < 4) : (dj.frame % 20 < 10);
+    if (!flash) {
+      ctx.save();
+      ctx.shadowColor = '#F5D46B'; ctx.shadowBlur = 18;
+      _djDrawAlien(ctx, cx, cy, dj);
+      ctx.restore();
+    } else {
+      _djDrawAlien(ctx, cx, cy, dj);
+    }
+    // 光圈
+    ctx.globalAlpha = 0.3 * (1 - prog);
+    ctx.strokeStyle = '#F5D46B'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, dj.R + 8 + 4*Math.sin(dj.frame*0.2), 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineWidth = 1;
+  } else {
+    _djDrawAlien(ctx, cx, cy, dj);
+  }
 
   // Opening hint overlay
   if (dj.hintAlpha > 0) {
@@ -3555,18 +3576,15 @@ function _djDraw() {
     ctx.fillStyle = 'rgba(10,10,30,0.52)';
     _djRR(ctx, W*.1, H*.5, W*.8, H*.22, 18); ctx.fill();
     ctx.textAlign = 'center';
-    ctx.font = '28px serif'; ctx.fillStyle = '#fff';
-    ctx.fillText('←  📱  →', W/2, H*0.585);
+    ctx.font = '22px serif'; ctx.fillStyle = '#fff';
+    ctx.fillText('← 左右點螢幕移動 →', W/2, H*0.585);
     ctx.font = '13px Noto\ Sans\ TC, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillText('左右傾斜手機移動', W/2, H*0.635);
-    ctx.fillStyle = 'rgba(245,212,107,0.9)';
-    ctx.fillText('點螢幕發射子彈 💛', W/2, H*0.67);
+    ctx.fillStyle = 'rgba(245,212,107,0.95)';
+    ctx.fillText('⭐ 收集星星開啟無敵模式', W/2, H*0.635);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText('碰到黑洞會被吸進去 🌑', W/2, H*0.67);
     ctx.restore();
   }
-
-  // Character (alien)
-  _djDrawAlien(ctx, dj.wx, dj.wy - dj.camY, dj);
 
   // Rocket flame
   if (dj.rocket) {
@@ -3655,6 +3673,19 @@ function _djDrawAlien(ctx, x, y, dj) {
   ctx.restore();
 }
 
+function _djDrawStar(ctx, x, y, size, anim) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(anim * 0.04);
+  var spk=5, out=size, inn=size*0.42;
+  ctx.fillStyle='#F5D46B'; ctx.strokeStyle='#D4A828'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for (var i=0;i<spk*2;i++) {
+    var a=(i/(spk*2))*Math.PI*2-Math.PI/2;
+    var r=i%2===0?out:inn;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
 function _djDrawMonster(ctx, x, y) {
   ctx.save(); ctx.translate(x, y);
   var spikes=7, r=13;
