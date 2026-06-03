@@ -1639,7 +1639,7 @@ function classify(item) {
   if (daysSinceClose > 30) return 'auto-archived';
   if (closeD < now) return 'ended';
   if (open <= now && closeTs >= new Date()) return 'active';
-  if (daysToOpen <= 7 && daysToOpen > 0) return 'soon';
+  if (daysToOpen <= 30 && daysToOpen > 0) return 'soon';
   return 'hidden';
 }
 
@@ -2133,7 +2133,7 @@ function _buildItemCard(item, noHandle) {
         '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.openD === '2000-01-01' ? '' : item.openD) + '"></div>' +
         '<div class="fld" style="flex:1" id="fclose-' + item.id + '"' + (item.permanent ? ' style="display:none"' : '') + '><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
       '</div>' +
-      '<div class="hint-box">開始前7天→倒數預告 ／ 開始~截止→開團中 ／ 截止後30天→自動下架 ／ 常駐優惠可設開始日</div>' +
+      '<div class="hint-box">開始前30天→倒數預告 ／ 開始~截止→開團中 ／ 截止後30天→自動下架 ／ 常駐優惠可設開始日</div>' +
       (item.permanent ? '<button class="adm-end-perm-btn" onclick="endPermanentItem(' + item.id + ')">🏁 手動結束開團 → 移至已結團</button>' : '') +
       '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
     '</div>';
