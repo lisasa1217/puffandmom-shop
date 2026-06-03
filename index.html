@@ -3400,18 +3400,6 @@ function _djUpdate() {
     }
   });
   dj.stars = dj.stars.filter(function(s){ return !s.collected && s.wy < dj.camY + dj.H + 100; });
-  // bullets (legacy placeholder)
-  dj.bullets = dj.bullets.filter(function(b) {
-    b.wy -= 12;
-    for (var i = 0; i < dj.monsters.length; i++) {
-      var m = dj.monsters[i]; if (!m.alive) continue;
-      if (Math.abs(b.wx-m.wx) < 18 && Math.abs(b.wy-m.wy) < 18) {
-        m.alive = false; b.dead = true;
-        _djParticle(m.wx, m.wy, '#F5D46B', 12); dj.score += 8;
-      }
-    }
-    return !b.dead && b.wy > dj.camY - 120;
-  });
   // hint fade
   if (dj.hintAlpha > 0 && (dj.score > 0 || dj.frame > 160))
     dj.hintAlpha = Math.max(0, dj.hintAlpha - 0.018);
