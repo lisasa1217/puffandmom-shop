@@ -212,13 +212,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap}
 /* 已結團 header 按鈕 */
-.ended-sec-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
-.ended-sec-head:active{opacity:.8}
-.ended-toggle-arrow{font-size:11px;color:var(--ink3);transition:transform .28s;flex-shrink:0;display:inline-block}
-.ended-toggle-arrow.open{transform:rotate(180deg)}
-.ended-cs-tag{background:rgba(130,183,204,.12);border:1px solid rgba(90,154,181,.3);border-radius:20px;font-size:10px;color:var(--green-dk);padding:3px 9px;cursor:pointer;font-family:inherit;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;line-height:1.4}
-.ended-cs-tag:active{background:rgba(130,183,204,.25)}
-.ended-count{font-size:10px;color:var(--ink3);opacity:.65;margin-left:2px}
+.ended-cs-tag{background:none;border:none;font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:2px;color:var(--ink3);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;font-weight:400}
+.ended-cs-tag:active{opacity:.65}
+.ended-count{font-size:10px;color:var(--ink3);opacity:.65;margin-left:2px;font-family:inherit;letter-spacing:.5px}
 /* 找客服彈出視窗 */
 .cs-hint-overlay{position:fixed;inset:0;background:rgba(28,25,23,.45);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .cs-hint-overlay.on{opacity:1;pointer-events:all}
@@ -734,14 +730,9 @@ input[type=file]{display:none}
   </div>
 
   <div id="ended-sec">
-    <div class="sec-head ended-sec-head" onclick="toggleEndedSec()">
+    <div class="sec-head">
       <span class="sec-h-line"></span>
-      <span class="sec-h-title">
-        已結團<span class="ended-count" id="ended-count"></span>
-        <span class="sec-h-en">ended</span>
-      </span>
-      <button class="ended-cs-tag" onclick="showCSHint(event)">💬 找客服</button>
-      <span class="ended-toggle-arrow" id="ended-toggle-arrow">▼</span>
+      <button class="ended-cs-tag" onclick="showCSHint()">💬 已結團找客服<span class="ended-count" id="ended-count"></span></button>
       <span class="sec-h-line"></span>
     </div>
     <div class="ended-list" id="ended-list"></div>
@@ -750,9 +741,9 @@ input[type=file]{display:none}
   <!-- 找客服提示視窗 -->
   <div class="cs-hint-overlay" id="cs-hint-overlay" onclick="closeCSHint()">
     <div class="cs-hint-box">
-      <div class="cs-hint-icon">🩵</div>
+      <div class="cs-hint-icon">💡</div>
       <div class="cs-hint-text">若與客服溝通後仍有疑問或需要協助，歡迎保留對話截圖私訊我，我會再幫您一起了解與追蹤處理🩵</div>
-      <button class="cs-hint-close" onclick="closeCSHint()">了解，謝謝</button>
+      <button class="cs-hint-close" onclick="closeCSHintAndExpand()">了解，謝謝</button>
     </div>
   </div>
 
@@ -1764,18 +1755,16 @@ function renderActive(items, permanentItems) {
 }
 
 var _endedOpen = false;
-function toggleEndedSec() {
-  _endedOpen = !_endedOpen;
-  document.getElementById('ended-list').classList.toggle('open', _endedOpen);
-  var arrow = document.getElementById('ended-toggle-arrow');
-  if (arrow) arrow.classList.toggle('open', _endedOpen);
-}
-function showCSHint(e) {
-  if (e) e.stopPropagation();
+function showCSHint() {
   document.getElementById('cs-hint-overlay').classList.add('on');
 }
 function closeCSHint() {
   document.getElementById('cs-hint-overlay').classList.remove('on');
+}
+function closeCSHintAndExpand() {
+  closeCSHint();
+  _endedOpen = true;
+  document.getElementById('ended-list').classList.add('open');
 }
 
 function renderEnded(items) {
