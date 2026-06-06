@@ -1914,7 +1914,16 @@ function confirmClearOldClicks() {
 async function _doClearOldClicks(btn) {
   btn.disabled = true; btn.textContent = '刪除中…';
   var cutoff = new Date();
-  cutoff.setMonfunction addToCalendar(id) {
+  cutoff.setMonth(cutoff.getMonth() - 3);
+  try {
+    await sb.from('clicks').delete().lt('created_at', cutoff.toISOString());
+    toast('✓ 已清除 3 個月前的記錄');
+  } catch(e) { toast('❌ 清除失敗'); }
+  btn.disabled = false; btn.textContent = '🗑️ 清除 3 個月前的流量記錄';
+}
+
+var _calItem = null;
+function addToCalendar(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   trackClick('calendar', id);
   _calItem = item;
@@ -1922,13 +1931,6 @@ async function _doClearOldClicks(btn) {
   if (nameEl) nameEl.textContent = item.name;
   var tmplEl = document.getElementById('cal-remind-template');
   if (tmplEl) tmplEl.textContent = item.name + ' 提醒🔔';
-  document.getElementById('cal-sheet-overlay').classList.add('on');
-}Calendar(id) {
-  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
-  trackClick('calendar', id);
-  _calItem = item;
-  var nameEl = document.getElementById('cal-sheet-name');
-  if (nameEl) nameEl.textContent = '【開團通知】' + item.name + '\n' + item.openD + ' 上午 10:30';
   document.getElementById('cal-sheet-overlay').classList.add('on');
 }
 
