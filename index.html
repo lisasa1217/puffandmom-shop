@@ -1143,22 +1143,17 @@ input[type=file]{display:none}
   <div class="cal-sheet" onclick="event.stopPropagation()">
     <div class="cal-sheet-title">🔔 設提醒</div>
     <div class="cal-sheet-name" id="cal-sheet-name"></div>
-    <div style="font-size:12px;color:var(--ink2);text-align:center;margin-bottom:12px;line-height:1.6;font-weight:300;">到 IG 貼文下方留言，時間到我會來敲你的門 🚪</div>
-    <div style="background:var(--bg);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--ink);text-align:center;margin-bottom:16px;font-weight:400;" id="cal-remind-template"></div>
-    <div class="cal-options">
-      <button class="cal-opt-btn" onclick="calCopyText()">
-        <span class="cal-opt-icon">📋</span>
-        <div class="cal-opt-info">
-          <div class="cal-opt-label">一鍵複製留言文字</div>
-        </div>
-      </button>
-      <button class="cal-opt-btn" onclick="calGoIG()">
-        <span class="cal-opt-icon">📸</span>
-        <div class="cal-opt-info">
-          <div class="cal-opt-label">前往 IG 貼文留言</div>
-        </div>
-      </button>
+    <!-- 已複製狀態 -->
+    <div id="cal-copied-badge" style="display:none;background:#e8f5e9;border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:14px;">
+      <div style="font-size:22px;margin-bottom:4px;">✅</div>
+      <div style="font-size:13px;font-weight:600;color:#2e7d32;margin-bottom:2px;">已複製留言文字！</div>
+      <div style="font-size:11px;color:#555;" id="cal-copied-text"></div>
     </div>
+    <div style="font-size:12px;color:var(--ink2);text-align:center;margin-bottom:14px;line-height:1.6;font-weight:300;" id="cal-hint-text">到 IG 貼文下方留言，時間到我會來敲你的門 🚪</div>
+    <button class="cal-opt-btn" onclick="calGoIG()" style="width:100%;justify-content:center;gap:8px;background:var(--gold,#e8b84b);color:#fff;font-weight:600;font-size:14px;border-radius:14px;padding:14px;">
+      <span style="font-size:18px;">📸</span>
+      <span>前往 IG 貼文留言</span>
+    </button>
     <button class="cal-cancel" onclick="closeCalSheet()">取消</button>
   </div>
 </div>
@@ -1929,9 +1924,24 @@ function addToCalendar(id) {
   _calItem = item;
   var nameEl = document.getElementById('cal-sheet-name');
   if (nameEl) nameEl.textContent = item.name;
-  var tmplEl = document.getElementById('cal-remind-template');
-  if (tmplEl) tmplEl.textContent = item.name + ' 提醒🔔';
+  // 重置狀態
+  document.getElementById('cal-copied-badge').style.display = 'none';
+  document.getElementById('cal-hint-text').style.display = 'block';
   document.getElementById('cal-sheet-overlay').classList.add('on');
+  // 自動複製
+  var text = item.name + ' 提醒🔔';
+  function showCopied() {
+    document.getElementById('cal-copied-badge').style.display = 'block';
+    document.getElementById('cal-hint-text').style.display = 'none';
+    document.getElementById('cal-copied-text').textContent = text;
+  }
+  navigator.clipboard.writeText(text).then(showCopied).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showCopied();
+  });
 }
 
 function closeCalSheet() {
