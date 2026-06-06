@@ -2133,7 +2133,7 @@ function _buildItemCard(item, noHandle) {
       })() +
       '<div class="fld"><label>商品說明</label><textarea id="fd' + item.id + '">' + (item.desc || '') + '</textarea></div>' +
       '<div class="fld"><label>購買連結（已結團找客服也用此連結）</label><input type="url" id="fl' + item.id + '" value="' + (item.link || '') + '" placeholder="https://..."></div>' +
-      '<div class="fld"><label>IG 詳細介紹連結（Reels / 精選限動，選填）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
+      '<div class="fld"><label>▶ Reels 影片連結（填入後商品圖片會出現播放按鈕）</label><input type="url" id="fig' + item.id + '" value="' + (item.igUrl || '') + '" placeholder="https://www.instagram.com/reel/..."></div>' +
       '<div class="sw-row"><span>有折扣碼</span><label class="sw"><input type="checkbox" id="fdc-sw-' + item.id + '"' + (item.discCode ? ' checked' : '') + ' onchange="toggleDisc(' + item.id + ')"><span class="sw-sl"></span></label></div>' +
       '<div id="fdc-fld-' + item.id + '" style="display:' + (item.discCode ? 'flex' : 'none') + ';gap:8px">' +
         '<div class="fld" style="flex:0 0 80px"><label>折扣說明</label><input id="fdlabel-' + item.id + '" value="' + (item.discLabel || '') + '" placeholder="如：8折" maxlength="6"></div>' +
