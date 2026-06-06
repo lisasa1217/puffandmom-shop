@@ -203,11 +203,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .detail-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--rule);background:none;font-family:inherit;font-size:9px;color:var(--ink3);cursor:pointer;letter-spacing:.2px;margin-bottom:5px;align-self:flex-start;flex-shrink:0}
 .detail-btn:active{background:var(--bg)}
 .detail-btn svg{width:9px;height:9px}
-.reels-play-btn{position:absolute;top:8px;left:8px;z-index:5;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.55);cursor:pointer;transition:transform .15s,background .15s;-webkit-tap-highlight-color:transparent}
-.reels-play-btn:active{transform:scale(.88);background:rgba(0,0,0,.65)}
-.disc-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px dashed var(--rule);border-radius:4px;padding:3px 8px;cursor:pointer;margin-bottom:5px;align-self:flex-start;transition:background .15s,border-color .15s}
-.disc-chip:hover{background:rgba(130,183,204,.13);border-color:var(--green)}
-.disc-chip:active{background:rgba(130,183,204,.24);border-color:var(--green-dk)}
+.reels-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.42);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.65);cursor:pointer;transition:transform .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.reels-play-btn:active{transform:translate(-50%,-50%) scale(.88);background:rgba(0,0,0,.65)}
+.disc-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.15);border:none;border-radius:6px;padding:3px 8px;cursor:pointer;margin-bottom:5px;align-self:flex-start;transition:background .15s}
+.disc-chip:active{background:rgba(130,183,204,.32)}
 .disc-label{font-size:8px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3)}
 .disc-code{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:1.5px;color:var(--ink);font-weight:500}
 .disc-copy{font-size:9px;color:var(--ink3)}
@@ -1755,8 +1754,8 @@ function renderActive(items, permanentItems) {
       : '';
     var discRow = item.discCode
       ? '<div class="disc-chip" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
-          '<span class="disc-label">' + (item.discLabel || '折扣') + '</span>' +
-          '<span class="disc-code">' + item.discCode + '</span>' +
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" style="width:9px;height:9px;color:#4d7d94;flex-shrink:0"><path d="M9.5 2H14v4.5L7.5 13 3 8.5 9.5 2z"/><circle cx="11.5" cy="4.5" r="1" fill="currentColor" stroke="none"/></svg>' +
+          '<span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span>' +
         '</div>'
       : '';
     var buyHref = item.link || 'javascript:void(0)';
@@ -1775,11 +1774,17 @@ function renderActive(items, permanentItems) {
       '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
-        '<div class="acard-date">' +
-          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' +
-          dateLbl +
+        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px;">' +
+          '<div class="acard-date" style="margin-bottom:0">' +
+            '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' +
+            dateLbl +
+          '</div>' +
+          (item.discCode ? '<div class="disc-chip" style="margin-bottom:0" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
+            '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" style="width:9px;height:9px;color:#4d7d94;flex-shrink:0"><path d="M9.5 2H14v4.5L7.5 13 3 8.5 9.5 2z"/><circle cx="11.5" cy="4.5" r="1" fill="currentColor" stroke="none"/></svg>' +
+            '<span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span>' +
+          '</div>' : '') +
         '</div>' +
-        discRow + igBtnH +
+        igBtnH +
       '</div>';
     if (!item.link) {
       (function(iid) {
