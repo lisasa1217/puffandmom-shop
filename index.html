@@ -1141,21 +1141,21 @@ input[type=file]{display:none}
 <!-- 行事曆選擇選單 -->
 <div class="cal-sheet-overlay" id="cal-sheet-overlay" onclick="closeCalSheet()">
   <div class="cal-sheet" onclick="event.stopPropagation()">
-    <div class="cal-sheet-title">📅 加入行事曆</div>
+    <div class="cal-sheet-title">🔔 設提醒</div>
     <div class="cal-sheet-name" id="cal-sheet-name"></div>
+    <div style="font-size:12px;color:var(--ink2);text-align:center;margin-bottom:12px;line-height:1.6;font-weight:300;">到 IG 貼文下方留言，時間到我會來敲你的門 🚪</div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--ink);text-align:center;margin-bottom:16px;font-weight:400;" id="cal-remind-template"></div>
     <div class="cal-options">
-      <button class="cal-opt-btn" onclick="calAddApple()">
-        <span class="cal-opt-icon">🍎</span>
+      <button class="cal-opt-btn" onclick="calCopyText()">
+        <span class="cal-opt-icon">📋</span>
         <div class="cal-opt-info">
-          <div class="cal-opt-label">Apple 行事曆</div>
-          <div class="cal-opt-desc">下載 .ics 檔 → 點擊加入（iOS 14+ / Mac）</div>
+          <div class="cal-opt-label">一鍵複製留言文字</div>
         </div>
       </button>
-      <button class="cal-opt-btn" onclick="calAddGoogle()">
-        <span class="cal-opt-icon">📅</span>
+      <button class="cal-opt-btn" onclick="calGoIG()">
+        <span class="cal-opt-icon">📸</span>
         <div class="cal-opt-info">
-          <div class="cal-opt-label">Google 行事曆</div>
-          <div class="cal-opt-desc">開啟 Google 行事曆新增活動</div>
+          <div class="cal-opt-label">前往 IG 貼文留言</div>
         </div>
       </button>
     </div>
@@ -1914,18 +1914,16 @@ function confirmClearOldClicks() {
 async function _doClearOldClicks(btn) {
   btn.disabled = true; btn.textContent = '刪除中…';
   var cutoff = new Date();
-  cutoff.setMonth(cutoff.getMonth() - 3);
-  try {
-    var res = await sb.from('clicks').delete().lt('created_at', cutoff.toISOString());
-    if (res.error) { toast('❌ 刪除失敗'); }
-    else { toast('✓ 舊紀錄已清除'); loadStats(); }
-  } catch(e) { toast('❌ 刪除失敗'); }
-  var ov = document.getElementById('clear-old-overlay'); if (ov) ov.remove();
-}
-
-var _calItem = null; // 當前選擇的商品（給行事曆選單用）
-
-function addToCalendar(id) {
+  cutoff.setMonfunction addToCalendar(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  trackClick('calendar', id);
+  _calItem = item;
+  var nameEl = document.getElementById('cal-sheet-name');
+  if (nameEl) nameEl.textContent = item.name;
+  var tmplEl = document.getElementById('cal-remind-template');
+  if (tmplEl) tmplEl.textContent = item.name + ' 提醒🔔';
+  document.getElementById('cal-sheet-overlay').classList.add('on');
+}Calendar(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   trackClick('calendar', id);
   _calItem = item;
@@ -1953,32 +1951,30 @@ function _buildIcs(item) {
   ].join('\r\n');
 }
 
-function calAddApple() {
+function calCopyText() {
   closeCalSheet();
   if (!_calItem) return;
-  var ics  = _buildIcs(_calItem);
-  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  a.href = url; a.download = 'puffandmom.ics';
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
-  toast('📥 請點開下載的 .ics 檔即可加入行事曆');
+  var text = _calItem.name + ' 提醒🔔';
+  navigator.clipboard.writeText(text).then(function() {
+    toast('✓ 已複製！請前往 IG 貼文貼上留言');
+  }).catch(function() {
+    // fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✓ 已複製！請前往 IG 貼文貼上留言');
+  });
 }
 
-function calAddGoogle() {
+
+function calGoIG() {
   closeCalSheet();
-  if (!_calItem) return;
-  var item  = _calItem;
-  var dt    = item.openD.replace(/-/g,'') + 'T023000Z';
-  var dtEnd = item.openD.replace(/-/g,'') + 'T033000Z';
-  var desc  = item.link ? '前往購買：' + item.link : '泡芙與媽精選好物';
-  var url   = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-    '&text='    + encodeURIComponent('【開團通知】' + item.name) +
-    '&dates='   + dt + '/' + dtEnd +
-    '&details=' + encodeURIComponent(desc);
-  window.open(url, '_blank');
-  toast('📅 已開啟 Google 行事曆，確認後點儲存');
+  window.open('https://www.instagram.com/p/DNNEmrNThws/', '_blank');
 }
 /* ── NOTE TAG POPUP ── */
 var _notePop  = null;
