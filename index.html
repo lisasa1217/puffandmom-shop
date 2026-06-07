@@ -450,6 +450,14 @@ input[type=file]{display:none}
 /* toast */
 .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(5px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .22s;z-index:200;font-weight:300}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.cal-notice-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:950;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.cal-notice-overlay.on{opacity:1;pointer-events:all}
+.cal-notice-box{background:var(--card);border-radius:18px;padding:24px 22px 20px;width:82%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.cal-notice-icon{font-size:32px;margin-bottom:10px}
+.cal-notice-msg{font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:16px}
+.cal-notice-msg strong{color:var(--ink)}
+.cal-notice-count{font-size:38px;font-weight:700;color:var(--gold,#e8b84b);line-height:1;margin-bottom:6px}
+.cal-notice-sub{font-size:11px;color:var(--ink3)}
 .overlay{position:fixed;inset:0;background:rgba(28,25,23,.42);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.on{opacity:1;pointer-events:all}
 .sheet{width:100%;max-width:430px;background:var(--card);border-radius:20px 20px 0 0;padding:20px 24px calc(44px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .3s cubic-bezier(.3,1,.2,1)}
@@ -1142,7 +1150,15 @@ input[type=file]{display:none}
 </div>
 
 <!-- 行事曆選擇選單 -->
-<!-- cal-sheet 已移除，直接下載 ICS -->
+<!-- cal 倒數提示 -->
+<div class="cal-notice-overlay" id="cal-notice-overlay">
+  <div class="cal-notice-box">
+    <div class="cal-notice-icon">📅</div>
+    <div class="cal-notice-msg">開啟後請按畫面下方<br><strong>「加入行事曆」</strong><br>才能收到開團推播提醒</div>
+    <div class="cal-notice-count" id="cal-notice-count">3</div>
+    <div class="cal-notice-sub">秒後自動下載…</div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1920,14 +1936,26 @@ function addToCalendar(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   trackClick('calendar', id);
   _calItem = item;
-  var ics  = _buildIcs(item);
-  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  a.href = url; a.download = item.name + '.ics';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
-  toast('📅 請按下方「加入行事曆」才能收到提醒', 4500);
+  var overlay = document.getElementById('cal-notice-overlay');
+  var countEl = document.getElementById('cal-notice-count');
+  var n = 3;
+  countEl.textContent = n;
+  overlay.classList.add('on');
+  var iv = setInterval(function() {
+    n--;
+    countEl.textContent = n;
+    if (n <= 0) {
+      clearInterval(iv);
+      overlay.classList.remove('on');
+      var ics  = _buildIcs(item);
+      var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = item.name + '.ics';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+  }, 1000);
 }
 
 function calDownloadIcs() {
