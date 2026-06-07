@@ -1155,6 +1155,9 @@ input[type=file]{display:none}
         </div>
       </button>
     </div>
+    <div style="background:#fff8e1;border-radius:10px;padding:10px 13px;font-size:11px;color:#7a5c00;line-height:1.6;margin-bottom:4px;">
+      ⚠️ 開啟後請按畫面<strong>下方「加入行事曆」</strong>，<br>不要按右上角打勾，才能收到開團推播提醒！
+    </div>
     <button class="cal-cancel" onclick="closeCalSheet()">取消</button>
   </div>
 </div>
@@ -1960,8 +1963,8 @@ function closeCalSheet() {
 }
 
 function _buildIcs(item) {
-  var dt    = item.openD.replace(/-/g,'') + 'T023000Z';
-  var dtEnd = item.openD.replace(/-/g,'') + 'T033000Z';
+  var dt    = item.openD.replace(/-/g,'') + 'T020000Z';
+  var dtEnd = item.openD.replace(/-/g,'') + 'T030000Z';
   var desc  = item.link ? '前往購買：' + item.link : '泡芙與媽精選好物';
   return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//泡芙與媽//ZH',
     'BEGIN:VEVENT',
