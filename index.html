@@ -1144,26 +1144,17 @@ input[type=file]{display:none}
 <!-- 行事曆選擇選單 -->
 <div class="cal-sheet-overlay" id="cal-sheet-overlay" onclick="closeCalSheet()">
   <div class="cal-sheet" onclick="event.stopPropagation()">
-    <!-- Step 1 -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <div style="width:26px;height:26px;border-radius:50%;background:#2e7d32;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:#2e7d32;">留言文字已複製</div>
-        <div style="font-size:11px;color:var(--ink2);margin-top:2px;" id="cal-copied-text"></div>
-      </div>
+    <div class="cal-sheet-title">🔔 設提醒</div>
+    <div class="cal-sheet-name" id="cal-sheet-name"></div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--ink);text-align:center;margin-bottom:16px;font-weight:400;" id="cal-remind-template"></div>
+    <div class="cal-options">
+      <button class="cal-opt-btn" onclick="calDownloadIcs()">
+        <span class="cal-opt-icon">📅</span>
+        <div class="cal-opt-info">
+          <div class="cal-opt-label">加入手機行事曆（可推播提醒）</div>
+        </div>
+      </button>
     </div>
-    <!-- Step 2 -->
-    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;">
-      <div style="width:26px;height:26px;border-radius:50%;background:var(--gold,#e8b84b);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
-      <div>
-        <div style="font-size:13px;font-weight:600;color:var(--ink);">到 IG 貼文留言處貼上</div>
-        <div style="font-size:11px;color:var(--ink2);margin-top:2px;line-height:1.5;">開團時我會來提醒你 🚪</div>
-      </div>
-    </div>
-    <button class="cal-opt-btn" onclick="calGoIG()" style="width:100%;justify-content:center;gap:8px;background:var(--gold,#e8b84b);color:#fff;font-weight:600;font-size:14px;border-radius:14px;padding:14px;">
-      <span>前往 IG 《團購排程》貼文留言</span>
-      <span style="font-size:16px;">→</span>
-    </button>
     <button class="cal-cancel" onclick="closeCalSheet()">取消</button>
   </div>
 </div>
@@ -1946,19 +1937,22 @@ function addToCalendar(id) {
   _calItem = item;
   var nameEl = document.getElementById('cal-sheet-name');
   if (nameEl) nameEl.textContent = item.name;
+  var tmplEl = document.getElementById('cal-remind-template');
+  if (tmplEl) tmplEl.textContent = '開團日：' + (item.openD ? item.openD.slice(5).replace('-','/') : '—');
   document.getElementById('cal-sheet-overlay').classList.add('on');
-  // 自動複製
-  var text = item.name + ' 提醒🔔';
-  function showCopied() {
-    document.getElementById('cal-copied-text').textContent = text;
-  }
-  navigator.clipboard.writeText(text).then(showCopied).catch(function() {
-    var ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showCopied();
-  });
+}
+
+function calDownloadIcs() {
+  if (!_calItem) return;
+  var ics = _buildIcs(_calItem);
+  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = _calItem.name + '.ics';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  closeCalSheet();
+  toast('✓ 已下載！請開啟檔案加入行事曆');
 }
 
 function closeCalSheet() {
