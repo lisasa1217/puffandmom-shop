@@ -906,9 +906,15 @@ input[type=file]{display:none}
     <div class="asec">
       <div class="asec-lbl">商品管理</div>
       <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
+      <div class="adm-arch-sep">開團中 · 7天內預告</div>
       <div class="adm-items" id="adm-items"></div>
+      <div class="adm-arch-sep" id="adm-sched-sep" style="display:none">行事曆預告（7天以上）</div>
+      <div class="adm-items" id="adm-sched-items"></div>
       <div class="adm-arch-sep" id="adm-ended-sep" style="display:none">已結團</div>
-      <div class="adm-items" id="adm-ended-items"></div>
+      <div class="adm-arch-zone" id="adm-ended-zone" style="margin-bottom:8px">
+        <div id="adm-ended-items"></div>
+        <div class="adm-arch-hint" id="adm-ended-hint" style="display:none"></div>
+      </div>
       <div class="adm-arch-sep">下架區</div>
       <div class="adm-arch-zone" id="adm-arch-zone"
            ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
@@ -2249,9 +2255,12 @@ function renderAdmItems() {
   var normalNonPerm = normal.filter(function(i){ return !i.permanent; });
   var normalPerm    = normal.filter(function(i){ return  i.permanent; });
 
-  /* split non-permanent into active/soon/hidden vs ended */
-  var mainItems  = normalNonPerm.filter(function(i){ return classify(i) !== 'ended'; });
-  var endedItems = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; });
+  /* split into active/soon | scheduled | ended */
+  var mainItems      = normalNonPerm.filter(function(i){ var s=classify(i); return s==='active'||s==='soon'||s==='hidden'; });
+  var schedItems     = normalNonPerm.filter(function(i){ return classify(i) === 'scheduled'; });
+  var endedItems     = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; });
+  var schedList      = document.getElementById('adm-sched-items'); schedList.innerHTML = '';
+  var schedSep       = document.getElementById('adm-sched-sep');
 
   /* helper: attach drag-to-reorder listeners */
   function _attachReorder(item, el, section) {
@@ -2289,18 +2298,41 @@ function renderAdmItems() {
     if (cw) czBindDrag(cw, item.id);
   });
 
-  /* ── 已結團 section（可拖曳排序） ── */
+  /* ── 行事曆預告（scheduled）── */
+  if (schedItems.length) {
+    schedSep.style.display = '';
+    schedItems.forEach(function(item) {
+      var el = _buildItemCard(item);
+      _attachReorder(item, el, 'main');
+      schedList.appendChild(el);
+    });
+  } else {
+    schedSep.style.display = 'none';
+  }
+
+  /* ── 已結團：精簡列格式 ── */
+  var endedZone = document.getElementById('adm-ended-zone');
   if (endedItems.length) {
     endedSep.style.display = '';
+    endedZone.style.display = '';
+    endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var el = _buildItemCard(item); /* drag handle shown */
-      _attachReorder(item, el, 'ended'); /* reorder within ended + archive-zone drag */
-      endedList.appendChild(el);
-      var cw = document.getElementById('czitem-' + item.id);
-      if (cw) czBindDrag(cw, item.id);
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
+      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') + ' 截止' : '';
+      var row = document.createElement('div'); row.className = 'adm-arch-item';
+      row.innerHTML =
+        '<div class="adm-arch-ithumb">' + th + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="adm-arch-name">' + item.name + '</div>' +
+          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:2px;">' + closeStr + '</div>' : '') +
+        '</div>' +
+        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')" style="font-size:10px;padding:4px 8px;">🔄 開團</button>' +
+        '<button class="delete-arch-btn" onclick="delItem(' + item.id + ')">🗑️</button>';
+      endedList.appendChild(row);
     });
   } else {
     endedSep.style.display = 'none';
+    endedZone.style.display = 'none';
   }
 
   /* archive zone: explicitly archived + auto-archived */
