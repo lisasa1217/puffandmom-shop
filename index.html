@@ -246,6 +246,19 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cs-hint-close{margin-top:18px;background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-family:inherit;font-size:13px;cursor:pointer;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
 .cs-hint-close:active{filter:brightness(.85)}
 
+/* 設提醒按鈕 on soon card */
+.acard-img-btn.soon-remind a{background:rgba(232,184,75,.82);border-color:rgba(232,184,75,.5)}
+.acard-img-btn.soon-remind a:hover{background:rgba(232,184,75,.97)}
+/* 團購行事曆 */
+.cal-list{padding:0 14px 12px;display:flex;flex-direction:column;gap:16px}
+.cal-mo-group{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.cal-mo-label{font-family:'Noto Serif TC',serif;font-size:13px;font-weight:500;color:var(--ink2);padding:12px 16px 8px;border-bottom:1px solid var(--rule);letter-spacing:.8px}
+.cal-item-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--rule)}
+.cal-item-row:last-child{border-bottom:none}
+.cal-item-day{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--ink);width:28px;flex-shrink:0;text-align:center;line-height:1}
+.cal-item-name{flex:1;font-size:12px;color:var(--ink2);font-weight:300;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-item-remind{flex-shrink:0;font-size:10px;padding:5px 10px;border-radius:7px;background:var(--gold,#e8b84b);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.cal-item-remind:active{filter:brightness(.85)}
 .community{background:var(--bg);padding:32px 28px 28px;border-top:1px solid var(--rule)}
 .comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Serif TC',serif}
 .comm-desc{font-size:12px;color:var(--ink2);text-align:center;line-height:1.9;margin-bottom:18px;font-weight:300}
@@ -743,6 +756,11 @@ input[type=file]{display:none}
   <div id="active-sec">
     <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中<span class="sec-h-en">嚴選好物，限時搶購，錯過要等下次</span></span><span class="sec-h-line"></span></div>
     <div class="active-grid" id="active-grid"></div>
+  </div>
+
+  <div id="cal-sec" style="display:none">
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">團購行事曆<span class="sec-h-en">預告中，設提醒不錯過</span></span><span class="sec-h-line"></span></div>
+    <div class="cal-list" id="cal-list"></div>
   </div>
 
   <div id="ended-sec">
@@ -1638,7 +1656,8 @@ function classify(item) {
   if (daysSinceClose > 30) return 'auto-archived';
   if (closeD < now) return 'ended';
   if (open <= now && closeTs >= new Date()) return 'active';
-  if (daysToOpen <= 30 && daysToOpen > 0) return 'soon';
+  if (daysToOpen > 0 && daysToOpen <= 7)  return 'soon';
+  if (daysToOpen > 7)                     return 'scheduled';
   return 'hidden';
 }
 
@@ -1665,22 +1684,24 @@ function renderFront() {
   document.getElementById('pw-display').textContent = s.commPw || '';
   document.getElementById('pw-row').style.display = (s.pwVis && s.commPw) ? 'flex' : 'none';
 
-  var soon = [], active = [], ended = [], permanent = [];
+  var soon = [], active = [], ended = [], permanent = [], scheduled = [];
   D.items.forEach(function(i) {
     if (i.archived) return;
     var st = classify(i);
     if (i.permanent) {
-      if (st === 'soon') { soon.push(i); return; } // countdown before open date
-      permanent.push(i); return;                   // active permanent (no end date)
+      if (st === 'soon') { soon.push(i); return; }
+      permanent.push(i); return;
     }
-    if (st === 'soon')        soon.push(i);
-    else if (st === 'active') active.push(i);
-    else if (st === 'ended')  ended.push(i);
+    if (st === 'soon')           soon.push(i);
+    else if (st === 'active')    active.push(i);
+    else if (st === 'ended')     ended.push(i);
+    else if (st === 'scheduled') scheduled.push(i);
   });
-  renderSoon(soon); renderActive(active, permanent); renderEnded(ended);
-  document.getElementById('soon-sec').style.display   = soon.length  ? 'block' : 'none';
+  renderActive(active, permanent, soon); renderEnded(ended); renderScheduled(scheduled);
+  document.getElementById('soon-sec').style.display   = 'none';
   document.getElementById('active-sec').style.display = 'block';
-  document.getElementById('ended-sec').style.display  = ended.length ? 'block' : 'none';
+  document.getElementById('ended-sec').style.display  = ended.length     ? 'block' : 'none';
+  document.getElementById('cal-sec').style.display    = scheduled.length ? 'block' : 'none';
 }
 
 function renderSoon(items) {
@@ -1722,49 +1743,53 @@ function renderSoon(items) {
   startCD();
 }
 
-function renderActive(items, permanentItems) {
+function renderActive(items, permanentItems, soonItems) {
   permanentItems = permanentItems || [];
+  soonItems = soonItems || [];
   var grid = document.getElementById('active-grid'); grid.innerHTML = '';
-  if (!items.length && !permanentItems.length) {
+  if (!items.length && !permanentItems.length && !soonItems.length) {
     grid.innerHTML = '<div class="active-empty">目前沒有進行中的團購</div>';
     return;
   }
-  var buildCard = function(item, idx, isPerm) {
-    var dateLbl = isPerm
-      ? '常駐優惠'
-      : (item.closeD.slice(5).replace('-', '/') + ' 截止');
+  var buildCard = function(item, idx, isPerm, isSoon) {
+    var now = new Date();
+    var daysToOpen = isSoon ? Math.ceil((new Date(item.openD + 'T00:00:00') - now) / 86400000) : 0;
+    var dateLbl = isSoon
+      ? (item.openD.slice(5).replace('-', '/') + ' 開團')
+      : isPerm
+        ? '常駐優惠'
+        : (item.closeD.slice(5).replace('-', '/') + ' 截止');
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt="">'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)">' + (item.emoji || '🛍️') + '</div>';
-    var igBtnH = item.igUrl
+      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1);opacity:.55"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1);opacity:.55' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+    var igBtnH = (!isSoon && item.igUrl)
       ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
           '詳細介紹</a>'
       : '';
-    var reelsBtnH = item.reelsUrl
+    var reelsBtnH = (!isSoon && item.reelsUrl)
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
           '</a>'
       : '';
-    var discRow = item.discCode
-      ? '<div class="disc-chip" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
-          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" style="width:9px;height:9px;color:#4d7d94;flex-shrink:0"><path d="M9.5 2H14v4.5L7.5 13 3 8.5 9.5 2z"/><circle cx="11.5" cy="4.5" r="1" fill="currentColor" stroke="none"/></svg>' +
-          '<span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span>' +
-        '</div>'
-      : '';
-    var buyHref = item.link || 'javascript:void(0)';
-    var buyTarget = item.link ? ' target="_blank"' : '';
-    var buyTrack = item.link ? ' onclick="trackClick(\'buy\',' + item.id + ')"' : '';
-    var daysLeft = isPerm ? 99 : Math.ceil((new Date(item.closeD + 'T23:59:59') - new Date()) / 86400000);
-    var closingSoon = !isPerm && daysLeft >= 0 && daysLeft <= 2;
+    var daysLeft = isPerm ? 99 : Math.ceil((new Date(item.closeD + 'T23:59:59') - now) / 86400000);
+    var closingSoon = !isPerm && !isSoon && daysLeft >= 0 && daysLeft <= 2;
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
-    var noteH = _nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '';
+    // soon 商品自動顯示倒數備註
+    var autoNote = isSoon ? ('還有 ' + daysToOpen + ' 天') : '';
+    var noteH = autoNote
+      ? '<div class="acard-note" style="background:#e8b84b;color:#fff;">' + autoNote + '</div>'
+      : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
+    // 按鈕
+    var btnHtml = isSoon
+      ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">設提醒 🔔</a></div>'
+      : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>';
     el.innerHTML =
       '<div class="acard-img">' +
         imgH + noteH + reelsBtnH +
-        '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + buyHref + '"' + buyTarget + buyTrack + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>' +
+        btnHtml +
       '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
@@ -1773,20 +1798,19 @@ function renderActive(items, permanentItems) {
             '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' +
             dateLbl +
           '</div>' +
-          (item.discCode ? '<div class="disc-chip" style="margin-bottom:0" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
+          (!isSoon && item.discCode ? '<div class="disc-chip" style="margin-bottom:0" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')">' +
             '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" style="width:9px;height:9px;color:#4d7d94;flex-shrink:0"><path d="M9.5 2H14v4.5L7.5 13 3 8.5 9.5 2z"/><circle cx="11.5" cy="4.5" r="1" fill="currentColor" stroke="none"/></svg>' +
             '<span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span>' +
           '</div>' : '') +
         '</div>' +
         igBtnH +
       '</div>';
-    if (!item.link) {
+    if (!isSoon && !item.link) {
       (function(iid) {
         el.querySelector('.acard-img-btn a').onclick = function(e) { e.preventDefault(); openSheet(iid); };
       })(item.id);
     }
-    /* note badge: hover on desktop, click on touch */
-    if (item.note) {
+    if (!isSoon && item.note) {
       var badge = el.querySelector('.acard-note');
       if (badge) {
         if (_noteHover) {
@@ -1799,8 +1823,38 @@ function renderActive(items, permanentItems) {
     }
     grid.appendChild(el);
   };
-  items.forEach(function(item, idx) { buildCard(item, idx, false); });
-  permanentItems.forEach(function(item, idx) { buildCard(item, items.length + idx, true); });
+  items.forEach(function(item, idx) { buildCard(item, idx, false, false); });
+  permanentItems.forEach(function(item, idx) { buildCard(item, items.length + idx, true, false); });
+  soonItems.forEach(function(item, idx) { buildCard(item, items.length + permanentItems.length + idx, false, true); });
+}
+
+function renderScheduled(items) {
+  var sec = document.getElementById('cal-list'); sec.innerHTML = '';
+  if (!items.length) return;
+  // 依月份分組
+  var groups = {};
+  items.forEach(function(i) {
+    var mo = i.openD.slice(0, 7); // "2026-08"
+    if (!groups[mo]) groups[mo] = [];
+    groups[mo].push(i);
+  });
+  Object.keys(groups).sort().forEach(function(mo) {
+    var d = new Date(mo + '-01');
+    var moLabel = (d.getMonth() + 1) + ' 月';
+    var moEl = document.createElement('div');
+    moEl.className = 'cal-mo-group';
+    var rows = groups[mo].map(function(item) {
+      var day = parseInt(item.openD.slice(8), 10);
+      var daysTo = Math.ceil((new Date(item.openD + 'T00:00:00') - new Date()) / 86400000);
+      return '<div class="cal-item-row">' +
+        '<div class="cal-item-day">' + day + '</div>' +
+        '<div class="cal-item-name">' + item.name + '</div>' +
+        '<button class="cal-item-remind" onclick="addToCalendar(' + item.id + ')">設提醒</button>' +
+      '</div>';
+    }).join('');
+    moEl.innerHTML = '<div class="cal-mo-label">' + moLabel + '</div>' + rows;
+    sec.appendChild(moEl);
+  });
 }
 
 var _endedOpen = false;
