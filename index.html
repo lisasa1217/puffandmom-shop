@@ -2305,13 +2305,25 @@ function renderAdmItems() {
     if (cw) czBindDrag(cw, item.id);
   });
 
-  /* ── 行事曆預告（scheduled）── */
+  /* ── 行事曆預告（scheduled）：精簡列 ── */
   if (schedItems.length) {
     schedSep.style.display = '';
     schedItems.forEach(function(item) {
-      var el = _buildItemCard(item);
-      _attachReorder(item, el, 'main');
-      schedList.appendChild(el);
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
+      var openStr = item.openD ? item.openD.slice(5).replace('-','/') + ' 開團' : '';
+      var row = document.createElement('div'); row.className = 'adm-arch-item';
+      row.innerHTML =
+        '<div class="adm-arch-ithumb">' + th + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="adm-arch-name">' + item.name + '</div>' +
+          (openStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + openStr + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:4px">' +
+          '<button class="adm-ibtn" onclick="tF(' + item.id + ')">✏️</button>' +
+          '<button class="adm-ibtn" title="下架" onclick="archiveItem(' + item.id + ')">📦</button>' +
+          '<button class="adm-ibtn" onclick="delItem(' + item.id + ')">🗑️</button>' +
+        '</div>';
+      schedList.appendChild(row);
     });
   } else {
     schedSep.style.display = 'none';
@@ -2324,7 +2336,7 @@ function renderAdmItems() {
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)">' : '<span style="filter:grayscale(1)">' + (item.emoji || '🛍️') + '</span>';
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
       var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') + ' 截止' : '';
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
@@ -2357,7 +2369,7 @@ function renderAdmItems() {
   if (allArch.length) {
     archHint.style.display = 'none';
     allArch.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)">' : '<span style="filter:grayscale(1);opacity:.6">' + (item.emoji || '🛍️') + '</span>';
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
