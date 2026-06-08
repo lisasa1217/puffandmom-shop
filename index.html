@@ -611,8 +611,9 @@ input[type=file]{display:none}
 .pw-modal-btn.confirm{background:var(--ink);color:#fff}
 
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fu-soon{from{opacity:0;transform:translateY(8px)}to{opacity:.45;transform:translateY(0)}}
-.acard.soon-card{animation:fu-soon .28s ease both}
+.acard.soon-card{animation:fu .28s ease both}
+.acard.soon-card .acard-img img,.acard.soon-card .acard-img>div:first-child{opacity:.45}
+.acard.soon-card .acard-name,.acard.soon-card .acard-date{opacity:.45}
 .fu{animation:fu .28s ease both}
 
 /* ── 懷舊遊戲 hub ── */
