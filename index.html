@@ -909,7 +909,7 @@ input[type=file]{display:none}
       <div class="adm-arch-sep">開團中 · 7天內預告</div>
       <div class="adm-items" id="adm-items"></div>
       <div class="adm-arch-sep" id="adm-sched-sep" style="display:none">行事曆預告（7天以上）</div>
-      <div class="adm-arch-zone" style="margin-bottom:8px;background:var(--white)"><div id="adm-sched-items"></div></div>
+      <div class="adm-arch-zone" style="margin-bottom:8px"><div id="adm-sched-items"></div></div>
       <div class="adm-arch-sep" id="adm-ended-sep" style="display:none" onclick="toggleAdmZone('ended')" style="cursor:pointer">
         已結團 <span id="adm-ended-chevron" style="font-size:10px;opacity:.6">▼</span>
       </div>
@@ -2311,7 +2311,7 @@ function renderAdmItems() {
     schedItems.forEach(function(item) {
       var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
       var openStr = item.openD ? item.openD.slice(5).replace('-','/') + ' 開團' : '';
-      var row = document.createElement('div'); row.className = 'adm-arch-item';
+      var row = document.createElement('div'); row.className = 'adm-arch-item'; row.style.background = 'var(--white)';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
         '<div style="flex:1;min-width:0">' +
