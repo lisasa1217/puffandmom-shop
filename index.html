@@ -160,7 +160,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard:active{transform:scale(.98);box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:0;right:12px;z-index:4;background:#4A3528;color:#F3E0A7;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.acard-note{position:absolute;top:0;right:12px;z-index:4;background:#e8b84b;color:#fff;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acard-note.note-red{background:#C0392B;color:#F3E0A7;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
@@ -247,7 +247,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cs-hint-close:active{filter:brightness(.85)}
 
 .community{background:var(--white);padding:28px 20px 26px;border-top:1px solid var(--rule);margin-top:8px}
-.comm-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;text-align:center}
+.comm-label{font-size:13px;letter-spacing:1.5px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:500;font-family:'Noto Serif TC',serif}
 .comm-btns{display:flex;gap:10px;margin-bottom:13px}
 .comm-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;color:#fff;text-decoration:none;transition:filter .15s,transform .15s}
 .comm-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
@@ -735,12 +735,12 @@ input[type=file]{display:none}
   </div>
 
   <div id="soon-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團<span class="sec-h-en">coming soon</span></span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">即將開團<span class="sec-h-en">按下提醒，別讓喜歡的團購偷偷結束了</span></span><span class="sec-h-line"></span></div>
     <div class="soon-list" id="soon-list"></div>
   </div>
 
   <div id="active-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中<span class="sec-h-en">now open</span></span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中<span class="sec-h-en">嚴選好物，限時搶購，錯過要等下次</span></span><span class="sec-h-line"></span></div>
     <div class="active-grid" id="active-grid"></div>
   </div>
 
@@ -767,6 +767,7 @@ input[type=file]{display:none}
 
   <div id="community-block" class="community">
     <div class="comm-label">加入社群</div>
+    <div style="font-size:12px;color:var(--ink2);text-align:center;line-height:1.8;margin-bottom:16px;font-weight:300;">不吵鬧的社群日常，分享團購資訊、優惠提醒與選品心得，<br>一起交流使用經驗。<br><span style="color:var(--ink);font-weight:400;">別讓喜歡的團購偷偷結束了！</span></div>
     <div class="comm-btns">
       <a id="line-btn" class="comm-btn line" href="#" onclick="handleLine(event)">
         <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.07 2 11.07c0 4.43 3.93 8.14 9.25 8.89v2.54c0 .28.32.43.54.26l3.89-2.83C18.71 18.85 22 15.28 22 11.07 22 6.07 17.52 2 12 2z"/></svg>
@@ -2142,7 +2143,7 @@ function _buildItemCard(item, noHandle) {
         var nVal = nRed ? nr.slice(5) : nr;
         return '<div class="fld"><label>備註標籤（圖片角落顯示）</label>' +
           '<div class="note-color-pick">' +
-            '<label class="ncp-opt" title="咖色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:#4A3528"></span></label>' +
+            '<label class="ncp-opt" title="黃色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:#e8b84b"></span></label>' +
             '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#C0392B"></span></label>' +
           '</div>' +
           '<input id="fnote' + item.id + '" value="' + nVal + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12">' +
