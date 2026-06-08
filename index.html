@@ -612,7 +612,9 @@ input[type=file]{display:none}
 
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .acard.soon-card{animation:fu .28s ease both}
-.acard.soon-card .acard-img img,.acard.soon-card .acard-img>div:first-child{opacity:.45}
+.acard.soon-card .acard-img{background:transparent}
+.acard.soon-card .acard-img img{opacity:.45}
+.acard.soon-card .acard-img>div:not(.acard-img-btn):not(.acard-note):not(.reels-play-btn){opacity:.45}
 .acard.soon-card .acard-name,.acard.soon-card .acard-date{opacity:.45}
 .fu{animation:fu .28s ease both}
 
@@ -1764,12 +1766,12 @@ function renderActive(items, permanentItems, soonItems) {
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1)"' : '') + '>'
       : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
-    var igBtnH = (!isSoon && item.igUrl)
+    var igBtnH = item.igUrl
       ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
           '詳細介紹</a>'
       : '';
-    var reelsBtnH = (!isSoon && item.reelsUrl)
+    var reelsBtnH = item.reelsUrl
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
           '</a>'
