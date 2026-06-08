@@ -227,7 +227,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .ended-list{display:flex;flex-direction:column}
 .ended-row{background:var(--card);display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid var(--rule)}
-.ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ended-name{flex:1;font-size:12px;color:var(--ink3);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:52px}
 .ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap;animation:cs-nudge 1.8s ease-in-out infinite}
 @keyframes cs-nudge{0%,85%,100%{transform:translateX(0)}88%{transform:translateX(3px)}92%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
 /* 已結團 header 按鈕 */
@@ -246,7 +246,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cs-hint-close{margin-top:18px;background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-family:inherit;font-size:13px;cursor:pointer;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
 .cs-hint-close:active{filter:brightness(.85)}
 
-.community{background:var(--white);padding:28px 20px 26px;border-top:1px solid var(--rule);margin-top:8px}
+.community{background:var(--bg);padding:32px 28px 28px;border-top:1px solid var(--rule)}
 .comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Serif TC',serif}
 .comm-desc{font-size:12px;color:var(--ink2);text-align:center;line-height:1.9;margin-bottom:18px;font-weight:300}
 .comm-btns{display:flex;gap:10px;margin-bottom:13px}
@@ -768,7 +768,7 @@ input[type=file]{display:none}
 
   <div id="community-block" class="community">
     <div class="comm-label">加入社群</div>
-    <p class="comm-desc">不吵鬧的社群日常，分享團購資訊、優惠提醒與選品心得，一起交流使用經驗，別讓喜歡的團購偷偷結束了！</p>
+    <p class="comm-desc">分享團購資訊、優惠提醒與選品心得<br>別讓喜歡的團購偷偷結束了！</p>
     <div class="comm-btns">
       <a id="line-btn" class="comm-btn line" href="#" onclick="handleLine(event)">
         <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.07 2 11.07c0 4.43 3.93 8.14 9.25 8.89v2.54c0 .28.32.43.54.26l3.89-2.83C18.71 18.85 22 15.28 22 11.07 22 6.07 17.52 2 12 2z"/></svg>
