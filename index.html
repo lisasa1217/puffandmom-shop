@@ -256,7 +256,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cal-item-row:last-child{border-bottom:none}
 .cal-item-day{font-size:11px;font-weight:500;color:var(--ink2);width:34px;flex-shrink:0;text-align:center;letter-spacing:.3px}
 .cal-item-name{flex:1;font-size:12px;color:var(--ink2);font-weight:300;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cal-item-remind{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:7px;background:#4d7d94;color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.cal-item-remind{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:7px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
 .cal-item-remind:active{filter:brightness(.85)}
 .community{background:var(--bg);padding:32px 28px 28px;border-top:1px solid var(--rule)}
 .comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Serif TC',serif}
@@ -753,12 +753,12 @@ input[type=file]{display:none}
   </div>
 
   <div id="active-sec">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">現正開團中<span class="sec-h-en">嚴選好物，限時搶購，錯過要等下次</span></span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">限時團購中<span class="sec-h-en">錯過不再，下次再見！</span></span><span class="sec-h-line"></span></div>
     <div class="active-grid" id="active-grid"></div>
   </div>
 
   <div id="cal-sec" style="display:none">
-    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">團購行事曆<span class="sec-h-en">預告中，設提醒不錯過</span></span><span class="sec-h-line"></span></div>
+    <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">團購行事曆<span class="sec-h-en">按下提醒，別讓喜歡的團購偷偷結束了</span></span><span class="sec-h-line"></span></div>
     <div class="cal-list" id="cal-list"></div>
   </div>
 
@@ -1759,8 +1759,8 @@ function renderActive(items, permanentItems, soonItems) {
         ? '常駐優惠'
         : (item.closeD.slice(5).replace('-', '/') + ' 截止');
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1);opacity:.55"' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1);opacity:.55' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1)"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
     var igBtnH = (!isSoon && item.igUrl)
       ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
@@ -1830,6 +1830,7 @@ function renderActive(items, permanentItems, soonItems) {
 function renderScheduled(items) {
   var sec = document.getElementById('cal-list'); sec.innerHTML = '';
   if (!items.length) return;
+  items = items.slice().sort(function(a,b){ return a.openD < b.openD ? -1 : 1; });
   // 依月份分組
   var groups = {};
   items.forEach(function(i) {
