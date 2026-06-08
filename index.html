@@ -2310,25 +2310,18 @@ function renderAdmItems() {
     schedSep.style.display = 'none';
   }
 
-  /* ── 已結團：精簡列格式 ── */
+  /* ── 已結團：完整卡片格式 ── */
   var endedZone = document.getElementById('adm-ended-zone');
   if (endedItems.length) {
     endedSep.style.display = '';
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
-      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') + ' 截止' : '';
-      var row = document.createElement('div'); row.className = 'adm-arch-item';
-      row.innerHTML =
-        '<div class="adm-arch-ithumb">' + th + '</div>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div class="adm-arch-name">' + item.name + '</div>' +
-          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:2px;">' + closeStr + '</div>' : '') +
-        '</div>' +
-        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')" style="font-size:10px;padding:4px 8px;">🔄 開團</button>' +
-        '<button class="delete-arch-btn" onclick="delItem(' + item.id + ')">🗑️</button>';
-      endedList.appendChild(row);
+      var el = _buildItemCard(item);
+      _attachReorder(item, el, 'ended');
+      endedList.appendChild(el);
+      var cw = document.getElementById('czitem-' + item.id);
+      if (cw) czBindDrag(cw, item.id);
     });
   } else {
     endedSep.style.display = 'none';
