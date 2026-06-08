@@ -910,16 +910,23 @@ input[type=file]{display:none}
       <div class="adm-items" id="adm-items"></div>
       <div class="adm-arch-sep" id="adm-sched-sep" style="display:none">行事曆預告（7天以上）</div>
       <div class="adm-items" id="adm-sched-items"></div>
-      <div class="adm-arch-sep" id="adm-ended-sep" style="display:none">已結團</div>
-      <div class="adm-arch-zone" id="adm-ended-zone" style="margin-bottom:8px">
-        <div id="adm-ended-items"></div>
-        <div class="adm-arch-hint" id="adm-ended-hint" style="display:none"></div>
+      <div class="adm-arch-sep" id="adm-ended-sep" style="display:none" onclick="toggleAdmZone('ended')" style="cursor:pointer">
+        已結團 <span id="adm-ended-chevron" style="font-size:10px;opacity:.6">▼</span>
       </div>
-      <div class="adm-arch-sep">下架區</div>
-      <div class="adm-arch-zone" id="adm-arch-zone"
-           ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
-        <div id="adm-arch-list"></div>
-        <div class="adm-arch-hint" id="adm-arch-hint">拖曳商品到這裡，或點「📦」按鈕下架</div>
+      <div id="adm-ended-wrap">
+        <div class="adm-arch-zone" id="adm-ended-zone" style="margin-bottom:8px">
+          <div id="adm-ended-items"></div>
+        </div>
+      </div>
+      <div class="adm-arch-sep" onclick="toggleAdmZone('arch')" style="cursor:pointer">
+        下架區 <span id="adm-arch-chevron" style="font-size:10px;opacity:.6">▼</span>
+      </div>
+      <div id="adm-arch-wrap">
+        <div class="adm-arch-zone" id="adm-arch-zone"
+             ondragover="archDragOver(event)" ondragleave="archDragLeave(event)" ondrop="archDrop(event)">
+          <div id="adm-arch-list"></div>
+          <div class="adm-arch-hint" id="adm-arch-hint">拖曳商品到這裡，或點「📦」按鈕下架</div>
+        </div>
       </div>
     </div>
   </div>
@@ -2310,18 +2317,25 @@ function renderAdmItems() {
     schedSep.style.display = 'none';
   }
 
-  /* ── 已結團：完整卡片格式 ── */
+  /* ── 已結團：精簡列 + 保留按鈕 ── */
   var endedZone = document.getElementById('adm-ended-zone');
   if (endedItems.length) {
     endedSep.style.display = '';
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var el = _buildItemCard(item);
-      _attachReorder(item, el, 'ended');
-      endedList.appendChild(el);
-      var cw = document.getElementById('czitem-' + item.id);
-      if (cw) czBindDrag(cw, item.id);
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
+      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') : '';
+      var row = document.createElement('div'); row.className = 'adm-arch-item';
+      row.innerHTML =
+        '<div class="adm-arch-ithumb">' + th + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="adm-arch-name">' + item.name + '</div>' +
+          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + closeStr + ' 截止</div>' : '') +
+        '</div>' +
+        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')">🔄 恢復</button>' +
+        '<button class="delete-arch-btn" onclick="delItem(' + item.id + ')">🗑️</button>';
+      endedList.appendChild(row);
     });
   } else {
     endedSep.style.display = 'none';
@@ -2650,6 +2664,15 @@ async function saveSocial() {
   toast('✓ 社群設定已儲存');
 }
 
+var _admZoneOpen = {ended: true, arch: true};
+function toggleAdmZone(zone) {
+  _admZoneOpen[zone] = !_admZoneOpen[zone];
+  var wrap = document.getElementById('adm-' + zone + '-wrap');
+  var chev = document.getElementById('adm-' + zone + '-chevron');
+  if (wrap) wrap.style.display = _admZoneOpen[zone] ? '' : 'none';
+  if (chev) chev.textContent = _admZoneOpen[zone] ? '▼' : '▶';
+}
+
 function switchAdmTab(tab) {
   var tabs = ['profile','social','items','broadcast','stats'];
   tabs.forEach(function(t) {
@@ -2806,7 +2829,7 @@ function go(pg) {
   document.querySelector('.doll-fab').style.display = inAdm ? 'none' : '';
   var csfab = document.querySelector('.cs-fab'); if(csfab) csfab.style.display = inAdm ? 'none' : '';
   if (pg === 'front') renderFront();
-  if (pg === 'admin') { switchAdmTab('profile'); renderAdmin(); }
+  if (pg === 'admin') { switchAdmTab('items'); renderAdmin(); }
 }
 
 function toast(msg, dur) {
