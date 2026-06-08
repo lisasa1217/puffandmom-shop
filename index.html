@@ -2324,23 +2324,33 @@ function renderAdmItems() {
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
-      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') : '';
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)">' : '<span style="filter:grayscale(1)">' + (item.emoji || '🛍️') + '</span>';
+      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') + ' 截止' : '';
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
-        '<div style="flex:1;min-width:0;">' +
+        '<div style="flex:1;min-width:0;opacity:.55">' +
           '<div class="adm-arch-name">' + item.name + '</div>' +
-          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + closeStr + ' 截止</div>' : '') +
+          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + closeStr + '</div>' : '') +
         '</div>' +
-        '<button class="restore-btn" onclick="restoreItem(' + item.id + ')">🔄 恢復</button>' +
-        '<button class="delete-arch-btn" onclick="delItem(' + item.id + ')">🗑️</button>';
+        '<div style="display:flex;gap:4px">' +
+          '<button class="adm-ibtn" onclick="tF(' + item.id + ')">✏️</button>' +
+          '<button class="adm-ibtn" title="下架" onclick="archiveItem(' + item.id + ')">📦</button>' +
+          '<button class="adm-ibtn" onclick="delItem(' + item.id + ')">🗑️</button>' +
+        '</div>';
       endedList.appendChild(row);
     });
   } else {
     endedSep.style.display = 'none';
     endedZone.style.display = 'none';
   }
+  // 確保收折狀態套用
+  ['ended','arch'].forEach(function(z) {
+    var wrap = document.getElementById('adm-' + z + '-wrap');
+    var chev = document.getElementById('adm-' + z + '-chevron');
+    if (wrap) wrap.style.display = _admZoneOpen[z] ? '' : 'none';
+    if (chev) chev.textContent = _admZoneOpen[z] ? '▼' : '▶';
+  });
 
   /* archive zone: explicitly archived + auto-archived */
   var allArch = archived.concat(autoArchived);
@@ -2664,7 +2674,7 @@ async function saveSocial() {
   toast('✓ 社群設定已儲存');
 }
 
-var _admZoneOpen = {ended: true, arch: true};
+var _admZoneOpen = {ended: false, arch: false};
 function toggleAdmZone(zone) {
   _admZoneOpen[zone] = !_admZoneOpen[zone];
   var wrap = document.getElementById('adm-' + zone + '-wrap');
