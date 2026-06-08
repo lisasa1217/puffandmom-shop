@@ -1775,6 +1775,7 @@ function renderActive(items, permanentItems, soonItems) {
     var closingSoon = !isPerm && !isSoon && daysLeft >= 0 && daysLeft <= 2;
     var el = document.createElement('div');
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
+    if (isSoon) el.style.opacity = '.45';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     // soon 商品自動顯示倒數備註
     var autoNote = isSoon ? ('⏱ 還有 ' + daysToOpen + ' 天') : '';
