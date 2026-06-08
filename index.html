@@ -160,7 +160,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard:active{transform:scale(.98);box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:0;right:12px;z-index:4;background:#e8b84b;color:#fff;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.acard-note{position:absolute;top:0;right:12px;z-index:4;background:var(--yellow);color:#2E2E2E;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acard-note.note-red{background:#C0392B;color:#F3E0A7;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
@@ -2222,7 +2222,7 @@ function _buildItemCard(item, noHandle) {
         var nVal = nRed ? nr.slice(5) : nr;
         return '<div class="fld"><label>備註標籤（圖片角落顯示）</label>' +
           '<div class="note-color-pick">' +
-            '<label class="ncp-opt" title="黃色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:#e8b84b"></span></label>' +
+            '<label class="ncp-opt" title="黃色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:var(--yellow)"></span></label>' +
             '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#C0392B"></span></label>' +
           '</div>' +
           '<input id="fnote' + item.id + '" value="' + nVal + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12">' +
