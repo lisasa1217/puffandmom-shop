@@ -252,12 +252,11 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* 團購行事曆 */
 .cal-list{padding:0 14px 12px;display:flex;flex-direction:column;gap:16px}
 .cal-mo-group{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.cal-mo-label{font-family:'Noto Serif TC',serif;font-size:13px;font-weight:500;color:var(--ink2);padding:12px 16px 8px;border-bottom:1px solid var(--rule);letter-spacing:.8px}
 .cal-item-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--rule)}
 .cal-item-row:last-child{border-bottom:none}
-.cal-item-day{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--ink);width:28px;flex-shrink:0;text-align:center;line-height:1}
+.cal-item-day{font-size:11px;font-weight:500;color:var(--ink2);width:34px;flex-shrink:0;text-align:center;letter-spacing:.3px}
 .cal-item-name{flex:1;font-size:12px;color:var(--ink2);font-weight:300;line-height:1.4;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cal-item-remind{flex-shrink:0;font-size:10px;padding:5px 10px;border-radius:7px;background:var(--gold,#e8b84b);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
+.cal-item-remind{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:7px;background:#4d7d94;color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
 .cal-item-remind:active{filter:brightness(.85)}
 .community{background:var(--bg);padding:32px 28px 28px;border-top:1px solid var(--rule)}
 .comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Serif TC',serif}
@@ -1778,9 +1777,9 @@ function renderActive(items, permanentItems, soonItems) {
     el.className = 'acard fu'; el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     // soon 商品自動顯示倒數備註
-    var autoNote = isSoon ? ('還有 ' + daysToOpen + ' 天') : '';
+    var autoNote = isSoon ? ('⏱ 還有 ' + daysToOpen + ' 天') : '';
     var noteH = autoNote
-      ? '<div class="acard-note" style="background:#e8b84b;color:#fff;">' + autoNote + '</div>'
+      ? '<div class="acard-note" style="background:rgba(0,0,0,.52);color:#fff;">' + autoNote + '</div>'
       : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
     // 按鈕
     var btnHtml = isSoon
@@ -1839,20 +1838,22 @@ function renderScheduled(items) {
     groups[mo].push(i);
   });
   Object.keys(groups).sort().forEach(function(mo) {
-    var d = new Date(mo + '-01');
-    var moLabel = (d.getMonth() + 1) + ' 月';
     var moEl = document.createElement('div');
     moEl.className = 'cal-mo-group';
     var rows = groups[mo].map(function(item) {
+      var mo2 = parseInt(item.openD.slice(5,7), 10);
       var day = parseInt(item.openD.slice(8), 10);
-      var daysTo = Math.ceil((new Date(item.openD + 'T00:00:00') - new Date()) / 86400000);
+      var dateStr = mo2 + '/' + day;
       return '<div class="cal-item-row">' +
-        '<div class="cal-item-day">' + day + '</div>' +
+        '<div class="cal-item-day">' + dateStr + '</div>' +
         '<div class="cal-item-name">' + item.name + '</div>' +
-        '<button class="cal-item-remind" onclick="addToCalendar(' + item.id + ')">設提醒</button>' +
+        '<button class="cal-item-remind" onclick="addToCalendar(' + item.id + ')">' +
+          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:11px;height:11px;flex-shrink:0"><rect x="2" y="3" width="12" height="11" rx="2"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/><line x1="2" y1="7" x2="14" y2="7"/></svg>' +
+          '設提醒' +
+        '</button>' +
       '</div>';
     }).join('');
-    moEl.innerHTML = '<div class="cal-mo-label">' + moLabel + '</div>' + rows;
+    moEl.innerHTML = rows;
     sec.appendChild(moEl);
   });
 }
