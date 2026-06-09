@@ -1722,7 +1722,11 @@ function renderFront() {
   D.items.forEach(function(i) {
     if (i.archived) return;
     var st = classify(i);
-    if (i.permanent) { permanent.push(i); return; }
+    if (i.permanent) {
+      if (st === 'scheduled') { scheduled.push(i); return; } // 超過7天 → 行事曆
+      if (st === 'soon')      { soon.push(i);      return; } // 7天內 → 灰階預告
+      permanent.push(i); return;                             // 已開始 → 常駐顯示
+    }
     if (st === 'soon')           soon.push(i);
     else if (st === 'active')    active.push(i);
     else if (st === 'ended')     ended.push(i);
