@@ -2299,7 +2299,7 @@ function _buildCompactItemCard(item) {
     : (item.openD + ' – ' + item.closeD);
   var row = document.createElement('div');
   row.className = 'adm-arch-item';
-  row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px';
+  row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
   row.innerHTML =
     '<div class="adm-arch-ithumb">' + th + '</div>' +
     '<div style="flex:1;min-width:0">' +
