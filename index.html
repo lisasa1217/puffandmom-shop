@@ -1780,6 +1780,10 @@ function renderSoon(items) {
 function renderActive(items, permanentItems, soonItems) {
   permanentItems = permanentItems || [];
   soonItems = soonItems || [];
+  // 正在開團：越新鮮（openD 越近）越上面
+  items = items.slice().sort(function(a, b) { return a.openD > b.openD ? -1 : 1; });
+  // 即將開團：最快開的排最前
+  soonItems = soonItems.slice().sort(function(a, b) { return a.openD < b.openD ? -1 : 1; });
   var grid = document.getElementById('active-grid'); grid.innerHTML = '';
   if (!items.length && !permanentItems.length && !soonItems.length) {
     grid.innerHTML = '<div class="active-empty">目前沒有進行中的團購</div>';
@@ -1788,14 +1792,18 @@ function renderActive(items, permanentItems, soonItems) {
   var buildCard = function(item, idx, isPerm, isSoon) {
     var now = new Date();
     var daysToOpen = isSoon ? Math.ceil((new Date(item.openD + 'T00:00:00') - now) / 86400000) : 0;
-    var dateLbl = isSoon
+    // 常駐優惠但 openD 未到 → 視同 soon
+    var permNotStarted = isPerm && item.openD && item.openD > new Date().toISOString().slice(0, 10);
+    var daysToPermOpen = permNotStarted ? Math.ceil((new Date(item.openD + 'T00:00:00') - now) / 86400000) : 0;
+    var dateLbl = (isSoon || permNotStarted)
       ? (item.openD.slice(5).replace('-', '/') + ' 開團')
       : isPerm
         ? '常駐優惠'
         : (item.closeD.slice(5).replace('-', '/') + ' 截止');
+    var isGray = isSoon || permNotStarted;
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1)"' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+      ? '<img src="' + item.imgData + '" alt=""' + (isGray ? ' style="filter:grayscale(1)"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isGray ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
     var igBtnH = item.igUrl
       ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
@@ -1809,16 +1817,16 @@ function renderActive(items, permanentItems, soonItems) {
     var daysLeft = isPerm ? 99 : Math.ceil((new Date(item.closeD + 'T23:59:59') - now) / 86400000);
     var closingSoon = !isPerm && !isSoon && daysLeft >= 0 && daysLeft <= 2;
     var el = document.createElement('div');
-    el.className = isSoon ? 'acard soon-card' : 'acard fu';
+    el.className = isGray ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
-    // soon 商品自動顯示倒數備註
-    var autoNote = isSoon ? ('⏱ 還有 ' + daysToOpen + ' 天') : '';
+    // soon 商品與常駐未開團自動顯示倒數備註
+    var autoNote = isSoon ? ('⏱ 還有 ' + daysToOpen + ' 天') : permNotStarted ? ('⏱ 還有 ' + daysToPermOpen + ' 天') : '';
     var noteH = autoNote
       ? '<div class="acard-note" style="background:rgba(0,0,0,.52);color:#fff;">' + autoNote + '</div>'
       : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
     // 按鈕
-    var btnHtml = isSoon
+    var btnHtml = (isSoon || permNotStarted)
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">設提醒 🔔</a></div>'
       : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>';
     el.innerHTML =
@@ -1840,7 +1848,7 @@ function renderActive(items, permanentItems, soonItems) {
         '</div>' +
         igBtnH +
       '</div>';
-    if (!isSoon && !item.link) {
+    if (!isSoon && !permNotStarted && !item.link) {
       (function(iid) {
         el.querySelector('.acard-img-btn a').onclick = function(e) { e.preventDefault(); openSheet(iid); };
       })(item.id);
@@ -1922,6 +1930,7 @@ function renderEnded(items) {
   var list = document.getElementById('ended-list'); list.innerHTML = '';
   var cnt = document.getElementById('ended-count');
   if (cnt) cnt.textContent = items.length ? '（' + items.length + '）' : '';
+  items = items.slice().sort(function(a, b) { return a.closeD > b.closeD ? -1 : 1; });
   items.forEach(function(item, idx) {
     var url = item.link || '#';
     var el = document.createElement('div');
@@ -2188,8 +2197,9 @@ function _buildItemCard(item, noHandle) {
     var st = classify(item);
     stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[st] || '—';
   }
+  var _permNotStarted = item.permanent && item.openD && item.openD > new Date().toISOString().slice(0,10);
   var subText = item.permanent
-    ? ('常駐優惠' + (item.openD && item.openD !== '2000-01-01' ? '・' + item.openD + ' 起' : ''))
+    ? (_permNotStarted ? ('未開始・' + item.openD + ' 開團') : ('常駐優惠' + (item.openD && item.openD !== '2000-01-01' ? '・' + item.openD + ' 起' : '')))
     : (item.openD + ' – ' + item.closeD);
   var el = document.createElement('div');
   el.className = 'adm-icard'; el.id = 'ic' + item.id;
@@ -2204,7 +2214,7 @@ function _buildItemCard(item, noHandle) {
       '<div class="adm-ithumb">' + th + '</div>' +
       '<div class="adm-iinfo">' +
         '<div class="adm-iname">' + item.name + (item.permanent ? '<span class="perm-badge" style="margin-left:5px">常駐優惠</span>' : '') + '</div>' +
-        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? '常駐' : ({soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
+        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? (_permNotStarted ? '行事曆預告' : '常駐') : ({soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
       '</div>' +
       '<div class="adm-ibtns">' +
         '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
@@ -2284,10 +2294,16 @@ function renderAdmItems() {
   var normalNonPerm = normal.filter(function(i){ return !i.permanent; });
   var normalPerm    = normal.filter(function(i){ return  i.permanent; });
 
-  /* split into active/soon | scheduled | ended */
-  var mainItems      = normalNonPerm.filter(function(i){ var s=classify(i); return s==='active'||s==='soon'||s==='hidden'; });
-  var schedItems     = normalNonPerm.filter(function(i){ return classify(i) === 'scheduled'; });
-  var endedItems     = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; });
+  /* split into active/soon | scheduled | ended，全部固定時序 */
+  var mainActive = normalNonPerm.filter(function(i){ return classify(i) === 'active'; })
+                    .sort(function(a,b){ return a.openD > b.openD ? -1 : 1; }); // 最新開的在上
+  var mainSoon   = normalNonPerm.filter(function(i){ var s=classify(i); return s==='soon'||s==='hidden'; })
+                    .sort(function(a,b){ return a.openD < b.openD ? -1 : 1; }); // 最快開的在上
+  var mainItems  = mainActive.concat(mainSoon);
+  var schedItems = normalNonPerm.filter(function(i){ return classify(i) === 'scheduled'; })
+                    .sort(function(a,b){ return a.openD < b.openD ? -1 : 1; });
+  var endedItems = normalNonPerm.filter(function(i){ return classify(i) === 'ended'; })
+                    .sort(function(a,b){ return a.closeD > b.closeD ? -1 : 1; });
   var schedList      = document.getElementById('adm-sched-items'); schedList.innerHTML = '';
   var schedSep       = document.getElementById('adm-sched-sep');
 
@@ -2310,10 +2326,9 @@ function renderAdmItems() {
     if (handle) handle.addEventListener('touchstart', function(e){ admTouchStart(item, el, e, section); }, {passive:false});
   }
 
-  /* ── 商品管理：draggable non-permanent, non-ended items ── */
+  /* ── 商品管理：固定時序，不可拖曳 ── */
   mainItems.forEach(function(item) {
-    var el = _buildItemCard(item);
-    _attachReorder(item, el, 'main');
+    var el = _buildItemCard(item, true);
     list.appendChild(el);
     var cw = document.getElementById('czitem-' + item.id);
     if (cw) czBindDrag(cw, item.id);
@@ -2331,8 +2346,7 @@ function renderAdmItems() {
   if (schedItems.length) {
     schedSep.style.display = '';
     schedItems.forEach(function(item) {
-      var el = _buildItemCard(item);
-      _attachReorder(item, el, 'main');
+      var el = _buildItemCard(item, true);
       schedList.appendChild(el);
       var cw = document.getElementById('czitem-' + item.id);
       if (cw) czBindDrag(cw, item.id);
@@ -2348,8 +2362,7 @@ function renderAdmItems() {
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var el = _buildItemCard(item);
-      _attachReorder(item, el, 'ended');
+      var el = _buildItemCard(item, true);
       endedList.appendChild(el);
       var cw = document.getElementById('czitem-' + item.id);
       if (cw) czBindDrag(cw, item.id);
