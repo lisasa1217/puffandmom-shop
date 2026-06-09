@@ -2133,12 +2133,33 @@ async function _doClearOldClicks(btn) {
   btn.disabled = false; btn.textContent = '🗑️ 清除 3 個月前的流量記錄';
 }
 
+/* Safari 偵測：有 Safari 且沒有 Chrome / CriOS（iOS Chrome）/ FxiOS */
+function _isSafari() {
+  var ua = navigator.userAgent;
+  return /Safari/i.test(ua) && !/Chrome/i.test(ua) && !/CriOS/i.test(ua) && !/FxiOS/i.test(ua);
+}
+
+function _openGoogleCal(item) {
+  var dt    = item.openD.replace(/-/g,'') + 'T020000Z';
+  var dtEnd = item.openD.replace(/-/g,'') + 'T030000Z';
+  var desc  = item.link ? '前往購買：' + item.link : '前往團購頁面：https://puffandmom-picks.vercel.app';
+  var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    '&text='    + encodeURIComponent('【開團通知】' + item.name) +
+    '&dates='   + dt + '/' + dtEnd +
+    '&details=' + encodeURIComponent(desc);
+  window.open(url, '_blank');
+}
+
 var _calItem = null;
 function addToCalendar(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   trackClick('calendar', id);
   _calItem = item;
-  document.getElementById('cal-notice-overlay').classList.add('on');
+  if (_isSafari()) {
+    document.getElementById('cal-notice-overlay').classList.add('on');
+  } else {
+    _openGoogleCal(item);
+  }
 }
 
 function calConfirmDownload() {
