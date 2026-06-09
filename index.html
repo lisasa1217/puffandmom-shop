@@ -1722,10 +1722,7 @@ function renderFront() {
   D.items.forEach(function(i) {
     if (i.archived) return;
     var st = classify(i);
-    if (i.permanent) {
-      if (st === 'soon') { soon.push(i); return; }
-      permanent.push(i); return;
-    }
+    if (i.permanent) { permanent.push(i); return; }
     if (st === 'soon')           soon.push(i);
     else if (st === 'active')    active.push(i);
     else if (st === 'ended')     ended.push(i);
@@ -2206,7 +2203,7 @@ function _buildItemCard(item, noHandle) {
   el.setAttribute('draggable', (!item.permanent && !noHandle) ? 'true' : 'false');
   var leadIcon = item.permanent
     ? '<span class="adm-lock-icon">🔒</span>'
-    : noHandle ? ''
+    : noHandle ? '<span class="adm-lock-icon" style="opacity:0">·</span>'
     : '<span class="adm-drag-handle">⠿</span>';
   el.innerHTML =
     '<div class="adm-ihead" onclick="tF(' + item.id + ')">' +
