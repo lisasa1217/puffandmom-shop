@@ -1192,10 +1192,23 @@ input[type=file]{display:none}
 <!-- cal 確認提示 -->
 <div class="cal-notice-overlay" id="cal-notice-overlay">
   <div class="cal-notice-box">
-    <div class="cal-notice-icon">📅</div>
-    <div class="cal-notice-msg">開啟後請按畫面下方<br><strong>「加入行事曆」</strong><br>才能收到開團推播提醒</div>
-    <button onclick="calConfirmDownload()" style="width:100%;padding:12px;background:var(--gold,#e8b84b);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;">好，打開提醒</button>
-    <button onclick="document.getElementById('cal-notice-overlay').classList.remove('on')" style="width:100%;padding:10px;background:none;border:none;font-size:13px;color:var(--ink3);cursor:pointer;">取消</button>
+    <div class="cal-notice-icon">🔔</div>
+    <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:10px;">設定開團提醒</div>
+    <div style="background:var(--bg);border-radius:12px;padding:14px 16px;margin-bottom:16px;text-align:left;">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6;">點下方按鈕，開啟行事曆檔案</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--gold,#e8b84b);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
+        <div style="font-size:12px;line-height:1.6;">
+          <span style="color:var(--ink);font-weight:600;">務必按畫面下方「加入行事曆」</span>
+          <span style="color:var(--ink2)">，右上角打勾不會有提醒！</span>
+        </div>
+      </div>
+    </div>
+    <button onclick="calConfirmDownload()" style="width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;letter-spacing:.3px;">開啟行事曆檔案 →</button>
+    <button onclick="document.getElementById('cal-notice-overlay').classList.remove('on')" style="width:100%;padding:10px;background:none;border:none;font-size:12px;color:var(--ink3);cursor:pointer;">取消</button>
   </div>
 </div>
 
@@ -2314,52 +2327,32 @@ function renderAdmItems() {
     if (cw) czBindDrag(cw, item.id);
   });
 
-  /* ── 行事曆預告（scheduled）：精簡列 ── */
+  /* ── 行事曆預告（scheduled）：_buildItemCard 可展開編輯 ── */
   if (schedItems.length) {
     schedSep.style.display = '';
     schedItems.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
-      var openStr = item.openD ? item.openD.slice(5).replace('-','/') + ' 開團' : '';
-      var row = document.createElement('div'); row.className = 'adm-arch-item'; row.style.background = 'var(--card)';
-      row.innerHTML =
-        '<div class="adm-arch-ithumb">' + th + '</div>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div class="adm-arch-name">' + item.name + '</div>' +
-          (openStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + openStr + '</div>' : '') +
-        '</div>' +
-        '<div style="display:flex;gap:4px">' +
-          '<button class="adm-ibtn" onclick="tF(' + item.id + ')">✏️</button>' +
-          '<button class="adm-ibtn" title="下架" onclick="archiveItem(' + item.id + ')">📦</button>' +
-          '<button class="adm-ibtn" onclick="delItem(' + item.id + ')">🗑️</button>' +
-        '</div>';
-      schedList.appendChild(row);
+      var el = _buildItemCard(item);
+      _attachReorder(item, el, 'main');
+      schedList.appendChild(el);
+      var cw = document.getElementById('czitem-' + item.id);
+      if (cw) czBindDrag(cw, item.id);
     });
   } else {
     schedSep.style.display = 'none';
   }
 
-  /* ── 已結團：精簡列 + 保留按鈕 ── */
+  /* ── 已結團：_buildItemCard 可展開編輯 ── */
   var endedZone = document.getElementById('adm-ended-zone');
   if (endedItems.length) {
     endedSep.style.display = '';
     endedZone.style.display = '';
     endedList.innerHTML = '';
     endedItems.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : (item.emoji || '🛍️');
-      var closeStr = item.closeD && item.closeD !== '2099-12-31' ? item.closeD.slice(5).replace('-','/') + ' 截止' : '';
-      var row = document.createElement('div'); row.className = 'adm-arch-item';
-      row.innerHTML =
-        '<div class="adm-arch-ithumb">' + th + '</div>' +
-        '<div style="flex:1;min-width:0;opacity:.55">' +
-          '<div class="adm-arch-name">' + item.name + '</div>' +
-          (closeStr ? '<div style="font-size:9px;color:var(--ink3);margin-top:1px;">' + closeStr + '</div>' : '') +
-        '</div>' +
-        '<div style="display:flex;gap:4px">' +
-          '<button class="adm-ibtn" onclick="tF(' + item.id + ')">✏️</button>' +
-          '<button class="adm-ibtn" title="下架" onclick="archiveItem(' + item.id + ')">📦</button>' +
-          '<button class="adm-ibtn" onclick="delItem(' + item.id + ')">🗑️</button>' +
-        '</div>';
-      endedList.appendChild(row);
+      var el = _buildItemCard(item);
+      _attachReorder(item, el, 'ended');
+      endedList.appendChild(el);
+      var cw = document.getElementById('czitem-' + item.id);
+      if (cw) czBindDrag(cw, item.id);
     });
   } else {
     endedSep.style.display = 'none';
