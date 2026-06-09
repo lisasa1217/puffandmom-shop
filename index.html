@@ -2063,7 +2063,7 @@ function closeCalSheet() {
 function _buildIcs(item) {
   var dt    = item.openD.replace(/-/g,'') + 'T020000Z';
   var dtEnd = item.openD.replace(/-/g,'') + 'T030000Z';
-  var desc  = item.link ? '前往購買：' + item.link : '泡芙與媽精選好物';
+  var desc  = item.link ? '前往購買：' + item.link : '前往團購頁面：https://puffandmom-picks.vercel.app';
   return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//泡芙與媽//ZH',
     'BEGIN:VEVENT',
     'DTSTART:' + dt, 'DTEND:' + dtEnd,
