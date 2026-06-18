@@ -175,17 +175,19 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .shop-card-desc{font-size:11px;color:var(--ink3);line-height:1.5;flex:1;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .shop-card-btn{
-  margin-top:4px;padding:8px 10px;border-radius:8px;
-  border:none;background:var(--yellow);
-  color:var(--ink);font-size:11px;font-weight:500;
+  margin-top:4px;padding:9px 10px;border-radius:8px;
+  border:none;background:var(--green-dk);
+  color:#fff;font-size:11px;font-weight:500;
   font-family:inherit;cursor:pointer;text-align:center;
-  letter-spacing:.3px;transition:background .15s;width:100%;
+  letter-spacing:.3px;width:100%;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .12s,filter .12s;
 }
-.shop-card-btn.taobao{background:var(--green);color:var(--white)}
-.shop-card-btn:active{filter:brightness(.92)}
+.shop-card-btn.taobao{background:var(--green-dk)}
+.shop-card-btn:active{transform:scale(.95);filter:brightness(.88)}
 .shop-btn-hint{
   font-size:9px;color:var(--ink3);text-align:center;
-  margin-top:3px;letter-spacing:.3px;line-height:1.4;
+  margin-bottom:3px;letter-spacing:.3px;line-height:1.4;
 }
 
 /* ── Empty state ── */
@@ -351,27 +353,27 @@ function renderGrid() {
   grid.style.display = 'grid';
   grid.innerHTML = filtered.map(function(item) {
     var imgHtml = item.imgData
-      ? '<img src="' + item.imgData + '" alt="' + _esc(item.name) + '">'
-      : '<span>' + (item.emoji || '🛍️') + '</span>';
+      ? '<div class="shop-card-img"><img src="' + _esc(item.imgData) + '" alt="' + _esc(item.name) + '"></div>'
+      : '';
     var catTag = item.category
       ? '<span class="shop-cat-tag">' + _esc(item.category) + '</span>'
       : '';
     var btnHtml, hintHtml = '';
     if (item.isTaobao) {
-      btnHtml = '<button class="shop-card-btn taobao" onclick="copyText(' + JSON.stringify(item.link) + ',\'✓ 已複製淘寶連結\')">複製淘寶連結</button>';
       hintHtml = '<div class="shop-btn-hint">複製後打開淘寶APP搜尋</div>';
+      btnHtml = '<button class="shop-card-btn taobao" onclick="copyText(' + JSON.stringify(item.link) + ',\'✓ 已複製淘寶連結\')">複製淘寶連結</button>';
     } else if (item.link) {
-      btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">跟買起來</a>';
+      btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">+1 跟著買</a>';
     } else {
-      btnHtml = '<button class="shop-card-btn" style="opacity:.4;cursor:default" disabled>跟買起來</button>';
+      btnHtml = '<button class="shop-card-btn" style="opacity:.4;cursor:default" disabled>+1 跟著買</button>';
     }
     return '<div class="shop-card">' +
-      '<div class="shop-card-img">' + imgHtml + '</div>' +
+      imgHtml +
       '<div class="shop-card-body">' +
         catTag +
         '<div class="shop-card-name">' + _esc(item.name) + '</div>' +
         (item.desc ? '<div class="shop-card-desc">' + _esc(item.desc) + '</div>' : '') +
-        btnHtml + hintHtml +
+        hintHtml + btnHtml +
       '</div>' +
     '</div>';
   }).join('');
