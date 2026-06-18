@@ -176,14 +176,14 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .shop-card-btn{
   margin-top:4px;padding:9px 10px;border-radius:8px;
-  border:none;background:var(--green-dk);
+  border:none;background:var(--green);
   color:#fff;font-size:11px;font-weight:500;
   font-family:inherit;cursor:pointer;text-align:center;
   letter-spacing:.3px;width:100%;
   -webkit-tap-highlight-color:transparent;
   transition:transform .12s,filter .12s;
 }
-.shop-card-btn.taobao{background:var(--green-dk)}
+.shop-card-btn.taobao{background:var(--green)}
 .shop-card-btn:active{transform:scale(.95);filter:brightness(.88)}
 .shop-btn-hint{
   font-size:9px;color:var(--ink3);text-align:center;
@@ -354,7 +354,7 @@ function renderGrid() {
   grid.innerHTML = filtered.map(function(item) {
     var imgHtml = item.imgData
       ? '<div class="shop-card-img"><img src="' + _esc(item.imgData) + '" alt="' + _esc(item.name) + '"></div>'
-      : '';
+      : '<div class="shop-card-img"><span style="font-size:36px;line-height:1">✦</span></div>';
     var catTag = item.category
       ? '<span class="shop-cat-tag">' + _esc(item.category) + '</span>'
       : '';
@@ -393,7 +393,7 @@ async function init() {
           name:     i.name       || '',
           desc:     i.description|| '',
           imgData:  i.img_data   || null,
-          emoji:    i.emoji      || '🛍️',
+          emoji:    i.emoji      || '✦',
           category: i.category   || '',
           link:     i.link       || '',
           isTaobao: i.is_taobao  || false
