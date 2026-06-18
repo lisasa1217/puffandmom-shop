@@ -220,7 +220,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
     首頁
   </a>
-  <div class="shop-strip-title">莎的選品</div>
+  <div class="shop-strip-title" style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;letter-spacing:1.5px;font-style:italic">Puffmom Picks</div>
   <button class="shop-strip-menu" onclick="openMenu()" aria-label="選單">☰</button>
 </div>
 
@@ -350,7 +350,7 @@ function renderGrid() {
   if (!filtered.length) {
     grid.innerHTML = '';
     grid.style.display = 'block';
-    grid.innerHTML = '<div class="shop-empty"><div class="shop-empty-icon">🛍️</div>這個分類還沒有商品</div>';
+    grid.innerHTML = '<div class="shop-empty"><div class="shop-empty-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;opacity:.35"><circle cx="24" cy="24" r="20"/><path d="M17 21c0-3.866 3.134-7 7-7s7 3.134 7 7"/><path d="M13 21h22l-2.5 14h-17L13 21z"/></svg></div>這個分類還沒有商品</div>';
     return;
   }
   grid.style.display = 'grid';

@@ -4416,7 +4416,14 @@ async function addShopItem() {
     name:'新選品', emoji:'🛍️', img_data:null, category:'', link:'',
     description:'', is_taobao:false, archived:false, sort_order:0
   }).select().single();
-  if (res.error) { toast('❌ 新增失敗'); console.error(res.error); return; }
+  if (res.error) {
+    console.error(res.error);
+    var msg = res.error.code === '42P01'
+      ? '❌ 請先在 Supabase 建立 shop_items 資料表'
+      : '❌ 新增失敗：' + (res.error.message || res.error.code);
+    toast(msg);
+    return;
+  }
   var d = res.data;
   D.shopItems.unshift({ id:d.id, name:d.name, desc:d.description||'', imgData:null, emoji:d.emoji, category:d.category||'', link:d.link||'', isTaobao:false, archived:false });
   renderShopAdm();
