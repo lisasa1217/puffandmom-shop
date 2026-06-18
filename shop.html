@@ -188,7 +188,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .shop-card-btn.copied{background:var(--green-dk)!important;transition:background 0s}
 .shop-btn-hint{
   font-size:9px;color:var(--ink3);text-align:center;
-  margin-bottom:3px;letter-spacing:.3px;line-height:1.4;
+  margin-top:5px;margin-bottom:0;letter-spacing:.3px;line-height:1.4;
 }
 
 /* ── Empty state ── */
@@ -369,7 +369,7 @@ function renderGrid() {
       : '';
     var btnHtml, hintHtml = '';
     if (item.isTaobao) {
-      hintHtml = '<div class="shop-btn-hint">複製後打開淘寶APP搜尋</div>';
+      hintHtml = '<div class="shop-btn-hint">一鍵複製，打開淘寶APP搜尋</div>';
       btnHtml = '<button class="shop-card-btn taobao" data-link="' + _esc(item.link) + '" onclick="copyText(this.dataset.link,\'✓ 已複製淘寶連結\',this)">複製淘寶連結</button>';
     } else if (item.link) {
       btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">+1 跟著買</a>';
@@ -382,7 +382,7 @@ function renderGrid() {
         catTag +
         '<div class="shop-card-name">' + _esc(item.name) + '</div>' +
         (item.desc ? '<div class="shop-card-desc">' + _esc(item.desc) + '</div>' : '') +
-        hintHtml + btnHtml +
+        btnHtml + hintHtml +
       '</div>' +
     '</div>';
   }).join('');
