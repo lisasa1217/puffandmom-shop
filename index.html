@@ -635,9 +635,8 @@ input[type=file]{display:none}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .acard.soon-card{animation:fu .28s ease both}
 .acard.soon-card .acard-img{background:transparent}
-.acard.soon-card .acard-img img{opacity:.45}
-.acard.soon-card .acard-img>div:not(.acard-img-btn):not(.acard-note):not(.reels-play-btn){opacity:.45}
-.acard.soon-card .acard-name,.acard.soon-card .acard-date{opacity:.45}
+.acard.soon-card .acard-img img{filter:saturate(.22)}
+.acard.soon-card .acard-img>div:not(.acard-img-btn):not(.acard-note):not(.reels-play-btn){filter:saturate(.22)}
 .fu{animation:fu .28s ease both}
 
 /* ── 懷舊遊戲 hub ── */
@@ -1321,7 +1320,7 @@ async function initApp() {
         return {
           id:        i.id,
           name:      i.name        || '',
-          emoji:     i.emoji       || '🛍️',
+          emoji:     i.emoji       || '✦',
           imgData:   i.img_data    || null,
           openD:     i.open_d      || '',
           closeD:    i.close_d     || '',
@@ -1340,7 +1339,7 @@ async function initApp() {
     var sRes = await sb.from('shop_items').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if (sRes.data) {
       D.shopItems = sRes.data.map(function(i){
-        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'🛍️', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
+        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
       });
     }
   } catch(e) {
@@ -1875,8 +1874,8 @@ function renderActive(items, permanentItems, soonItems) {
       ? (item.openD.slice(5).replace('-', '/') + ' 開團')
       : (item.closeD.slice(5).replace('-', '/') + ' 截止');
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:grayscale(1)"' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+      ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? ' style="filter:saturate(.22)"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isSoon ? 'filter:saturate(.22)' : '') + '">' + (item.emoji || '✦') + '</div>';
     var igBtnH = item.igUrl
       ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
@@ -1944,8 +1943,8 @@ function renderActive(items, permanentItems, soonItems) {
     var dateLbl = permNotStarted ? (item.openD.slice(5).replace('-', '/') + ' 開團') : '常駐優惠';
     var isGray = !!permNotStarted;
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt=""' + (isGray ? ' style="filter:grayscale(1)"' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isGray ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+      ? '<img src="' + item.imgData + '" alt=""' + (isGray ? ' style="filter:saturate(.22)"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isGray ? 'filter:saturate(.22)' : '') + '">' + (item.emoji || '✦') + '</div>';
     var reelsBtnH = item.reelsUrl ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg></a>' : '';
     var igBtnH = item.igUrl ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>詳細介紹</a>' : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
@@ -1992,8 +1991,8 @@ function renderPermanent(items) {
     var dateLbl = permNotStarted ? (item.openD.slice(5).replace('-', '/') + ' 開團') : '常駐優惠';
     var isGray = !!permNotStarted;
     var imgH = item.imgData
-      ? '<img src="' + item.imgData + '" alt=""' + (isGray ? ' style="filter:grayscale(1)"' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isGray ? 'filter:grayscale(1)' : '') + '">' + (item.emoji || '🛍️') + '</div>';
+      ? '<img src="' + item.imgData + '" alt=""' + (isGray ? ' style="filter:saturate(.22)"' : '') + '>'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);' + (isGray ? 'filter:saturate(.22)' : '') + '">' + (item.emoji || '✦') + '</div>';
     var reelsBtnH = item.reelsUrl
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
@@ -2396,7 +2395,7 @@ function _buildCompactItemCard(item) {
   form.style.boxSizing = 'border-box';
   var th = item.imgData
     ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">'
-    : '<span style="font-size:14px">' + (item.emoji || '🛍️') + '</span>';
+    : '<span style="font-size:14px">' + (item.emoji || '✦') + '</span>';
   var sub = item.permanent
     ? ('常駐優惠' + (item.openD && item.openD !== '2000-01-01' ? '・' + item.openD + ' 起' : ''))
     : (item.openD + ' – ' + item.closeD);
@@ -2419,7 +2418,7 @@ function _buildCompactItemCard(item) {
 }
 
 function _buildItemCard(item, noHandle) {
-  var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '🛍️');
+  var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '✦');
   var stLabel;
   if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
   else {
@@ -2456,7 +2455,7 @@ function _buildItemCard(item, noHandle) {
       '<div class="crop-card">' +
         '<div class="crop-zone rect" id="czitem-' + item.id + '">' +
           (item.imgData ? '<img id="czresult-' + item.id + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;" src="' + item.imgData + '">' : '') +
-          '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '🛍️') + '</span>點擊上傳圖片</div>' +
+          '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '✦') + '</span>點擊上傳圖片</div>' +
           '<div class="chint" id="czitem-hint-' + item.id + '" style="display:' + (item.imgData ? 'block' : 'none') + '">' + (item.imgData ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
         '</div>' +
         '<div class="crop-scale" id="czitem-scrow-' + item.id + '" style="display:none">' +
@@ -2613,7 +2612,7 @@ function renderAdmItems() {
   if (allArch.length) {
     archHint.style.display = 'none';
     allArch.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)">' : '<span style="filter:grayscale(1);opacity:.6">' + (item.emoji || '🛍️') + '</span>';
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover;filter:saturate(.22)">' : '<span style="filter:saturate(.22);opacity:.6">' + (item.emoji || '✦') + '</span>';
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
@@ -2884,7 +2883,7 @@ async function addItem() {
   var today = new Date().toISOString().slice(0,10);
   var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
   var res = await sb.from('items').insert({
-    name: '新商品', emoji: '🛍️', img_data: null,
+    name: '新商品', emoji: '✦', img_data: null,
     open_d: today, close_d: close,
     link: '', description: '', disc_code: '', disc_label: '', ig_url: '', reels_url: '', note: '', sort_order: 0
   }).select().single();
@@ -4297,7 +4296,7 @@ function renderShopAdm() {
   list.forEach(function(item) {
     var th = item.imgData
       ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">'
-      : '<span style="font-size:14px">' + (item.emoji || '🛍️') + '</span>';
+      : '<span style="font-size:14px">' + (item.emoji || '✦') + '</span>';
     var row = document.createElement('div');
     row.className = 'adm-arch-item';
     row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
@@ -4337,7 +4336,7 @@ function _buildShopImgUpload(item) {
   var sid = 'shop-' + item.id;
   var preview = item.imgData
     ? '<img src="' + item.imgData + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px" id="si-img-preview-' + item.id + '">'
-    : '<div id="si-img-preview-' + item.id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item.emoji||'🛍️') + '</div>';
+    : '<div id="si-img-preview-' + item.id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item.emoji||'✦') + '</div>';
   return preview +
     '<input type="file" accept="image/*" id="si-file-' + item.id + '" style="display:none" onchange="shopImgPicked(' + item.id + ',this)">' +
     '<div style="display:flex;gap:6px">' +
@@ -4373,7 +4372,7 @@ function clearShopImg(id) {
   var item = D.shopItems.find(function(i){ return i.id === id; });
   if (item) item.imgData = null;
   var prev = document.getElementById('si-img-preview-' + id);
-  if (prev) { prev.outerHTML = '<div id="si-img-preview-' + id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item&&item.emoji||'🛍️') + '</div>'; }
+  if (prev) { prev.outerHTML = '<div id="si-img-preview-' + id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item&&item.emoji||'✦') + '</div>'; }
 }
 
 function toggleShopForm(id) {
@@ -4413,7 +4412,7 @@ async function saveShopItem(id) {
 
 async function addShopItem() {
   var res = await sb.from('shop_items').insert({
-    name:'新選品', emoji:'🛍️', img_data:null, category:'', link:'',
+    name:'新選品', emoji:'✦', img_data:null, category:'', link:'',
     description:'', is_taobao:false, archived:false, sort_order:0
   }).select().single();
   if (res.error) {
