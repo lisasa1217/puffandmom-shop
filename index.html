@@ -280,6 +280,17 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .pw-num{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;letter-spacing:3px;color:var(--ink)}
 .pw-icon{font-size:11px;color:var(--ink3)}
 
+/* ── Shop FAB & drag ── */
+.shop-fab{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom,0px));right:16px;width:50px;height:50px;border-radius:50%;background:var(--green-dk);border:none;color:#fff;font-size:28px;line-height:1;cursor:pointer;z-index:92;box-shadow:0 4px 18px rgba(0,0,0,.22);display:none;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.shop-fab.on{display:flex}
+.shop-fab:active{transform:scale(.88);background:var(--accent)}
+.shop-drag-handle{font-size:17px;color:var(--ink3);cursor:grab;padding:8px 6px;flex-shrink:0;touch-action:none;line-height:1}
+.shop-drag-handle:active{cursor:grabbing;color:var(--ink)}
+.shop-drag-over{outline:2px dashed var(--green);outline-offset:-2px}
+.fld-check{display:flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:4px}
+.fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+.fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
+
 /* ── Hamburger menu ── */
 .hmenu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--ink);font-size:20px;line-height:1;flex-shrink:0;padding:0}
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -997,12 +1008,14 @@ input[type=file]{display:none}
   <div class="adm-panel" id="adm-panel-shop">
     <div class="asec">
       <div class="asec-lbl">莎的選品清單</div>
-      <button class="savebtn g" style="margin-bottom:12px" onclick="addShopItem()">＋ 新增選品</button>
       <div id="shop-adm-list"></div>
     </div>
   </div>
 
 </div>
+
+<!-- Shop FAB -->
+<button id="shop-fab" class="shop-fab" onclick="addShopItem()" aria-label="新增選品">＋</button>
 
 <!-- Hamburger overlay & drawer -->
 <div class="hmenu-overlay" id="hmenu-overlay" onclick="closeHMenu()"></div>
@@ -1638,6 +1651,15 @@ function cropApply(id) {
   if (isAva(id)) {
     D.profile.avatarData = dataUrl;
     toast('✓ 大頭貼已套用');
+  } else if (String(id).indexOf('shop-') === 0) {
+    var shopId = parseInt(String(id).slice(5));
+    var shopItem = D.shopItems.find(function(i){ return i.id === shopId; });
+    if (shopItem) {
+      shopItem.imgData = dataUrl;
+      var th = document.querySelector('#si-row-' + shopId + ' .adm-arch-ithumb');
+      if (th) th.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover">';
+    }
+    toast('✓ 圖片已套用');
   } else {
     var numId = parseInt(id);
     var item = D.items.find(function(i){ return i.id === numId; });
@@ -1724,6 +1746,8 @@ function adminLogout() {
   clearAdminTimeout();
   sessionStorage.removeItem('adminUnlocked');
   document.getElementById('tab-bar').style.display = 'none';
+  var fab = document.getElementById('shop-fab');
+  if (fab) fab.classList.remove('on');
   go('front');
   toast('已登出後台');
 }
@@ -2949,6 +2973,8 @@ function switchAdmTab(tab) {
   if (tab === 'broadcast') renderBcSortList();
   if (tab === 'stats') loadStats();
   if (tab === 'shop') renderShopAdm();
+  var fab = document.getElementById('shop-fab');
+  if (fab) fab.classList.toggle('on', tab === 'shop');
 }
 
 /* ── HAMBURGER MENU ── */
@@ -4287,11 +4313,16 @@ function stairSubmitScore() {
 function _djEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 /* ── SHOP ADMIN ── */
+var _shopDrag = { id: null, el: null, overEl: null };
+
 function renderShopAdm() {
   var wrap = document.getElementById('shop-adm-list');
   if (!wrap) return;
   var list = D.shopItems.filter(function(i){ return !i.archived; });
-  if (!list.length) { wrap.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--ink3);font-size:13px">還沒有選品，點上方按鈕新增</div>'; return; }
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--ink3);font-size:13px">還沒有選品，點右下角 ＋ 新增</div>';
+    return;
+  }
   wrap.innerHTML = '';
   list.forEach(function(item) {
     var th = item.imgData
@@ -4299,18 +4330,26 @@ function renderShopAdm() {
       : '<span style="font-size:14px">' + (item.emoji || '✦') + '</span>';
     var row = document.createElement('div');
     row.className = 'adm-arch-item';
+    row.id = 'si-row-' + item.id;
+    row.setAttribute('draggable', 'true');
+    row.dataset.sid = item.id;
     row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
+
     row.innerHTML =
+      '<span class="shop-drag-handle" title="拖曳排序">⠿</span>' +
       '<div class="adm-arch-ithumb">' + th + '</div>' +
       '<div style="flex:1;min-width:0">' +
         '<div style="font-size:12px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _esc(item.name) + '</div>' +
-        '<div style="font-size:10px;color:var(--ink3);margin-top:2px">' + (item.category ? _esc(item.category) : '未分類') + (item.isTaobao ? '・淘寶' : '') + '</div>' +
+        '<div style="font-size:10px;color:var(--ink3);margin-top:2px">' + (item.category || '未分類') + (item.isTaobao ? '・淘寶' : '') + '</div>' +
       '</div>' +
       '<div style="display:flex;gap:5px;flex-shrink:0">' +
         '<button class="adm-ibtn" onclick="event.stopPropagation();toggleShopForm(' + item.id + ')">✏️</button>' +
         '<button class="adm-ibtn" onclick="event.stopPropagation();delShopItem(' + item.id + ')">🗑️</button>' +
       '</div>';
+
     /* inline edit form */
+    var cid = 'shop-' + item.id;
+    var hasImg = !!item.imgData;
     var form = document.createElement('div');
     form.id = 'sif' + item.id;
     form.style.cssText = 'display:none;width:100%;box-sizing:border-box;padding:10px 0 4px';
@@ -4318,62 +4357,81 @@ function renderShopAdm() {
       '<div class="fld"><label>商品名稱</label><input id="si-name-' + item.id + '" value="' + _esc(item.name) + '"></div>' +
       '<div class="fld"><label>分類標籤</label><input id="si-cat-' + item.id + '" value="' + _esc(item.category) + '" placeholder="例：廚房・育兒・美妝"></div>' +
       '<div class="fld"><label>商品說明</label><textarea id="si-desc-' + item.id + '" style="height:56px">' + _esc(item.desc) + '</textarea></div>' +
-      '<div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="si-tb-' + item.id + '"' + (item.isTaobao ? ' checked' : '') + ' onchange="toggleShopTbHint(' + item.id + ')"> 淘寶商品</label></div>' +
+      '<div class="fld-check">' +
+        '<input type="checkbox" id="si-tb-' + item.id + '"' + (item.isTaobao ? ' checked' : '') + ' onchange="toggleShopTbHint(' + item.id + ')">' +
+        '<span onclick="document.getElementById(\'si-tb-' + item.id + '\').click();toggleShopTbHint(' + item.id + ')">淘寶商品</span>' +
+      '</div>' +
       '<div class="fld" id="si-link-row-' + item.id + '" style="' + (item.isTaobao ? '' : 'display:none') + '"><label>淘寶連結</label><input id="si-link-' + item.id + '" value="' + _esc(item.link) + '" placeholder="淘寶商品連結或關鍵字"></div>' +
       '<div class="fld" id="si-url-row-' + item.id + '" style="' + (item.isTaobao ? 'display:none' : '') + '"><label>購買連結</label><input id="si-url-' + item.id + '" value="' + (item.isTaobao ? '' : _esc(item.link)) + '" placeholder="https://..."></div>' +
-      '<div class="fld"><label>商品圖片</label>' + _buildShopImgUpload(item) + '</div>' +
+      '<div class="fld"><label>商品圖片</label>' +
+        '<div class="crop-card">' +
+          '<div class="crop-zone sq" id="czitem-' + cid + '">' +
+            (hasImg ? '<img id="czresult-' + cid + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5" src="' + item.imgData + '">' : '') +
+            '<div class="cph" id="czitem-ph-' + cid + '"' + (hasImg ? ' style="display:none"' : '') + '><span>✦</span>點擊上傳圖片</div>' +
+            '<div class="chint" id="czitem-hint-' + cid + '" style="display:' + (hasImg ? 'block' : 'none') + '">' + (hasImg ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
+          '</div>' +
+          '<div class="crop-scale" id="czitem-scrow-' + cid + '" style="display:none"><label>縮放</label><input type="range" id="czitem-sc-' + cid + '" min="0.1" max="4" step="0.01" value="1" oninput="cropScaleChange(\'' + cid + '\')"></div>' +
+          '<div class="crop-acts">' +
+            '<button class="crop-act" onclick="document.getElementById(\'sifile-' + item.id + '\').click()">' + (hasImg ? '🔄 重新上傳' : '📷 上傳圖片') + '</button>' +
+            '<button class="crop-act g" id="czitem-apply-' + cid + '" style="display:none" onclick="cropApply(\'' + cid + '\')">✓ 套用</button>' +
+          '</div>' +
+          '<input type="file" id="sifile-' + item.id + '" accept="image/*" style="display:none" onchange="cropLoad(\'' + cid + '\',event)">' +
+        '</div>' +
+      '</div>' +
       '<div style="display:flex;gap:8px;margin-top:8px">' +
         '<button class="savebtn g" style="flex:1" onclick="saveShopItem(' + item.id + ')">儲存</button>' +
       '</div>';
+
     row.appendChild(form);
+
+    /* drag events */
+    row.addEventListener('dragstart', function(e) {
+      _shopDrag.id = item.id;
+      _shopDrag.el = row;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(function(){ row.style.opacity = '.4'; }, 0);
+    });
+    row.addEventListener('dragend', function() {
+      row.style.opacity = '';
+      if (_shopDrag.overEl) _shopDrag.overEl.classList.remove('shop-drag-over');
+      _shopDrag = { id: null, el: null, overEl: null };
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      if (_shopDrag.overEl && _shopDrag.overEl !== row) _shopDrag.overEl.classList.remove('shop-drag-over');
+      _shopDrag.overEl = row;
+      row.classList.add('shop-drag-over');
+    });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault();
+      row.classList.remove('shop-drag-over');
+      if (_shopDrag.id === item.id) return;
+      _shopReorder(_shopDrag.id, item.id);
+    });
+
     wrap.appendChild(row);
   });
 }
 
+function _shopReorder(fromId, toId) {
+  var list = D.shopItems.filter(function(i){ return !i.archived; });
+  var fi = list.findIndex(function(i){ return i.id === fromId; });
+  var ti = list.findIndex(function(i){ return i.id === toId; });
+  if (fi < 0 || ti < 0) return;
+  var moved = list.splice(fi, 1)[0];
+  list.splice(ti, 0, moved);
+  list.forEach(function(i, idx){ i.sort_order = idx; });
+  /* persist in the background */
+  Promise.all(list.map(function(i){
+    return sb.from('shop_items').update({ sort_order: i.sort_order }).eq('id', i.id);
+  })).then(function(results){
+    var err = results.find(function(r){ return r.error; });
+    if (err) toast('❌ 排序儲存失敗');
+  });
+  renderShopAdm();
+}
+
 function _esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function _buildShopImgUpload(item) {
-  var sid = 'shop-' + item.id;
-  var preview = item.imgData
-    ? '<img src="' + item.imgData + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px" id="si-img-preview-' + item.id + '">'
-    : '<div id="si-img-preview-' + item.id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item.emoji||'✦') + '</div>';
-  return preview +
-    '<input type="file" accept="image/*" id="si-file-' + item.id + '" style="display:none" onchange="shopImgPicked(' + item.id + ',this)">' +
-    '<div style="display:flex;gap:6px">' +
-      '<button class="adm-ibtn" style="font-size:11px;padding:4px 10px;width:auto" onclick="document.getElementById(\'si-file-' + item.id + '\').click()">📷 上傳圖片</button>' +
-      (item.imgData ? '<button class="adm-ibtn" style="font-size:11px;padding:4px 10px;width:auto" onclick="clearShopImg(' + item.id + ')">✕ 移除</button>' : '') +
-    '</div>';
-}
-
-function shopImgPicked(id, input) {
-  var file = input.files[0]; if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var img = new Image();
-    img.onload = function() {
-      var size = Math.min(img.width, img.height, 800);
-      var canvas = document.createElement('canvas');
-      canvas.width = canvas.height = size;
-      var ctx = canvas.getContext('2d');
-      var sx = (img.width - size) / 2, sy = (img.height - size) / 2;
-      ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
-      var data = canvas.toDataURL('image/jpeg', 0.82);
-      var item = D.shopItems.find(function(i){ return i.id === id; });
-      if (item) item.imgData = data;
-      var prev = document.getElementById('si-img-preview-' + id);
-      if (prev) { prev.outerHTML = '<img src="' + data + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px" id="si-img-preview-' + id + '">'; }
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearShopImg(id) {
-  var item = D.shopItems.find(function(i){ return i.id === id; });
-  if (item) item.imgData = null;
-  var prev = document.getElementById('si-img-preview-' + id);
-  if (prev) { prev.outerHTML = '<div id="si-img-preview-' + id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item&&item.emoji||'✦') + '</div>'; }
-}
 
 function toggleShopForm(id) {
   var f = document.getElementById('sif' + id);
@@ -4391,6 +4449,10 @@ function toggleShopTbHint(id) {
 
 async function saveShopItem(id) {
   var item = D.shopItems.find(function(i){ return i.id === id; }); if (!item) return;
+  /* auto-apply pending crop */
+  var cid = 'shop-' + id;
+  var applyBtn = document.getElementById('czitem-apply-' + cid);
+  if (applyBtn && applyBtn.style.display !== 'none') cropApply(cid);
   var isTb = document.getElementById('si-tb-' + id).checked;
   var linkVal = isTb
     ? (document.getElementById('si-link-' + id)||{}).value || ''
