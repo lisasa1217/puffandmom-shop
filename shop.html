@@ -181,10 +181,11 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
   font-family:inherit;cursor:pointer;text-align:center;
   letter-spacing:.3px;width:100%;
   -webkit-tap-highlight-color:transparent;
-  transition:transform .12s,filter .12s;
+  transition:transform .15s,filter .15s,background .2s;
 }
 .shop-card-btn.taobao{background:var(--green)}
-.shop-card-btn:active{transform:scale(.95);filter:brightness(.88)}
+.shop-card-btn:active{transform:scale(.93);filter:brightness(.8)}
+.shop-card-btn.copied{background:var(--green-dk)!important;transition:background 0s}
 .shop-btn-hint{
   font-size:9px;color:var(--ink3);text-align:center;
   margin-bottom:3px;letter-spacing:.3px;line-height:1.4;
@@ -300,16 +301,23 @@ function closeMenu() {
   document.getElementById('hmenu-drawer').classList.remove('on');
 }
 
-function copyText(text, msg) {
+function copyText(text, msg, btn) {
+  function _done() {
+    toast(msg);
+    if (btn) {
+      var orig = btn.innerHTML;
+      btn.innerHTML = '✓ 已複製';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('copied'); }, 1800);
+    }
+  }
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function(){ toast(msg); }).catch(function(){
-      _fallbackCopy(text, msg);
-    });
+    navigator.clipboard.writeText(text).then(_done).catch(function(){ _fallbackCopy(text, msg, btn); });
   } else {
-    _fallbackCopy(text, msg);
+    _fallbackCopy(text, msg, btn);
   }
 }
-function _fallbackCopy(text, msg) {
+function _fallbackCopy(text, msg, btn) {
   var t = document.createElement('textarea');
   t.value = text;
   document.body.appendChild(t);
@@ -317,6 +325,12 @@ function _fallbackCopy(text, msg) {
   document.execCommand('copy');
   document.body.removeChild(t);
   toast(msg);
+  if (btn) {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '✓ 已複製';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('copied'); }, 1800);
+  }
 }
 
 function renderCats() {
@@ -361,7 +375,7 @@ function renderGrid() {
     var btnHtml, hintHtml = '';
     if (item.isTaobao) {
       hintHtml = '<div class="shop-btn-hint">複製後打開淘寶APP搜尋</div>';
-      btnHtml = '<button class="shop-card-btn taobao" onclick="copyText(' + JSON.stringify(item.link) + ',\'✓ 已複製淘寶連結\')">複製淘寶連結</button>';
+      btnHtml = '<button class="shop-card-btn taobao" onclick="copyText(' + JSON.stringify(item.link) + ',\'✓ 已複製淘寶連結\',this)">複製淘寶連結</button>';
     } else if (item.link) {
       btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">+1 跟著買</a>';
     } else {
