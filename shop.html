@@ -370,7 +370,7 @@ function renderGrid() {
     var btnHtml, hintHtml = '';
     if (item.isTaobao) {
       hintHtml = '<div class="shop-btn-hint">複製後打開淘寶APP搜尋</div>';
-      btnHtml = '<button class="shop-card-btn taobao" onclick="copyText(' + JSON.stringify(item.link) + ',\'✓ 已複製淘寶連結\',this)">複製淘寶連結</button>';
+      btnHtml = '<button class="shop-card-btn taobao" data-link="' + _esc(item.link) + '" onclick="copyText(this.dataset.link,\'✓ 已複製淘寶連結\',this)">複製淘寶連結</button>';
     } else if (item.link) {
       btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">+1 跟著買</a>';
     } else {
