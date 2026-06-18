@@ -302,35 +302,30 @@ function closeMenu() {
 }
 
 function copyText(text, msg, btn) {
-  function _done() {
-    toast(msg);
-    if (btn) {
-      var orig = btn.innerHTML;
-      btn.innerHTML = '✓ 已複製';
-      btn.classList.add('copied');
-      setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('copied'); }, 1800);
-    }
-  }
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(_done).catch(function(){ _fallbackCopy(text, msg, btn); });
-  } else {
-    _fallbackCopy(text, msg, btn);
-  }
-}
-function _fallbackCopy(text, msg, btn) {
-  var t = document.createElement('textarea');
-  t.value = text;
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand('copy');
-  document.body.removeChild(t);
+  // Show feedback immediately — don't wait for clipboard promise
   toast(msg);
   if (btn) {
-    var orig = btn.innerHTML;
-    btn.innerHTML = '✓ 已複製';
+    var orig = btn.textContent;
+    btn.textContent = '✓ 已複製';
     btn.classList.add('copied');
-    setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('copied'); }, 1800);
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
   }
+  // Copy in background
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).catch(function(){ _fallbackCopy(text); });
+  } else {
+    _fallbackCopy(text);
+  }
+}
+function _fallbackCopy(text) {
+  try {
+    var t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t);
+    t.focus(); t.select();
+    document.execCommand('copy');
+    document.body.removeChild(t);
+  } catch(e) {}
 }
 
 function renderCats() {
