@@ -280,6 +280,21 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .pw-num{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;letter-spacing:3px;color:var(--ink)}
 .pw-icon{font-size:11px;color:var(--ink3)}
 
+/* ── Hamburger menu ── */
+.hmenu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--ink);font-size:20px;line-height:1;flex-shrink:0;padding:0}
+.hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.hmenu-overlay.on{opacity:1;pointer-events:auto}
+.hmenu-drawer{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;max-width:100vw}
+.hmenu-drawer.on{transform:translateX(0)}
+.hmenu-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid var(--rule)}
+.hmenu-head-title{font-size:11px;color:var(--ink3);letter-spacing:1.5px;font-weight:300}
+.hmenu-close{width:28px;height:28px;border-radius:50%;border:none;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--ink2)}
+.hmenu-links{flex:1;overflow-y:auto;padding:8px 0}
+.hmenu-link{display:flex;align-items:center;gap:12px;padding:14px 20px;text-decoration:none;color:var(--ink);font-size:14px;font-weight:400;border:none;background:none;width:100%;font-family:inherit;cursor:pointer;text-align:left;border-bottom:1px solid rgba(0,0,0,.04);transition:background .15s}
+.hmenu-link:last-child{border-bottom:none}
+.hmenu-link:active{background:var(--bg)}
+.hmenu-link-icon{width:17px;height:17px;flex-shrink:0;opacity:.55}
+
 .tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(236,236,234,.97);backdrop-filter:blur(16px);border-top:1px solid var(--rule);display:flex;z-index:90;padding-bottom:env(safe-area-inset-bottom,0)}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border:none;background:none;font-size:10px;color:var(--ink3);font-family:inherit;cursor:pointer;letter-spacing:.5px}
 .tab-btn.on{color:var(--ink)}
@@ -697,6 +712,7 @@ input[type=file]{display:none}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
       追蹤
     </a>
+    <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">☰</button>
   </div>
 
   <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)">
@@ -854,6 +870,10 @@ input[type=file]{display:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         流量
       </button>
+      <button class="adm-tab" id="adm-tab-shop" onclick="switchAdmTab('shop')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        莎的清單
+      </button>
     </div>
   </div>
 
@@ -974,6 +994,46 @@ input[type=file]{display:none}
     </div>
   </div>
 
+  <!-- Panel: 莎的清單 -->
+  <div class="adm-panel" id="adm-panel-shop">
+    <div class="asec">
+      <div class="asec-lbl">莎的選品清單</div>
+      <button class="savebtn g" style="margin-bottom:12px" onclick="addShopItem()">＋ 新增選品</button>
+      <div id="shop-adm-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Hamburger overlay & drawer -->
+<div class="hmenu-overlay" id="hmenu-overlay" onclick="closeHMenu()"></div>
+<div class="hmenu-drawer" id="hmenu-drawer">
+  <div class="hmenu-head">
+    <div class="hmenu-head-title">MENU</div>
+    <button class="hmenu-close" onclick="closeHMenu()">✕</button>
+  </div>
+  <div class="hmenu-links">
+    <button class="hmenu-link" onclick="closeHMenu();scrollToSec('top')">
+      <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      首頁
+    </button>
+    <button class="hmenu-link" onclick="closeHMenu();scrollToSec('active-sec')">
+      <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      限時團購中
+    </button>
+    <button class="hmenu-link" onclick="closeHMenu();scrollToSec('cal-sec')">
+      <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      團購行事曆
+    </button>
+    <button class="hmenu-link" onclick="closeHMenu();scrollToSec('ended-sec')">
+      <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      團購客服
+    </button>
+    <a class="hmenu-link" href="shop.html">
+      <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      莎的這個！
+    </a>
+  </div>
 </div>
 
 <nav class="tab-bar" id="tab-bar" style="display:none">
@@ -1227,7 +1287,8 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var D = {
   profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null},
   social:  {commVis:true, lineUrl:'', igUrl:'', pw:'0403', commPw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
-  items: []
+  items: [],
+  shopItems: []
 };
 
 /* ── INIT ── */
@@ -1276,6 +1337,12 @@ async function initApp() {
         };
       });
     }
+    var sRes = await sb.from('shop_items').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    if (sRes.data) {
+      D.shopItems = sRes.data.map(function(i){
+        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'🛍️', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
+      });
+    }
   } catch(e) {
     console.error('載入資料失敗：', e);
   }
@@ -1283,6 +1350,14 @@ async function initApp() {
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
     startAdminTimeout();
+  }
+  /* hash scroll from shop.html */
+  var hash = window.location.hash;
+  if (hash) {
+    setTimeout(function(){
+      var el = document.getElementById(hash.slice(1));
+      if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 400);
   }
   /* 移除載入遮罩 */
   var veil = document.getElementById('loading-veil');
@@ -2865,7 +2940,7 @@ function toggleAdmZone(zone) {
 }
 
 function switchAdmTab(tab) {
-  var tabs = ['profile','social','items','broadcast','stats'];
+  var tabs = ['profile','social','items','broadcast','stats','shop'];
   tabs.forEach(function(t) {
     var btn   = document.getElementById('adm-tab-' + t);
     var panel = document.getElementById('adm-panel-' + t);
@@ -2874,6 +2949,22 @@ function switchAdmTab(tab) {
   });
   if (tab === 'broadcast') renderBcSortList();
   if (tab === 'stats') loadStats();
+  if (tab === 'shop') renderShopAdm();
+}
+
+/* ── HAMBURGER MENU ── */
+function openHMenu() {
+  document.getElementById('hmenu-overlay').classList.add('on');
+  document.getElementById('hmenu-drawer').classList.add('on');
+}
+function closeHMenu() {
+  document.getElementById('hmenu-overlay').classList.remove('on');
+  document.getElementById('hmenu-drawer').classList.remove('on');
+}
+function scrollToSec(id) {
+  if (id === 'top') { window.scrollTo({top:0, behavior:'smooth'}); return; }
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 /* ── BROADCAST SORT LIST ── */
@@ -4195,6 +4286,155 @@ function stairSubmitScore() {
   if(title)setTimeout(function(){title.scrollIntoView({behavior:'smooth',block:'start'});},120);
 }
 function _djEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ── SHOP ADMIN ── */
+function renderShopAdm() {
+  var wrap = document.getElementById('shop-adm-list');
+  if (!wrap) return;
+  var list = D.shopItems.filter(function(i){ return !i.archived; });
+  if (!list.length) { wrap.innerHTML = '<div style="text-align:center;padding:30px 0;color:var(--ink3);font-size:13px">還沒有選品，點上方按鈕新增</div>'; return; }
+  wrap.innerHTML = '';
+  list.forEach(function(item) {
+    var th = item.imgData
+      ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">'
+      : '<span style="font-size:14px">' + (item.emoji || '🛍️') + '</span>';
+    var row = document.createElement('div');
+    row.className = 'adm-arch-item';
+    row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
+    row.innerHTML =
+      '<div class="adm-arch-ithumb">' + th + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:12px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _esc(item.name) + '</div>' +
+        '<div style="font-size:10px;color:var(--ink3);margin-top:2px">' + (item.category ? _esc(item.category) : '未分類') + (item.isTaobao ? '・淘寶' : '') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:5px;flex-shrink:0">' +
+        '<button class="adm-ibtn" onclick="event.stopPropagation();toggleShopForm(' + item.id + ')">✏️</button>' +
+        '<button class="adm-ibtn" onclick="event.stopPropagation();delShopItem(' + item.id + ')">🗑️</button>' +
+      '</div>';
+    /* inline edit form */
+    var form = document.createElement('div');
+    form.id = 'sif' + item.id;
+    form.style.cssText = 'display:none;width:100%;box-sizing:border-box;padding:10px 0 4px';
+    form.innerHTML =
+      '<div class="fld"><label>商品名稱</label><input id="si-name-' + item.id + '" value="' + _esc(item.name) + '"></div>' +
+      '<div class="fld"><label>分類標籤</label><input id="si-cat-' + item.id + '" value="' + _esc(item.category) + '" placeholder="例：廚房・育兒・美妝"></div>' +
+      '<div class="fld"><label>商品說明</label><textarea id="si-desc-' + item.id + '" style="height:56px">' + _esc(item.desc) + '</textarea></div>' +
+      '<div class="fld"><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="si-tb-' + item.id + '"' + (item.isTaobao ? ' checked' : '') + ' onchange="toggleShopTbHint(' + item.id + ')"> 淘寶商品</label></div>' +
+      '<div class="fld" id="si-link-row-' + item.id + '" style="' + (item.isTaobao ? '' : 'display:none') + '"><label>淘寶連結</label><input id="si-link-' + item.id + '" value="' + _esc(item.link) + '" placeholder="淘寶商品連結或關鍵字"></div>' +
+      '<div class="fld" id="si-url-row-' + item.id + '" style="' + (item.isTaobao ? 'display:none' : '') + '"><label>購買連結</label><input id="si-url-' + item.id + '" value="' + (item.isTaobao ? '' : _esc(item.link)) + '" placeholder="https://..."></div>' +
+      '<div class="fld"><label>商品圖片</label>' + _buildShopImgUpload(item) + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:8px">' +
+        '<button class="savebtn g" style="flex:1" onclick="saveShopItem(' + item.id + ')">儲存</button>' +
+      '</div>';
+    row.appendChild(form);
+    wrap.appendChild(row);
+  });
+}
+
+function _esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function _buildShopImgUpload(item) {
+  var sid = 'shop-' + item.id;
+  var preview = item.imgData
+    ? '<img src="' + item.imgData + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px" id="si-img-preview-' + item.id + '">'
+    : '<div id="si-img-preview-' + item.id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item.emoji||'🛍️') + '</div>';
+  return preview +
+    '<input type="file" accept="image/*" id="si-file-' + item.id + '" style="display:none" onchange="shopImgPicked(' + item.id + ',this)">' +
+    '<div style="display:flex;gap:6px">' +
+      '<button class="adm-ibtn" style="font-size:11px;padding:4px 10px;width:auto" onclick="document.getElementById(\'si-file-' + item.id + '\').click()">📷 上傳圖片</button>' +
+      (item.imgData ? '<button class="adm-ibtn" style="font-size:11px;padding:4px 10px;width:auto" onclick="clearShopImg(' + item.id + ')">✕ 移除</button>' : '') +
+    '</div>';
+}
+
+function shopImgPicked(id, input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var size = Math.min(img.width, img.height, 800);
+      var canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      var sx = (img.width - size) / 2, sy = (img.height - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+      var data = canvas.toDataURL('image/jpeg', 0.82);
+      var item = D.shopItems.find(function(i){ return i.id === id; });
+      if (item) item.imgData = data;
+      var prev = document.getElementById('si-img-preview-' + id);
+      if (prev) { prev.outerHTML = '<img src="' + data + '" style="width:80px;height:80px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px" id="si-img-preview-' + id + '">'; }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearShopImg(id) {
+  var item = D.shopItems.find(function(i){ return i.id === id; });
+  if (item) item.imgData = null;
+  var prev = document.getElementById('si-img-preview-' + id);
+  if (prev) { prev.outerHTML = '<div id="si-img-preview-' + id + '" style="width:80px;height:80px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:6px">' + (item&&item.emoji||'🛍️') + '</div>'; }
+}
+
+function toggleShopForm(id) {
+  var f = document.getElementById('sif' + id);
+  if (!f) return;
+  f.style.display = f.style.display === 'none' ? '' : 'none';
+}
+
+function toggleShopTbHint(id) {
+  var checked = document.getElementById('si-tb-' + id).checked;
+  var linkRow = document.getElementById('si-link-row-' + id);
+  var urlRow  = document.getElementById('si-url-row-' + id);
+  if (linkRow) linkRow.style.display = checked ? '' : 'none';
+  if (urlRow)  urlRow.style.display  = checked ? 'none' : '';
+}
+
+async function saveShopItem(id) {
+  var item = D.shopItems.find(function(i){ return i.id === id; }); if (!item) return;
+  var isTb = document.getElementById('si-tb-' + id).checked;
+  var linkVal = isTb
+    ? (document.getElementById('si-link-' + id)||{}).value || ''
+    : (document.getElementById('si-url-' + id)||{}).value || '';
+  item.name     = document.getElementById('si-name-' + id).value;
+  item.category = document.getElementById('si-cat-' + id).value;
+  item.desc     = document.getElementById('si-desc-' + id).value;
+  item.isTaobao = isTb;
+  item.link     = linkVal;
+  var res = await sb.from('shop_items').update({
+    name: item.name, category: item.category, description: item.desc,
+    link: item.link, is_taobao: item.isTaobao, img_data: item.imgData
+  }).eq('id', id);
+  if (res.error) { toast('❌ 儲存失敗：' + res.error.message); return; }
+  toast('✓ 已儲存');
+  renderShopAdm();
+  setTimeout(function(){ var f = document.getElementById('sif'+id); if(f) f.style.display=''; }, 80);
+}
+
+async function addShopItem() {
+  var res = await sb.from('shop_items').insert({
+    name:'新選品', emoji:'🛍️', img_data:null, category:'', link:'',
+    description:'', is_taobao:false, archived:false, sort_order:0
+  }).select().single();
+  if (res.error) { toast('❌ 新增失敗'); console.error(res.error); return; }
+  var d = res.data;
+  D.shopItems.unshift({ id:d.id, name:d.name, desc:d.description||'', imgData:null, emoji:d.emoji, category:d.category||'', link:d.link||'', isTaobao:false, archived:false });
+  renderShopAdm();
+  setTimeout(function(){ var f = document.getElementById('sif'+d.id); if(f) f.style.display=''; }, 80);
+}
+
+async function delShopItem(id) {
+  var item = D.shopItems.find(function(i){ return i.id === id; });
+  var name = item ? item.name : '此選品';
+  document.getElementById('confirm-msg').innerHTML = '確定要刪除「' + name + '」嗎？<br><span style="font-size:11px;color:var(--ink3)">此動作無法復原</span>';
+  document.getElementById('confirm-ok').onclick = async function() {
+    var res = await sb.from('shop_items').delete().eq('id', id);
+    if (res.error) { toast('❌ 刪除失敗'); closeConfirm(); return; }
+    D.shopItems = D.shopItems.filter(function(i){ return i.id !== id; });
+    closeConfirm(); toast('🗑️ 已刪除'); renderShopAdm();
+  };
+  document.getElementById('confirm-overlay').classList.add('on');
+}
 </script>
 </body>
 </html>
