@@ -1863,7 +1863,7 @@ function renderActive(items, permanentItems, soonItems) {
       ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
-          : '<div class="acard-note acard-note-active">開團中</div>');
+          : (_nTxt ? '' : ''));
     var btnHtml = isSoon
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="12" height="12"><path d="M8 2.5a3.5 3.5 0 0 1 3.5 3.5v2.5l1 1.5H3.5L4.5 8.5V6A3.5 3.5 0 0 1 8 2.5z"/><path d="M6.5 12.5a1.5 1.5 0 0 0 3 0"/></svg> 設提醒</a></div>'
       : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>';
@@ -1921,7 +1921,7 @@ function renderActive(items, permanentItems, soonItems) {
       ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
-          : '<div class="acard-note acard-note-active">開團中</div>');
+          : (_nTxt ? '' : ''));
     var btnHtml = permNotStarted
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="12" height="12"><path d="M8 2.5a3.5 3.5 0 0 1 3.5 3.5v2.5l1 1.5H3.5L4.5 8.5V6A3.5 3.5 0 0 1 8 2.5z"/><path d="M6.5 12.5a1.5 1.5 0 0 0 3 0"/></svg> 設提醒</a></div>'
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
@@ -1979,7 +1979,7 @@ function renderPermanent(items) {
       ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
-          : '<div class="acard-note acard-note-active">開團中</div>');
+          : (_nTxt ? '' : ''));
     var btnHtml = permNotStarted
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="12" height="12"><path d="M8 2.5a3.5 3.5 0 0 1 3.5 3.5v2.5l1 1.5H3.5L4.5 8.5V6A3.5 3.5 0 0 1 8 2.5z"/><path d="M6.5 12.5a1.5 1.5 0 0 0 3 0"/></svg> 設提醒</a></div>'
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
