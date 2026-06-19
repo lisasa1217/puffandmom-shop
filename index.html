@@ -4391,7 +4391,13 @@ function _esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function toggleShopForm(id) {
   var f = document.getElementById('sif' + id);
   if (!f) return;
-  f.style.display = f.style.display === 'none' ? '' : 'none';
+  var opening = f.style.display === 'none';
+  f.style.display = opening ? '' : 'none';
+  if (opening) {
+    var cid = 'shop-' + id;
+    var cw = document.getElementById('czitem-' + cid);
+    if (cw && !cw._czBound) { czBindDrag(cw, cid); cw._czBound = true; }
+  }
 }
 
 function toggleShopTbHint(id) {
