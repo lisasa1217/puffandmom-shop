@@ -166,7 +166,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .acard-note{position:absolute;top:9px;left:9px;z-index:4;background:#F5D46B;color:#4A3528;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;letter-spacing:.4px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acard-note-active{background:var(--green)!important;color:#fff!important}
-.acard-note.note-red{background:#CF5240!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
+.acard-note-soon{background:rgba(255,255,255,.82)!important;color:var(--ink2)!important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.acard-note.note-red{background:#E05C30!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
 .ncp-opt{cursor:pointer;display:inline-flex}
@@ -684,7 +685,7 @@ input[type=file]{display:none}
     <div class="active-grid" id="active-grid"></div>
   </div>
 
-<div id="cal-sec" style="display:none">
+<div id="cal-sec" style="display:none;margin-top:32px">
     <div class="sec-head"><span class="sec-h-line"></span><span class="sec-h-title">團購行事曆<span class="sec-h-en">按下提醒，別讓喜歡的團購偷偷結束了</span></span><span class="sec-h-line"></span></div>
     <div class="cal-list" id="cal-list"></div>
   </div>
@@ -1675,7 +1676,7 @@ function renderActive(items, permanentItems, soonItems) {
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = isSoon
-      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note acard-note-soon" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : (_nTxt ? '' : ''));
@@ -1733,7 +1734,7 @@ function renderActive(items, permanentItems, soonItems) {
     var igBtnH = item.igUrl ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>詳細介紹</a>' : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note acard-note-soon" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : (_nTxt ? '' : ''));
@@ -1791,7 +1792,7 @@ function renderPermanent(items) {
       : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note acard-note-soon" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : (_nTxt ? '' : ''));
