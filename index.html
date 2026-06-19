@@ -122,7 +122,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 .sec-head{padding:36px 20px 16px;display:flex;flex-direction:column;align-items:center;gap:5px}
 .sec-h-line{display:none}
-.sec-h-title{font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:1.5px;color:var(--ink2);font-weight:400;white-space:nowrap;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.sec-h-title{font-family:'Noto Sans TC',sans-serif;font-size:15px;letter-spacing:1.5px;color:var(--ink2);font-weight:400;white-space:nowrap;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
 .sec-h-en{font-family:'Noto Sans TC',sans-serif;font-size:11px;font-weight:300;font-style:normal;color:var(--ink2);letter-spacing:.3px;opacity:1;text-transform:none;display:block}
 
 .soon-list{display:flex;flex-direction:column;gap:8px;padding:0 14px 4px}
@@ -235,7 +235,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ended-cs{font-size:11px;color:var(--ink3);flex-shrink:0;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px;white-space:nowrap;animation:cs-nudge 1.8s ease-in-out infinite}
 @keyframes cs-nudge{0%,85%,100%{transform:translateX(0)}88%{transform:translateX(3px)}92%{transform:translateX(-2px)}96%{transform:translateX(2px)}}
 /* 已結團 header 按鈕 */
-.ended-cs-tag{background:none;border:none;font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:2px;color:var(--ink3);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;font-weight:400}
+.ended-cs-tag{background:none;border:none;font-family:'Noto Sans TC',sans-serif;font-size:11px;letter-spacing:2px;color:var(--ink3);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;font-weight:400}
 .ended-cs-tag:active{opacity:.65}
 .ended-count{font-size:10px;color:var(--ink3);opacity:.65;margin-left:2px;font-family:inherit;letter-spacing:.5px}
 .ended-info-btn{background:none;border:1.2px solid var(--rule);border-radius:50%;width:15px;height:15px;font-size:9px;color:var(--ink3);cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;font-family:-apple-system,sans-serif;font-style:normal;font-weight:600;line-height:1;letter-spacing:0}
@@ -263,7 +263,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .cal-item-remind{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:5px 10px;border-radius:7px;background:var(--green);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:500}
 .cal-item-remind:active{filter:brightness(.85)}
 .community{background:var(--bg);padding:32px 28px 28px;border-top:1px solid var(--rule)}
-.comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Serif TC',serif}
+.comm-label{font-size:17px;letter-spacing:1px;color:var(--ink);margin-bottom:8px;text-align:center;font-weight:600;font-family:'Noto Sans TC',sans-serif}
 .comm-desc{font-size:12px;color:var(--ink2);text-align:center;line-height:1.9;margin-bottom:18px;font-weight:300}
 .comm-btns{display:flex;gap:10px;margin-bottom:13px}
 .comm-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer;color:#fff;text-decoration:none;transition:filter .15s,transform .15s}
@@ -740,47 +740,9 @@ input[type=file]{display:none}
     <!-- swipeable section -->
     <div class="hero-swipe-wrap">
       <div class="hero-swipe-track" id="hero-swipe-track">
-        <!-- Slide 0: bio + palette -->
         <div class="hero-swipe-slide">
           <div class="hero-bio" id="f-bio"></div>
-          <div class="hero-palette" aria-hidden="true">
-            <div class="hp-c" style="background:#82B7CC"></div>
-            <div class="hp-c" style="background:#F5D46B"></div>
-            <div class="hp-c" style="background:#F3E0A7;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"></div>
-            <div class="hp-c" style="background:#4A3528"></div>
-            <div class="hp-c" style="background:#B3B2AD"></div>
-          </div>
-          <div class="swipe-hint" id="swipe-hint">← 左滑看個人色譜</div>
         </div>
-        <!-- Slide 1: personality spectrum -->
-        <div class="hero-swipe-slide">
-          <div class="hero-spectrum">
-            <div class="spec-item">
-              <div class="spec-head"><span class="spec-pct" style="color:#82B7CC">90%</span><span class="spec-lbl">瘋癲</span></div>
-              <div class="spec-sub">不因為成為媽媽，就忘記曾經少女的自己＿保持發光</div>
-              <div class="spec-bar-bg"><div class="spec-bar-fill" data-w="90" style="background:linear-gradient(90deg,#82B7CC,rgba(130,183,204,.1))"></div></div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-head"><span class="spec-pct" style="color:#4A3528">99%</span><span class="spec-lbl">認真感受</span></div>
-              <div class="spec-sub">對生活認真，對選品也認真</div>
-              <div class="spec-bar-bg"><div class="spec-bar-fill" data-w="99" style="background:linear-gradient(90deg,#4A3528,rgba(74,53,40,.1))"></div></div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-head"><span class="spec-pct" style="color:#C8AA40">75%</span><span class="spec-lbl">美感創意</span></div>
-              <div class="spec-sub">把生活過得有趣又漂亮，自己就會亮起來</div>
-              <div class="spec-bar-bg"><div class="spec-bar-fill" data-w="75" style="background:linear-gradient(90deg,#F5D46B,rgba(245,212,107,.1))"></div></div>
-            </div>
-            <div class="spec-item">
-              <div class="spec-head"><span class="spec-pct" style="color:#8C7C6C">70%</span><span class="spec-lbl">朋友媽媽</span></div>
-              <div class="spec-sub">和泡芙一起發現世界的好玩</div>
-              <div class="spec-bar-bg"><div class="spec-bar-fill" data-w="70" style="background:linear-gradient(90deg,#8C7C6C,rgba(140,124,108,.1))"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="hero-swipe-dots">
-        <span class="hsdot on" data-idx="0"></span>
-        <span class="hsdot" data-idx="1"></span>
       </div>
     </div>
   </div>
