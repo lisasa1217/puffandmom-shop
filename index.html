@@ -1863,7 +1863,7 @@ function renderActive(items, permanentItems, soonItems) {
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = isSoon
-      ? '<div class="acard-note">⏰ ' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : '<div class="acard-note acard-note-active">開團中</div>');
@@ -1921,7 +1921,7 @@ function renderActive(items, permanentItems, soonItems) {
     var igBtnH = item.igUrl ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>詳細介紹</a>' : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note">⏰ ' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : '<div class="acard-note acard-note-active">開團中</div>');
@@ -1979,7 +1979,7 @@ function renderPermanent(items) {
       : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note">⏰ ' + daysToOpen + ' 天後開團</div>'
+      ? '<div class="acard-note" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
       : (_nTxt
           ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
           : '<div class="acard-note acard-note-active">開團中</div>');
