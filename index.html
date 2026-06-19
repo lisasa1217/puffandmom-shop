@@ -162,10 +162,11 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .active-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px;align-items:stretch}
 .acard{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07),0 0 0 0.5px rgba(0,0,0,.04);display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s}
 .acard:active{transform:scale(.98);box-shadow:0 1px 8px rgba(0,0,0,.06)}
-.acard-img{width:100%;padding-top:100%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
+.acard-img{width:100%;padding-top:72%;overflow:hidden;background:var(--yellow);position:relative;flex-shrink:0;display:block}
 .acard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.acard-note{position:absolute;top:0;right:12px;z-index:4;background:var(--yellow);color:#2E2E2E;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:9px;font-weight:500;padding:3px 8px 5px;border-radius:0 0 7px 7px;letter-spacing:.5px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.acard-note.note-red{background:#C0392B;color:#F3E0A7;animation:note-urgent 1.5s ease-in-out infinite}
+.acard-note{position:absolute;top:9px;left:9px;z-index:4;background:rgba(255,255,255,.82);color:var(--ink2);font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;letter-spacing:.4px;white-space:nowrap;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.acard-note-active{background:var(--green)!important;color:#fff!important}
+.acard-note.note-red{background:#C0392B!important;color:#F3E0A7!important;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
 .ncp-opt{cursor:pointer;display:inline-flex}
@@ -174,32 +175,22 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ncp-opt input[type=radio]:checked ~ span{border-color:var(--ink);transform:scale(1.15)}
 .note-pop{position:fixed;background:rgba(46,46,46,.93);color:#f2f2f0;font-size:11px;font-weight:400;letter-spacing:.4px;line-height:1.65;padding:8px 13px;border-radius:9px;max-width:190px;word-break:break-word;z-index:9910;box-shadow:0 4px 18px rgba(0,0,0,.22);pointer-events:none;animation:notepop-in .14s ease}
 .acard-emo{width:100%;height:100%;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow)}
-.acard-img-btn{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:28px 10px 10px;
-  background:linear-gradient(to top, rgba(0,0,0,.5) 0%, transparent 100%);
-  display:flex;align-items:flex-end;justify-content:center;
-  z-index:2;
-}
+.acard-img-btn{margin-top:auto;padding-top:10px}
 .acard-img-btn a,.acard-img-btn button{
-  display:inline-block;
-  padding:5px 14px;
-  border-radius:20px;
-  background:rgba(255,253,245,.15);
-  border:1px solid rgba(255,253,245,.6);
-  color:#fff !important;
-  font-size:10px;font-family:inherit;font-weight:400;
-  letter-spacing:.6px;cursor:pointer;text-decoration:none !important;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:block;width:100%;box-sizing:border-box;
+  padding:8px 14px;border-radius:8px;
+  background:var(--green);border:none;
+  color:#fff!important;
+  font-size:11px;font-family:inherit;font-weight:500;
+  letter-spacing:.4px;cursor:pointer;text-align:center;text-decoration:none!important;
   -webkit-appearance:none;
-  transition:opacity .15s,transform .15s,background .15s;
+  transition:opacity .15s,transform .15s;
 }
-.acard-img-btn a:hover,.acard-img-btn button:hover{transform:translateY(-2px);background:rgba(255,253,245,.28)}
-.acard-img-btn a:active,.acard-img-btn button:active{opacity:.65;transform:translateY(0) scale(.93)}
+.acard-img-btn a:active,.acard-img-btn button:active{opacity:.75;transform:scale(.97)}
+.acard-img-btn.soon-remind a{background:var(--yellow)!important;color:var(--ink)!important}
 /* 即將結團 */
-@keyframes closing-pulse{0%,100%{background:rgba(192,57,43,.82);box-shadow:0 0 0 0 rgba(192,57,43,0)}50%{background:rgba(220,55,35,.97);box-shadow:0 0 10px 4px rgba(192,57,43,.52)}}
-.acard-img-btn.closing a{background:rgba(192,57,43,.82)!important;border-color:rgba(255,130,110,.65)!important;animation:closing-pulse 1.6s ease-in-out infinite}
-.acard-img-btn.closing a:hover{background:rgba(220,55,35,.97)!important;transform:translateY(-2px)}
+@keyframes closing-pulse{0%,100%{background:#C0392B;box-shadow:0 0 0 0 rgba(192,57,43,0)}50%{background:#dc3723;box-shadow:0 0 10px 4px rgba(192,57,43,.52)}}
+.acard-img-btn.closing a{background:#C0392B!important;animation:closing-pulse 1.6s ease-in-out infinite}
 .acard-body{padding:10px 13px 14px;display:flex;flex-direction:column;flex:1}
 .acard-name{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:400;line-height:1.55;color:var(--ink);margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acard-date{display:inline-flex;align-items:center;gap:5px;background:rgba(130,183,204,.15);border:none;border-radius:6px;padding:3px 8px;font-size:10px;color:#4d7d94;letter-spacing:.3px;margin-bottom:5px;font-weight:400;align-self:flex-start}
@@ -1871,15 +1862,16 @@ function renderActive(items, permanentItems, soonItems) {
     el.className = isSoon ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
-    var autoNote = isSoon ? ('⏱ 還有 ' + daysToOpen + ' 天') : '';
-    var noteH = autoNote
-      ? '<div class="acard-note" style="background:rgba(0,0,0,.52);color:#fff;">' + autoNote + '</div>'
-      : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
+    var noteH = isSoon
+      ? '<div class="acard-note">' + (new Date(item.openD + 'T00:00:00').getMonth() + 1) + '月</div>'
+      : (_nTxt
+          ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
+          : '<div class="acard-note acard-note-active">開團中</div>');
     var btnHtml = isSoon
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">設提醒 🔔</a></div>'
       : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>';
     el.innerHTML =
-      '<div class="acard-img">' + imgH + noteH + reelsBtnH + btnHtml + '</div>' +
+      '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px;">' +
@@ -1893,6 +1885,7 @@ function renderActive(items, permanentItems, soonItems) {
           '</div>' : '') +
         '</div>' +
         igBtnH +
+        btnHtml +
       '</div>';
     if (!isSoon && !item.link) {
       (function(iid) {
@@ -1928,8 +1921,10 @@ function renderActive(items, permanentItems, soonItems) {
     var igBtnH = item.igUrl ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>詳細介紹</a>' : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note" style="background:rgba(0,0,0,.52);color:#fff;">⏱ 還有 ' + daysToOpen + ' 天</div>'
-      : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
+      ? '<div class="acard-note">' + (new Date(item.openD + 'T00:00:00').getMonth() + 1) + '月</div>'
+      : (_nTxt
+          ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
+          : '<div class="acard-note acard-note-active">開團中</div>');
     var btnHtml = permNotStarted
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">設提醒 🔔</a></div>'
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
@@ -1937,13 +1932,13 @@ function renderActive(items, permanentItems, soonItems) {
     el.className = isGray ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = ((_permOffset + idx) * .05) + 's';
     el.innerHTML =
-      '<div class="acard-img">' + imgH + noteH + reelsBtnH + btnHtml + '</div>' +
+      '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px;">' +
           '<div class="acard-date" style="margin-bottom:0"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + dateLbl + '</div>' +
           (item.discCode ? '<div class="disc-chip" style="margin-bottom:0" onclick="copyDisc(event,\'' + item.discCode + '\',' + item.id + ')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" style="width:9px;height:9px;color:#4d7d94;flex-shrink:0"><path d="M9.5 2H14v4.5L7.5 13 3 8.5 9.5 2z"/><circle cx="11.5" cy="4.5" r="1" fill="currentColor" stroke="none"/></svg><span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span></div>' : '') +
-        '</div>' + igBtnH +
+        '</div>' + igBtnH + btnHtml +
       '</div>';
     if (!permNotStarted && !item.link) {
       (function(iid){ el.querySelector('.acard-img-btn a').onclick = function(e){ e.preventDefault(); openSheet(iid); }; })(item.id);
@@ -1984,8 +1979,10 @@ function renderPermanent(items) {
       : '';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
-      ? '<div class="acard-note" style="background:rgba(0,0,0,.52);color:#fff;">⏱ 還有 ' + daysToOpen + ' 天</div>'
-      : (_nTxt ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>' : '');
+      ? '<div class="acard-note">' + (new Date(item.openD + 'T00:00:00').getMonth() + 1) + '月</div>'
+      : (_nTxt
+          ? '<div class="acard-note' + (_nRed ? ' note-red' : '') + '" data-note="' + _nTxt.replace(/"/g,'&quot;') + '">' + _nTxt + '</div>'
+          : '<div class="acard-note acard-note-active">開團中</div>');
     var btnHtml = permNotStarted
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">設提醒 🔔</a></div>'
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
@@ -1993,7 +1990,7 @@ function renderPermanent(items) {
     el.className = isGray ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = (idx * .05) + 's';
     el.innerHTML =
-      '<div class="acard-img">' + imgH + noteH + reelsBtnH + btnHtml + '</div>' +
+      '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
       '<div class="acard-body">' +
         '<div class="acard-name">' + item.name + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:5px;">' +
@@ -2006,7 +2003,7 @@ function renderPermanent(items) {
             '<span style="font-size:10px;color:#4d7d94;letter-spacing:.3px;">' + (item.discLabel || '折扣') + '&nbsp;<strong style="font-size:10px;letter-spacing:1px;">' + item.discCode + '</strong></span>' +
           '</div>' : '') +
         '</div>' +
-        igBtnH +
+        igBtnH + btnHtml +
       '</div>';
     if (!permNotStarted && !item.link) {
       (function(iid) {
