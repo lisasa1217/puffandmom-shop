@@ -1060,6 +1060,9 @@ var D = {
 
 /* ── INIT ── */
 async function initApp() {
+  /* 立刻移除 loading 遮罩，不等資料 */
+  var veil = document.getElementById('loading-veil');
+  if (veil) { veil.classList.add('fade'); setTimeout(function(){ veil.remove(); }, 400); }
   try {
     var res = await sb.from('profile').select('*').eq('id', 1).single();
     var profile = res.data;
