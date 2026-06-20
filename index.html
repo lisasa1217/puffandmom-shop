@@ -43,11 +43,12 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 /* ── IG top strip ── */
 .ig-strip{
-  display:flex;align-items:center;justify-content:flex-end;
+  display:flex;align-items:center;gap:10px;
   padding:10px 16px;
   background:rgba(255,255,255,.75);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(0,0,0,.06);
   position:fixed;top:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:430px;z-index:95;
 }
@@ -76,11 +77,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge span{font-size:11px;color:var(--green-dk);letter-spacing:.5px;font-weight:300}
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
-.hero{display:flex;flex-direction:column;align-items:center;padding:80px 28px 44px;position:relative;overflow:hidden;min-height:340px;border-bottom:1px solid var(--rule)}
-.hero-bg{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(22px) brightness(.72) saturate(1.1);transform:scale(1.08);z-index:0}
-.hero-bg-fallback{position:absolute;inset:0;background:linear-gradient(160deg,#c9b8a8 0%,#8fa8b8 100%);z-index:0}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.18) 0%,rgba(0,0,0,.48) 100%);z-index:1}
-.hero > *{position:relative;z-index:2}
+.hero{display:flex;flex-direction:column;align-items:center;padding:44px 28px 36px;background:var(--white);border-bottom:1px solid var(--rule)}
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
 .hp-c{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -118,10 +115,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 /* heart burst */
 .ava-heart{position:fixed;pointer-events:none;font-size:22px;z-index:9000;animation:ava-rise 1s ease forwards}
 @keyframes ava-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-60px) scale(1.2)}100%{opacity:0;transform:translateY(-100px) scale(.8)}}
-.hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.3)}
-.hero-handle{font-size:10px;color:rgba(255,255,255,.72);letter-spacing:3px;font-weight:300;margin-bottom:16px}
-.hero-divider{width:22px;height:1px;background:rgba(255,255,255,.6);margin:0 auto 16px}
-.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:rgba(255,255,255,.88);max-width:280px;white-space:pre-line}
+.hero-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;letter-spacing:3px;text-align:center;margin-bottom:6px}
+.hero-handle{font-size:10px;color:var(--ink3);letter-spacing:3px;font-weight:300;margin-bottom:16px}
+.hero-divider{width:22px;height:1px;background:var(--yellow);margin:0 auto 16px}
+.hero-bio{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;line-height:2.1;letter-spacing:.8px;text-align:center;color:var(--ink2);max-width:280px;white-space:pre-line}
 
 .sec-head{padding:36px 20px 16px;display:flex;flex-direction:column;align-items:center;gap:5px}
 .sec-h-line{display:none}
@@ -286,8 +283,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
 
 /* ── Hamburger menu ── */
-.hmenu-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:none;background:rgba(0,0,0,.06);cursor:pointer;color:var(--ink);font-size:18px;line-height:1;flex-shrink:0;padding:0;-webkit-tap-highlight-color:transparent}
-.hmenu-btn:active{background:rgba(0,0,0,.12)}
+.hmenu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--ink);font-size:20px;line-height:1;flex-shrink:0;padding:0}
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
 .hmenu-overlay.on{opacity:1;pointer-events:auto}
 .hmenu-drawer{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;max-width:100vw}
@@ -654,18 +650,23 @@ input[type=file]{display:none}
 
   <!-- IG top strip -->
   <div class="ig-strip" id="ig-strip">
-    <div id="ig-strip-ava" style="display:none"></div>
-    <div id="ig-strip-handle" style="display:none"></div>
-    <div id="ig-strip-name" style="display:none"></div>
-    <a id="ig-strip-btn" style="display:none"></a>
+    <div class="ig-strip-ava" id="ig-strip-ava"></div>
+    <div class="ig-strip-info">
+      <div class="ig-strip-handle" id="ig-strip-handle">@puff.andmom</div>
+      <div class="ig-strip-name" id="ig-strip-name">泡芙與媽</div>
+    </div>
+    <a id="ig-strip-btn" class="ig-strip-btn" href="https://instagram.com/puff.andmom" target="_blank" onclick="trackClick('ig_follow',null)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      追蹤
+    </a>
     <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">☰</button>
   </div>
 
-  <div id="line-nudge" style="display:none"></div>
+  <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)">
+    <span>加入 LINE 社群</span>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+  </a>
   <div class="hero">
-    <div class="hero-bg-fallback"></div>
-    <div class="hero-bg" id="hero-bg"></div>
-    <div class="hero-overlay"></div>
     <div class="ava-wrap" onclick="avaHeart(event)">
       <div class="ava-inner" id="f-ava"></div>
       <div class="ava-tap-badge" id="ava-tap-badge">👆</div>
@@ -1563,8 +1564,6 @@ function renderFront() {
   document.getElementById('f-handle').textContent = p.handle;
   document.getElementById('f-bio').textContent = p.bio;
   document.getElementById('f-ava').innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
-  var heroBg = document.getElementById('hero-bg');
-  if (heroBg && p.avatarData) heroBg.style.backgroundImage = 'url(' + p.avatarData + ')';
   document.getElementById('ig-strip-handle').textContent = s.igHandle || '@puff.andmom';
   document.getElementById('ig-strip-name').textContent   = s.igName   || '泡芙與媽';
   var stripBtn = document.getElementById('ig-strip-btn');
