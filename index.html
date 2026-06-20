@@ -43,7 +43,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 /* ── IG top strip ── */
 .ig-strip{
-  display:flex;align-items:center;gap:10px;
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
   padding:10px 16px;
   background:rgba(255,255,255,.75);
   backdrop-filter:blur(16px);
@@ -77,7 +77,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge span{font-size:11px;color:var(--green-dk);letter-spacing:.5px;font-weight:300}
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
-.hero{display:flex;flex-direction:column;align-items:center;padding:44px 28px 36px;background:var(--white);border-bottom:1px solid var(--rule)}
+.hero-cover{width:100%;height:160px;background:linear-gradient(135deg,#d4c5b2 0%,#b2c5d4 100%);background-size:cover;background-position:center}
+.hero{display:flex;flex-direction:column;align-items:center;padding:0 28px 36px;background:var(--white);border-bottom:1px solid var(--rule);border-radius:20px 20px 0 0}
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
 .hp-c{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -101,7 +102,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .spec-sub{font-size:10px;color:var(--ink3);font-weight:300;line-height:1.65;margin-bottom:6px;letter-spacing:.3px;font-family:'Noto Serif TC',serif}
 .spec-bar-bg{height:3px;border-radius:3px;background:rgba(0,0,0,.06);overflow:hidden}
 .spec-bar-fill{height:100%;border-radius:3px;width:0;transition:width 1s cubic-bezier(.34,1.56,.64,1)}
-.ava-wrap{width:86px;height:86px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-bottom:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.ava-wrap{width:86px;height:86px;border-radius:50%;background:linear-gradient(145deg,var(--yellow),var(--green));padding:2px;margin-top:-43px;margin-bottom:14px;cursor:pointer;position:relative;z-index:2;-webkit-tap-highlight-color:transparent}
 .ava-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--card);transition:transform .18s}
 .ava-wrap:active .ava-inner{transform:scale(.92)}
 .ava-inner img{width:100%;height:100%;object-fit:cover;display:block}
@@ -650,22 +651,11 @@ input[type=file]{display:none}
 
   <!-- IG top strip -->
   <div class="ig-strip" id="ig-strip">
-    <div class="ig-strip-ava" id="ig-strip-ava"></div>
-    <div class="ig-strip-info">
-      <div class="ig-strip-handle" id="ig-strip-handle">@puff.andmom</div>
-      <div class="ig-strip-name" id="ig-strip-name">泡芙與媽</div>
-    </div>
-    <a id="ig-strip-btn" class="ig-strip-btn" href="https://instagram.com/puff.andmom" target="_blank" onclick="trackClick('ig_follow',null)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      追蹤
-    </a>
     <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">☰</button>
   </div>
 
-  <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)">
-    <span>加入 LINE 社群</span>
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
-  </a>
+  <div id="line-nudge" style="display:none"></div>
+  <div class="hero-cover" id="hero-cover"></div>
   <div class="hero">
     <div class="ava-wrap" onclick="avaHeart(event)">
       <div class="ava-inner" id="f-ava"></div>
@@ -806,6 +796,7 @@ input[type=file]{display:none}
         <div class="fld"><label>名稱</label><input id="a-name" value="團媽小美"></div>
         <div class="fld"><label>帳號</label><input id="a-handle" value="@xiaomei_buys"></div>
         <div class="fld"><label>關於我</label><textarea id="a-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</textarea></div>
+        <div class="fld"><label>封面背景圖片網址</label><input type="url" id="a-cover-url" placeholder="https://... 貼上圖片連結"></div>
         <button class="savebtn" onclick="saveProfile()">儲存個人資料</button>
       </div>
     </div>
@@ -1058,7 +1049,7 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ── DATA (local cache) ── */
 var D = {
-  profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null},
+  profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null, coverUrl:''},
   social:  {commVis:true, lineUrl:'', igUrl:'', pw:'0403', commPw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
   items: [],
   shopItems: []
@@ -1074,7 +1065,8 @@ async function initApp() {
         name:       profile.name       || '團媽小美',
         handle:     profile.handle     || '@xiaomei_buys',
         bio:        profile.bio        || '',
-        avatarData: profile.avatar_data || null
+        avatarData: profile.avatar_data || null,
+        coverUrl:   profile.cover_url  || ''
       };
       D.social = {
         commVis:    profile.comm_vis    !== false,
@@ -1148,6 +1140,7 @@ function buildProfileRow() {
     handle:       D.profile.handle,
     bio:          D.profile.bio,
     avatar_data:  D.profile.avatarData,
+    cover_url:    D.profile.coverUrl   || null,
     comm_vis:     D.social.commVis,
     line_url:     D.social.lineUrl,
     ig_url:       D.social.igUrl,
@@ -1564,16 +1557,8 @@ function renderFront() {
   document.getElementById('f-handle').textContent = p.handle;
   document.getElementById('f-bio').textContent = p.bio;
   document.getElementById('f-ava').innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
-  document.getElementById('ig-strip-handle').textContent = s.igHandle || '@puff.andmom';
-  document.getElementById('ig-strip-name').textContent   = s.igName   || '泡芙與媽';
-  var stripBtn = document.getElementById('ig-strip-btn');
-  if (s.igStripUrl) stripBtn.href = s.igStripUrl;
-  var stripAva = document.getElementById('ig-strip-ava');
-  stripAva.innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
-
-  var nudge = document.getElementById('line-nudge');
-  nudge.style.display = s.lineUrl ? 'flex' : 'none';
-  if (s.lineUrl) nudge.href = s.lineUrl;
+  var coverEl = document.getElementById('hero-cover');
+  if (coverEl) coverEl.style.backgroundImage = p.coverUrl ? 'url(' + p.coverUrl + ')' : '';
   document.getElementById('community-block').style.display = s.commVis ? 'block' : 'none';
   if (s.lineUrl) document.getElementById('line-btn').href = s.lineUrl;
   if (s.igUrl)   document.getElementById('ig-btn').href  = s.igUrl;
@@ -2156,9 +2141,10 @@ function closeSheet() { document.getElementById('overlay').classList.remove('on'
 /* ── ADMIN ── */
 function renderAdmin() {
   var p = D.profile, s = D.social;
-  document.getElementById('a-name').value    = p.name;
-  document.getElementById('a-handle').value  = p.handle;
-  document.getElementById('a-bio').value     = p.bio;
+  document.getElementById('a-name').value      = p.name;
+  document.getElementById('a-handle').value    = p.handle;
+  document.getElementById('a-bio').value       = p.bio;
+  document.getElementById('a-cover-url').value = p.coverUrl || '';
   if (p.avatarData) {
     var wrap = document.getElementById('czava');
     var res = document.getElementById('czresult-ava');
@@ -2692,9 +2678,10 @@ async function addItem() {
 }
 
 async function saveProfile() {
-  D.profile.name   = document.getElementById('a-name').value;
-  D.profile.handle = document.getElementById('a-handle').value;
-  D.profile.bio    = document.getElementById('a-bio').value;
+  D.profile.name     = document.getElementById('a-name').value;
+  D.profile.handle   = document.getElementById('a-handle').value;
+  D.profile.bio      = document.getElementById('a-bio').value;
+  D.profile.coverUrl = document.getElementById('a-cover-url').value;
   var row = buildProfileRow(); delete row.id;
   var res = await sb.from('profile').update(row).eq('id', 1);
   if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
