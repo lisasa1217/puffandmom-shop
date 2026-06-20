@@ -1120,26 +1120,19 @@ async function initApp() {
     sb.from('items').select('id,img_data').then(function(r){
       if (!r.data) return;
       r.data.forEach(function(row){
+        if (!row.img_data) return;
         var item = D.items.find(function(x){ return x.id === row.id; });
-        if (item && row.img_data) {
-          item.imgData = row.img_data;
-          var el = document.querySelector('[data-card-id="' + row.id + '"] .acard-img img');
-          if (el) el.src = row.img_data;
-          else {
-            var wrap = document.querySelector('[data-card-id="' + row.id + '"] .acard-img');
-            if (wrap) wrap.innerHTML = '<img src="' + row.img_data + '" alt="">';
-          }
-        }
-      });
-    });
-    sb.from('shop_items').select('id,img_data').then(function(r){
-      if (!r.data) return;
-      r.data.forEach(function(row){
-        var item = D.shopItems.find(function(x){ return x.id === row.id; });
-        if (item && row.img_data) {
-          item.imgData = row.img_data;
-          var el = document.querySelector('[data-shop-id="' + row.id + '"] .shop-card-img img');
-          if (el) el.src = row.img_data;
+        if (item) item.imgData = row.img_data;
+        /* 找到 emoji 佔位 div，換成圖片（只換第一個子 div，不動標籤和按鈕） */
+        var card = document.querySelector('[data-card-id="' + row.id + '"]');
+        if (!card) return;
+        var imgWrap = card.querySelector('.acard-img');
+        if (!imgWrap) return;
+        var emoDiv = imgWrap.querySelector('div[style*="inset:0"]');
+        if (emoDiv) {
+          var img = document.createElement('img');
+          img.src = row.img_data; img.alt = '';
+          imgWrap.replaceChild(img, emoDiv);
         }
       });
     });
