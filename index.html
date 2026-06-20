@@ -1058,6 +1058,8 @@ var D = {
 
 /* ── INIT ── */
 async function initApp() {
+  /* 立刻移除遮罩，不等資料 */
+  (function(){ var v=document.getElementById('loading-veil'); if(v){v.classList.add('fade');setTimeout(function(){v.remove();},400);} })();
   try {
     var res = await sb.from('profile').select('*').eq('id', 1).single();
     var profile = res.data;
