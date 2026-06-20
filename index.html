@@ -1080,14 +1080,15 @@ async function initApp() {
         pwVis:      profile.pw_vis      !== false
       };
     }
-    var iRes = await sb.from('items').select('*').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
+    /* 先載入文字（不含圖片），速度快 */
+    var iRes = await sb.from('items').select('id,name,emoji,open_d,close_d,link,description,disc_code,ig_url,reels_url,note,disc_label,sort_order,created_at').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
     if (iRes.data) {
       D.items = iRes.data.map(function(i) {
         return {
           id:        i.id,
           name:      i.name        || '',
           emoji:     i.emoji       || '✦',
-          imgData:   i.img_data    || null,
+          imgData:   null,
           openD:     i.open_d      || '',
           closeD:    i.close_d     || '',
           link:      i.link        || '',
@@ -1102,16 +1103,45 @@ async function initApp() {
         };
       });
     }
-    var sRes = await sb.from('shop_items').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    var sRes = await sb.from('shop_items').select('id,name,description,emoji,category,link,is_taobao,archived,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if (sRes.data) {
       D.shopItems = sRes.data.map(function(i){
-        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
+        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
       });
     }
   } catch(e) {
     console.error('載入資料失敗：', e);
   }
   renderFront();
+  /* 文字顯示後，背景靜默載入圖片 */
+  setTimeout(function(){
+    sb.from('items').select('id,img_data').then(function(r){
+      if (!r.data) return;
+      r.data.forEach(function(row){
+        var item = D.items.find(function(x){ return x.id === row.id; });
+        if (item && row.img_data) {
+          item.imgData = row.img_data;
+          var el = document.querySelector('[data-card-id="' + row.id + '"] .acard-img img');
+          if (el) el.src = row.img_data;
+          else {
+            var wrap = document.querySelector('[data-card-id="' + row.id + '"] .acard-img');
+            if (wrap) wrap.innerHTML = '<img src="' + row.img_data + '" alt="">';
+          }
+        }
+      });
+    });
+    sb.from('shop_items').select('id,img_data').then(function(r){
+      if (!r.data) return;
+      r.data.forEach(function(row){
+        var item = D.shopItems.find(function(x){ return x.id === row.id; });
+        if (item && row.img_data) {
+          item.imgData = row.img_data;
+          var el = document.querySelector('[data-shop-id="' + row.id + '"] .shop-card-img img');
+          if (el) el.src = row.img_data;
+        }
+      });
+    });
+  }, 100);
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
     startAdminTimeout();
@@ -1667,6 +1697,7 @@ function renderActive(items, permanentItems, soonItems) {
     var closingSoon = !isSoon && daysLeft >= 0 && daysLeft <= 2;
     var el = document.createElement('div');
     el.className = isSoon ? 'acard soon-card' : 'acard fu';
+    el.dataset.cardId = item.id;
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = isSoon
@@ -1738,6 +1769,7 @@ function renderActive(items, permanentItems, soonItems) {
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
     var el = document.createElement('div');
     el.className = isGray ? 'acard soon-card' : 'acard fu';
+    el.dataset.cardId = item.id;
     el.style.animationDelay = ((_permOffset + idx) * .05) + 's';
     el.innerHTML =
       '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
@@ -1796,6 +1828,7 @@ function renderPermanent(items) {
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
     var el = document.createElement('div');
     el.className = isGray ? 'acard soon-card' : 'acard fu';
+    el.dataset.cardId = item.id;
     el.style.animationDelay = (idx * .05) + 's';
     el.innerHTML =
       '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
