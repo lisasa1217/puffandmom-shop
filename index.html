@@ -1058,8 +1058,6 @@ var D = {
 
 /* ── INIT ── */
 async function initApp() {
-  /* 立刻移除遮罩，不等資料 */
-  (function(){ var v=document.getElementById('loading-veil'); if(v){v.classList.add('fade');setTimeout(function(){v.remove();},400);} })();
   try {
     var res = await sb.from('profile').select('*').eq('id', 1).single();
     var profile = res.data;
@@ -1082,15 +1080,14 @@ async function initApp() {
         pwVis:      profile.pw_vis      !== false
       };
     }
-    /* 先載入文字（不含圖片），速度快 */
-    var iRes = await sb.from('items').select('id,name,emoji,open_d,close_d,link,description,disc_code,ig_url,reels_url,note,disc_label,sort_order,created_at').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
+    var iRes = await sb.from('items').select('*').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
     if (iRes.data) {
       D.items = iRes.data.map(function(i) {
         return {
           id:        i.id,
           name:      i.name        || '',
           emoji:     i.emoji       || '✦',
-          imgData:   null,
+          imgData:   i.img_data    || null,
           openD:     i.open_d      || '',
           closeD:    i.close_d     || '',
           link:      i.link        || '',
@@ -1105,38 +1102,16 @@ async function initApp() {
         };
       });
     }
-    var sRes = await sb.from('shop_items').select('id,name,description,emoji,category,link,is_taobao,archived,sort_order,created_at').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    var sRes = await sb.from('shop_items').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if (sRes.data) {
       D.shopItems = sRes.data.map(function(i){
-        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
+        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
       });
     }
   } catch(e) {
     console.error('載入資料失敗：', e);
   }
   renderFront();
-  /* 文字顯示後，背景靜默載入圖片 */
-  setTimeout(function(){
-    sb.from('items').select('id,img_data').then(function(r){
-      if (!r.data) return;
-      r.data.forEach(function(row){
-        if (!row.img_data) return;
-        var item = D.items.find(function(x){ return x.id === row.id; });
-        if (item) item.imgData = row.img_data;
-        /* 找到 emoji 佔位 div，換成圖片（只換第一個子 div，不動標籤和按鈕） */
-        var card = document.querySelector('[data-card-id="' + row.id + '"]');
-        if (!card) return;
-        var imgWrap = card.querySelector('.acard-img');
-        if (!imgWrap) return;
-        var emoDiv = imgWrap.querySelector('div[style*="inset:0"]');
-        if (emoDiv) {
-          var img = document.createElement('img');
-          img.src = row.img_data; img.alt = '';
-          imgWrap.replaceChild(img, emoDiv);
-        }
-      });
-    });
-  }, 100);
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
     startAdminTimeout();
@@ -1692,7 +1667,6 @@ function renderActive(items, permanentItems, soonItems) {
     var closingSoon = !isSoon && daysLeft >= 0 && daysLeft <= 2;
     var el = document.createElement('div');
     el.className = isSoon ? 'acard soon-card' : 'acard fu';
-    el.dataset.cardId = item.id;
     el.style.animationDelay = (idx * .05) + 's';
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = isSoon
@@ -1764,7 +1738,6 @@ function renderActive(items, permanentItems, soonItems) {
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
     var el = document.createElement('div');
     el.className = isGray ? 'acard soon-card' : 'acard fu';
-    el.dataset.cardId = item.id;
     el.style.animationDelay = ((_permOffset + idx) * .05) + 's';
     el.innerHTML =
       '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
@@ -1823,7 +1796,6 @@ function renderPermanent(items) {
       : '<div class="acard-img-btn"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>前往購買 →</a></div>';
     var el = document.createElement('div');
     el.className = isGray ? 'acard soon-card' : 'acard fu';
-    el.dataset.cardId = item.id;
     el.style.animationDelay = (idx * .05) + 's';
     el.innerHTML =
       '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
