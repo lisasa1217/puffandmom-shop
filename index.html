@@ -45,10 +45,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .ig-strip{
   display:flex;align-items:center;justify-content:flex-end;gap:10px;
   padding:10px 16px;
-  background:rgba(255,255,255,.75);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(0,0,0,.06);
+  background:transparent;
   position:fixed;top:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:430px;z-index:95;
 }
@@ -77,7 +74,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .line-nudge span{font-size:11px;color:var(--green-dk);letter-spacing:.5px;font-weight:300}
 .line-nudge svg{width:13px;height:13px;color:var(--green-dk)}
 
-.hero-cover{width:100%;height:160px;background:linear-gradient(135deg,#d4c5b2 0%,#b2c5d4 100%);background-size:cover;background-position:center}
+.hero-cover{width:100%;height:260px;background:linear-gradient(135deg,#d4c5b2 0%,#b2c5d4 100%);background-size:cover;background-position:center}
 .hero{display:flex;flex-direction:column;align-items:center;padding:0 28px 36px;background:transparent;border-bottom:1px solid var(--rule)}
 /* palette swatch strip */
 .hero-palette{display:flex;gap:6px;justify-content:center;margin-top:22px;align-items:center}
@@ -284,7 +281,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
 
 /* ── Hamburger menu ── */
-.hmenu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--ink);font-size:20px;line-height:1;flex-shrink:0;padding:0}
+.hmenu-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:none;background:rgba(0,0,0,.28);cursor:pointer;color:#fff;font-size:18px;line-height:1;flex-shrink:0;padding:0;-webkit-tap-highlight-color:transparent}
+.hmenu-btn:active{background:rgba(0,0,0,.45)}
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
 .hmenu-overlay.on{opacity:1;pointer-events:auto}
 .hmenu-drawer{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;max-width:100vw}
@@ -796,7 +794,11 @@ input[type=file]{display:none}
         <div class="fld"><label>名稱</label><input id="a-name" value="團媽小美"></div>
         <div class="fld"><label>帳號</label><input id="a-handle" value="@xiaomei_buys"></div>
         <div class="fld"><label>關於我</label><textarea id="a-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</textarea></div>
-        <div class="fld"><label>封面背景圖片網址</label><input type="url" id="a-cover-url" placeholder="https://... 貼上圖片連結"></div>
+        <div class="fld"><label>封面背景</label>
+          <div id="cover-preview" style="width:100%;height:100px;border-radius:10px;background:linear-gradient(135deg,#d4c5b2,#b2c5d4);background-size:cover;background-position:center;margin-bottom:8px;border:1px solid var(--rule)"></div>
+          <button type="button" onclick="document.getElementById('cover-file').click()" style="width:100%;padding:10px;border-radius:9px;border:1.5px dashed var(--rule);background:none;font-family:inherit;font-size:13px;color:var(--ink2);cursor:pointer;letter-spacing:.3px">📷 上傳封面照片</button>
+          <input type="file" id="cover-file" accept="image/*" style="display:none" onchange="coverLoad(event)">
+        </div>
         <button class="savebtn" onclick="saveProfile()">儲存個人資料</button>
       </div>
     </div>
@@ -1049,7 +1051,7 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ── DATA (local cache) ── */
 var D = {
-  profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null, coverUrl:''},
+  profile: {name:'團媽小美', handle:'@xiaomei_buys', bio:'', avatarData:null, coverUrl:'', coverData:null},
   social:  {commVis:true, lineUrl:'', igUrl:'', pw:'0403', commPw:'4343', pwVis:true, igHandle:'@puff.andmom', igName:'泡芙與媽', igStripUrl:'https://instagram.com/puff.andmom'},
   items: [],
   shopItems: []
@@ -1066,7 +1068,8 @@ async function initApp() {
         handle:     profile.handle     || '@xiaomei_buys',
         bio:        profile.bio        || '',
         avatarData: profile.avatar_data || null,
-        coverUrl:   profile.cover_url  || ''
+        coverUrl:   profile.cover_url  || '',
+        coverData:  profile.cover_data || null
       };
       D.social = {
         commVis:    profile.comm_vis    !== false,
@@ -1141,6 +1144,7 @@ function buildProfileRow() {
     bio:          D.profile.bio,
     avatar_data:  D.profile.avatarData,
     cover_url:    D.profile.coverUrl   || null,
+    cover_data:   D.profile.coverData  || null,
     comm_vis:     D.social.commVis,
     line_url:     D.social.lineUrl,
     ig_url:       D.social.igUrl,
@@ -1169,6 +1173,19 @@ function czHintId(id)   { return id === 'ava' ? 'czava-hint'  : 'czitem-hint-' +
 function czPhId(id)     { return id === 'ava' ? 'czava-ph'    : 'czitem-ph-' + id; }
 function czRingId(id)   { return id === 'ava' ? 'czava-ring'  : null; }
 function isAva(id)      { return id === 'ava'; }
+
+function coverLoad(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    D.profile.coverData = ev.target.result;
+    var cp = document.getElementById('cover-preview');
+    if (cp) cp.style.backgroundImage = 'url(' + ev.target.result + ')';
+    renderFront();
+  };
+  reader.readAsDataURL(file);
+}
 
 function cropLoad(id, e) {
   var file = e.target.files[0];
@@ -1558,7 +1575,7 @@ function renderFront() {
   document.getElementById('f-bio').textContent = p.bio;
   document.getElementById('f-ava').innerHTML = p.avatarData ? '<img src="' + p.avatarData + '">' : '🛍️';
   var coverEl = document.getElementById('hero-cover');
-  if (coverEl) coverEl.style.backgroundImage = p.coverUrl ? 'url(' + p.coverUrl + ')' : '';
+  if (coverEl) { var coverSrc = p.coverData || p.coverUrl; coverEl.style.backgroundImage = coverSrc ? 'url(' + coverSrc + ')' : ''; }
   document.getElementById('community-block').style.display = s.commVis ? 'block' : 'none';
   if (s.lineUrl) document.getElementById('line-btn').href = s.lineUrl;
   if (s.igUrl)   document.getElementById('ig-btn').href  = s.igUrl;
@@ -2141,10 +2158,11 @@ function closeSheet() { document.getElementById('overlay').classList.remove('on'
 /* ── ADMIN ── */
 function renderAdmin() {
   var p = D.profile, s = D.social;
-  document.getElementById('a-name').value      = p.name;
-  document.getElementById('a-handle').value    = p.handle;
-  document.getElementById('a-bio').value       = p.bio;
-  document.getElementById('a-cover-url').value = p.coverUrl || '';
+  document.getElementById('a-name').value   = p.name;
+  document.getElementById('a-handle').value = p.handle;
+  document.getElementById('a-bio').value    = p.bio;
+  var cp = document.getElementById('cover-preview');
+  if (cp) { var cs = p.coverData || p.coverUrl; cp.style.backgroundImage = cs ? 'url(' + cs + ')' : ''; }
   if (p.avatarData) {
     var wrap = document.getElementById('czava');
     var res = document.getElementById('czresult-ava');
@@ -2678,10 +2696,9 @@ async function addItem() {
 }
 
 async function saveProfile() {
-  D.profile.name     = document.getElementById('a-name').value;
-  D.profile.handle   = document.getElementById('a-handle').value;
-  D.profile.bio      = document.getElementById('a-bio').value;
-  D.profile.coverUrl = document.getElementById('a-cover-url').value;
+  D.profile.name   = document.getElementById('a-name').value;
+  D.profile.handle = document.getElementById('a-handle').value;
+  D.profile.bio    = document.getElementById('a-bio').value;
   var row = buildProfileRow(); delete row.id;
   var res = await sb.from('profile').update(row).eq('id', 1);
   if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
