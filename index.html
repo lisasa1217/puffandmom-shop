@@ -43,12 +43,11 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 
 /* ── IG top strip ── */
 .ig-strip{
-  display:flex;align-items:center;gap:10px;
+  display:flex;align-items:center;justify-content:flex-end;
   padding:10px 16px;
   background:rgba(255,255,255,.75);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
-  border-bottom:1px solid rgba(0,0,0,.06);
   position:fixed;top:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:430px;z-index:95;
 }
@@ -283,7 +282,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
 
 /* ── Hamburger menu ── */
-.hmenu-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--ink);font-size:20px;line-height:1;flex-shrink:0;padding:0}
+.hmenu-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:none;background:rgba(0,0,0,.06);cursor:pointer;color:var(--ink);font-size:18px;line-height:1;flex-shrink:0;padding:0;-webkit-tap-highlight-color:transparent}
+.hmenu-btn:active{background:rgba(0,0,0,.12)}
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
 .hmenu-overlay.on{opacity:1;pointer-events:auto}
 .hmenu-drawer{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;max-width:100vw}
@@ -650,19 +650,14 @@ input[type=file]{display:none}
 
   <!-- IG top strip -->
   <div class="ig-strip" id="ig-strip">
-    <div class="ig-strip-ava" id="ig-strip-ava"></div>
-    <div class="ig-strip-info">
-      <div class="ig-strip-handle" id="ig-strip-handle">@puff.andmom</div>
-      <div class="ig-strip-name" id="ig-strip-name">泡芙與媽</div>
-    </div>
-    <a id="ig-strip-btn" class="ig-strip-btn" href="https://instagram.com/puff.andmom" target="_blank" onclick="trackClick('ig_follow',null)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      追蹤
-    </a>
+    <div id="ig-strip-ava" style="display:none"></div>
+    <div id="ig-strip-handle" style="display:none"></div>
+    <div id="ig-strip-name" style="display:none"></div>
+    <a id="ig-strip-btn" style="display:none"></a>
     <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">☰</button>
   </div>
 
-  <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)">
+  <a id="line-nudge" class="line-nudge" href="#" onclick="handleLineNudge(event)" style="display:none!important">
     <span>加入 LINE 社群</span>
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
   </a>
