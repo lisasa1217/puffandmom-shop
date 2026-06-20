@@ -1114,6 +1114,7 @@ async function initApp() {
     console.error('載入資料失敗：', e);
   }
   renderFront();
+  clearTimeout(_veilTimeout);
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
     startAdminTimeout();
@@ -3421,6 +3422,11 @@ function _dollGoPooo() {
   }, 950);
 }
 
+var _veilTimeout = setTimeout(function(){
+  var v = document.getElementById('loading-veil');
+  if (v) { v.classList.add('fade'); setTimeout(function(){ v.remove(); }, 400); }
+  renderFront();
+}, 8000);
 initApp();
 
 /* ── HERO SWIPE (bio ↔ personality spectrum) ── */
