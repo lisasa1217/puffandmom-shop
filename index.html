@@ -165,7 +165,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-note{position:absolute;top:9px;left:9px;z-index:4;background:#F5D46B;color:#4A3528;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;letter-spacing:.4px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acard-note-active{background:var(--green)!important;color:#fff!important}
 .acard-note-soon{background:rgba(255,255,255,.82)!important;color:var(--ink2)!important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.acard-note.note-red{background:#E05C30!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
+.acard-note.note-red{background:#C0392B!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
 .ncp-opt{cursor:pointer;display:inline-flex}
@@ -2329,7 +2329,7 @@ function _buildItemCard(item, noHandle) {
         '</div>' +
         '<input type="file" id="ifile-' + item.id + '" accept="image/*" onchange="cropLoad(' + item.id + ',event)">' +
       '</div>' +
-      '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '"></div>' +
+      '<div class="fld"><label>商品名稱</label><input id="fn' + item.id + '" value="' + item.name + '" placeholder="輸入商品名稱"></div>' +
       (function(){
         var nr = item.note || '';
         var nRed = nr.startsWith('[red]');
@@ -2745,7 +2745,7 @@ async function addItem() {
   var today = new Date().toISOString().slice(0,10);
   var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
   var res = await sb.from('items').insert({
-    name: '新商品', emoji: '✦', img_data: null,
+    name: '', emoji: '✦', img_data: null,
     open_d: today, close_d: close,
     link: '', description: '', disc_code: '', disc_label: '', ig_url: '', reels_url: '', note: '', sort_order: 0
   }).select().single();
@@ -3585,7 +3585,7 @@ function renderShopAdm() {
     form.id = 'sif' + item.id;
     form.style.cssText = 'display:none;width:100%;box-sizing:border-box;padding:10px 0 4px';
     form.innerHTML =
-      '<div class="fld"><label>商品名稱</label><input id="si-name-' + item.id + '" value="' + _esc(item.name) + '"></div>' +
+      '<div class="fld"><label>商品名稱</label><input id="si-name-' + item.id + '" value="' + _esc(item.name) + '" placeholder="輸入商品名稱"></div>' +
       '<div class="fld"><label>分類標籤</label><input id="si-cat-' + item.id + '" value="' + _esc(item.category) + '" placeholder="例：廚房・育兒・美妝" list="shop-cat-list" autocomplete="off"></div>' +
       '<div class="fld"><label>商品說明</label><textarea id="si-desc-' + item.id + '" style="height:56px">' + _esc(item.desc) + '</textarea></div>' +
       '<div class="fld-check">' +
@@ -3718,7 +3718,7 @@ async function saveShopItem(id) {
 
 async function addShopItem() {
   var res = await sb.from('shop_items').insert({
-    name:'新選品', emoji:'✦', img_data:null, category:'', link:'',
+    name:'', emoji:'✦', img_data:null, category:'', link:'',
     description:'', is_taobao:false, archived:false, sort_order:0
   }).select().single();
   if (res.error) {
