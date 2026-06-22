@@ -1792,9 +1792,8 @@ function renderActive(items, permanentItems, soonItems) {
   soonItems.forEach(function(item, idx) {
     buildCard(item, _permOffset + permanentItems.length + idx, true);
     if (idx >= SOON_LIMIT) {
-      var cards = grid.querySelectorAll('.soon-card');
-      var last = cards[cards.length - 1];
-      if (last) { last.classList.add('soon-card-hidden'); last.style.display = 'none'; hiddenSoon.push(last); }
+      var last = grid.lastElementChild;
+      if (last) { last.style.display = 'none'; hiddenSoon.push(last); }
     }
   });
   if (hiddenSoon.length) {
