@@ -1787,7 +1787,27 @@ function renderActive(items, permanentItems, soonItems) {
     }
     grid.appendChild(el);
   });
-  soonItems.forEach(function(item, idx) { buildCard(item, _permOffset + permanentItems.length + idx, true); });
+  var SOON_LIMIT = 5;
+  var hiddenSoon = [];
+  soonItems.forEach(function(item, idx) {
+    buildCard(item, _permOffset + permanentItems.length + idx, true);
+    if (idx >= SOON_LIMIT) {
+      var cards = grid.querySelectorAll('.soon-card');
+      var last = cards[cards.length - 1];
+      if (last) { last.classList.add('soon-card-hidden'); last.style.display = 'none'; hiddenSoon.push(last); }
+    }
+  });
+  if (hiddenSoon.length) {
+    var moreBtn = document.createElement('div');
+    moreBtn.id = 'soon-more-btn';
+    moreBtn.style.cssText = 'grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;cursor:pointer;color:var(--ink3);font-size:12px;letter-spacing:.5px;-webkit-tap-highlight-color:transparent';
+    moreBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 9l6 6 6-6"/></svg> 看看更多活動（還有 ' + hiddenSoon.length + ' 個）';
+    moreBtn.onclick = function() {
+      hiddenSoon.forEach(function(el){ el.style.display = ''; });
+      moreBtn.style.display = 'none';
+    };
+    grid.appendChild(moreBtn);
+  }
 }
 
 function renderPermanent(items) {
