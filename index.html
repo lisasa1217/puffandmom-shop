@@ -1604,7 +1604,14 @@ function renderFront() {
   document.getElementById('cal-sec').style.display    = scheduled.length ? 'block' : 'none';
 }
 
+function expandSoonList() {
+  document.querySelectorAll('.soon-extra').forEach(function(el){ el.style.display = ''; });
+  var btn = document.getElementById('soon-more-btn');
+  if (btn) btn.style.display = 'none';
+}
+
 function renderSoon(items) {
+  var LIMIT = 5;
   var list = document.getElementById('soon-list'); list.innerHTML = '';
   items.forEach(function(item, idx) {
     var open = new Date(item.openD + 'T00:00:00'), diff = open - new Date();
@@ -1614,7 +1621,8 @@ function renderSoon(items) {
     var s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
     var lh = D.social.lineUrl || '#';
     var el = document.createElement('div');
-    el.className = 'fu'; el.style.animationDelay = (idx * .05) + 's';
+    el.className = 'fu' + (idx >= LIMIT ? ' soon-extra' : ''); el.style.animationDelay = (idx * .05) + 's';
+    if (idx >= LIMIT) el.style.display = 'none';
     el.innerHTML =
       '<div class="soon-row">' +
         '<div class="soon-date-col">' +
@@ -1640,6 +1648,14 @@ function renderSoon(items) {
       '</div>';
     list.appendChild(el);
   });
+  if (items.length > LIMIT) {
+    var more = document.createElement('button');
+    more.id = 'soon-more-btn';
+    more.onclick = expandSoonList;
+    more.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;background:none;border:none;font-family:inherit;font-size:12px;color:var(--ink3);cursor:pointer;letter-spacing:.5px;-webkit-tap-highlight-color:transparent';
+    more.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 9l6 6 6-6"/></svg> 看看更多活動（還有 ' + (items.length - LIMIT) + ' 個）';
+    list.appendChild(more);
+  }
   startCD();
 }
 
