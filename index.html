@@ -165,7 +165,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .acard-note{position:absolute;top:9px;left:9px;z-index:4;background:#F5D46B;color:#4A3528;font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;letter-spacing:.4px;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .acard-note-active{background:var(--green)!important;color:#fff!important}
 .acard-note-soon{background:rgba(255,255,255,.82)!important;color:var(--ink2)!important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.acard-note.note-red{background:#C0392B!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
+.acard-note.note-red{background:#E05C30!important;color:#fff!important;animation:note-urgent 1.5s ease-in-out infinite}
 @keyframes note-urgent{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.55);transform:scaleX(1)}55%{box-shadow:0 0 0 5px rgba(192,57,43,0);transform:scaleX(1.05)}}
 .note-color-pick{display:flex;gap:8px;margin-top:4px}
 .ncp-opt{cursor:pointer;display:inline-flex}
@@ -2337,7 +2337,7 @@ function _buildItemCard(item, noHandle) {
         return '<div class="fld"><label>備註標籤（圖片角落顯示）</label>' +
           '<div class="note-color-pick">' +
             '<label class="ncp-opt" title="黃色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:var(--yellow)"></span></label>' +
-            '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#C0392B"></span></label>' +
+            '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#E05C30"></span></label>' +
           '</div>' +
           '<input id="fnote' + item.id + '" value="' + nVal + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12">' +
         '</div>';
