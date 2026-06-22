@@ -1880,35 +1880,51 @@ function renderPermanent(items) {
 }
 
 function renderScheduled(items) {
+  var LIMIT = 5;
   var sec = document.getElementById('cal-list'); sec.innerHTML = '';
   if (!items.length) return;
   items = items.slice().sort(function(a,b){ return a.openD < b.openD ? -1 : 1; });
-  // 依月份分組
+  var visible = items.slice(0, LIMIT);
+  var hidden  = items.slice(LIMIT);
+  function makeRow(item) {
+    var mo2 = parseInt(item.openD.slice(5,7), 10);
+    var day = parseInt(item.openD.slice(8), 10);
+    var dateStr = mo2 + '/' + day;
+    return '<div class="cal-item-row">' +
+      '<div class="cal-item-day">' + dateStr + '</div>' +
+      '<div class="cal-item-name">' + item.name + '</div>' +
+      '<button class="cal-item-remind" onclick="addToCalendar(' + item.id + ')">' +
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:11px;height:11px;flex-shrink:0"><rect x="2" y="3" width="12" height="11" rx="2"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/><line x1="2" y1="7" x2="14" y2="7"/></svg>' +
+        '設提醒' +
+      '</button>' +
+    '</div>';
+  }
+  /* 月份分組（只顯示前5） */
   var groups = {};
-  items.forEach(function(i) {
-    var mo = i.openD.slice(0, 7); // "2026-08"
-    if (!groups[mo]) groups[mo] = [];
-    groups[mo].push(i);
-  });
+  visible.forEach(function(i){ var mo=i.openD.slice(0,7); if(!groups[mo])groups[mo]=[]; groups[mo].push(i); });
   Object.keys(groups).sort().forEach(function(mo) {
     var moEl = document.createElement('div');
     moEl.className = 'cal-mo-group';
-    var rows = groups[mo].map(function(item) {
-      var mo2 = parseInt(item.openD.slice(5,7), 10);
-      var day = parseInt(item.openD.slice(8), 10);
-      var dateStr = mo2 + '/' + day;
-      return '<div class="cal-item-row">' +
-        '<div class="cal-item-day">' + dateStr + '</div>' +
-        '<div class="cal-item-name">' + item.name + '</div>' +
-        '<button class="cal-item-remind" onclick="addToCalendar(' + item.id + ')">' +
-          '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" style="width:11px;height:11px;flex-shrink:0"><rect x="2" y="3" width="12" height="11" rx="2"/><line x1="5" y1="1" x2="5" y2="5"/><line x1="11" y1="1" x2="11" y2="5"/><line x1="2" y1="7" x2="14" y2="7"/></svg>' +
-          '設提醒' +
-        '</button>' +
-      '</div>';
-    }).join('');
-    moEl.innerHTML = rows;
+    moEl.innerHTML = groups[mo].map(makeRow).join('');
     sec.appendChild(moEl);
   });
+  if (hidden.length) {
+    var moreEl = document.createElement('button');
+    moreEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:14px;background:none;border:none;font-family:inherit;font-size:12px;color:var(--ink3);cursor:pointer;letter-spacing:.5px;-webkit-tap-highlight-color:transparent';
+    moreEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 9l6 6 6-6"/></svg> 看看更多活動（還有 ' + hidden.length + ' 個）';
+    moreEl.onclick = function() {
+      var hGroups = {};
+      hidden.forEach(function(i){ var mo=i.openD.slice(0,7); if(!hGroups[mo])hGroups[mo]=[]; hGroups[mo].push(i); });
+      Object.keys(hGroups).sort().forEach(function(mo) {
+        var moEl = document.createElement('div');
+        moEl.className = 'cal-mo-group';
+        moEl.innerHTML = hGroups[mo].map(makeRow).join('');
+        sec.insertBefore(moEl, moreEl);
+      });
+      moreEl.remove();
+    };
+    sec.appendChild(moreEl);
+  }
 }
 
 var _endedOpen = false;
