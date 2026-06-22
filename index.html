@@ -1944,10 +1944,11 @@ async function loadStats() {
       .order('id',{ascending:false}).limit(2000);
     var data = res.data || [];
     var cnt = {buy:0,ig_detail:0,calendar:0,disc_copy:0,line:0,ig_follow:0};
-    var byItem = {};
+    var byItem = {}, byItemCal = {};
     data.forEach(function(c) {
       if (cnt[c.event_type] !== undefined) cnt[c.event_type]++;
       if (c.item_id && c.event_type === 'buy') byItem[c.item_id] = (byItem[c.item_id]||0)+1;
+      if (c.item_id && c.event_type === 'calendar') byItemCal[c.item_id] = (byItemCal[c.item_id]||0)+1;
     });
     var html = '<div class="stat-grid">' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.buy + '</div><div class="stat-lbl">購買點擊</div></div>' +
@@ -1955,10 +1956,13 @@ async function loadStats() {
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.disc_copy + '</div><div class="stat-lbl">折扣碼複製</div></div>' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.line + '</div><div class="stat-lbl">LINE 點擊</div></div>' +
     '</div>';
-    var itemRows = D.items.filter(function(i){ return byItem[i.id]; }).sort(function(a,b){ return (byItem[b.id]||0)-(byItem[a.id]||0); });
+    var itemRows = D.items.filter(function(i){ return byItem[i.id] || byItemCal[i.id]; }).sort(function(a,b){ return (byItem[b.id]||0)-(byItem[a.id]||0); });
     if (itemRows.length) {
-      html += '<div class="asec-lbl" style="margin-bottom:8px">商品購買點擊排行</div><div class="pcard">';
-      itemRows.forEach(function(i){ html += '<div class="stat-row"><span class="stat-row-name">' + i.name + '</span><span class="stat-row-n">👆 ' + byItem[i.id] + '</span></div>'; });
+      html += '<div class="asec-lbl" style="margin-bottom:8px">商品互動排行</div><div class="pcard">';
+      itemRows.forEach(function(i){
+        var buyN = byItem[i.id] || 0, calN = byItemCal[i.id] || 0;
+        html += '<div class="stat-row"><span class="stat-row-name">' + i.name + '</span><span class="stat-row-n" style="display:flex;gap:10px">' + (buyN ? '<span>👆 ' + buyN + '</span>' : '') + (calN ? '<span>📅 ' + calN + '</span>' : '') + '</span></div>';
+      });
       html += '</div>';
     } else {
       html += '<div class="stat-empty">尚無點擊記錄，需先在 Supabase 建立 clicks 資料表</div>';
@@ -3519,7 +3523,7 @@ function renderShopAdm() {
     form.style.cssText = 'display:none;width:100%;box-sizing:border-box;padding:10px 0 4px';
     form.innerHTML =
       '<div class="fld"><label>商品名稱</label><input id="si-name-' + item.id + '" value="' + _esc(item.name) + '"></div>' +
-      '<div class="fld"><label>分類標籤</label><input id="si-cat-' + item.id + '" value="' + _esc(item.category) + '" placeholder="例：廚房・育兒・美妝"></div>' +
+      '<div class="fld"><label>分類標籤</label><input id="si-cat-' + item.id + '" value="' + _esc(item.category) + '" placeholder="例：廚房・育兒・美妝" list="shop-cat-list" autocomplete="off"></div>' +
       '<div class="fld"><label>商品說明</label><textarea id="si-desc-' + item.id + '" style="height:56px">' + _esc(item.desc) + '</textarea></div>' +
       '<div class="fld-check">' +
         '<input type="checkbox" id="si-tb-' + item.id + '"' + (item.isTaobao ? ' checked' : '') + ' onchange="toggleShopTbHint(' + item.id + ')">' +
@@ -3575,6 +3579,13 @@ function renderShopAdm() {
 
     wrap.appendChild(row);
   });
+  /* update category autocomplete datalist */
+  var dl = document.getElementById('shop-cat-list');
+  if (dl) {
+    var cats = {};
+    D.shopItems.forEach(function(i){ if (i.category) cats[i.category] = 1; });
+    dl.innerHTML = Object.keys(cats).map(function(c){ return '<option value="' + _esc(c) + '">'; }).join('');
+  }
 }
 
 function _shopReorder(fromId, toId) {
@@ -3674,5 +3685,6 @@ async function delShopItem(id) {
   document.getElementById('confirm-overlay').classList.add('on');
 }
 </script>
+<datalist id="shop-cat-list"></datalist>
 </body>
 </html>
