@@ -812,9 +812,6 @@ input[type=file]{display:none}
       <div class="asec-lbl">社群設定</div>
       <div class="pcard">
         <div class="sw-row"><span>顯示社群區塊</span><label class="sw"><input type="checkbox" id="a-comm-vis" checked><span class="sw-sl"></span></label></div>
-        <div class="fld"><label>頂部 IG 帳號（@開頭）</label><input id="a-ig-handle" value="@puff.andmom"></div>
-        <div class="fld"><label>頂部 IG 名稱</label><input id="a-ig-name" value="泡芙與媽"></div>
-        <div class="fld"><label>頂部 IG 連結</label><input type="url" id="a-ig-url" value="https://instagram.com/puff.andmom" placeholder="https://instagram.com/..."></div>
         <div class="fld"><label>LINE 社群連結</label><input type="url" id="a-line" placeholder="https://line.me/..."></div>
         <div class="fld"><label>Instagram（社群區塊）連結</label><input type="url" id="a-ig" placeholder="https://instagram.com/..."></div>
         <div class="fld"><label>LINE 社群驗證碼（前台顯示給客人）</label><input id="a-comm-pw" value="4343" maxlength="20"></div>
@@ -829,7 +826,6 @@ input[type=file]{display:none}
   <div class="adm-panel" id="adm-panel-items">
     <div class="asec">
       <div class="asec-lbl">商品管理</div>
-      <button class="addbtn" onclick="addItem()">＋ 新增商品</button>
       <div class="adm-arch-sep">開團中 · 7天內預告</div>
       <div class="adm-items" id="adm-items"></div>
       <div class="adm-arch-sep" id="adm-sched-sep" style="display:none">行事曆預告（7天以上）</div>
@@ -903,6 +899,7 @@ input[type=file]{display:none}
 
 <!-- Shop FAB -->
 <button id="shop-fab" class="shop-fab" onclick="addShopItem()" aria-label="新增選品">＋</button>
+<button id="items-fab" class="shop-fab" onclick="addItem()" aria-label="新增商品" style="display:none">＋</button>
 
 <!-- Hamburger overlay & drawer -->
 <div class="hmenu-overlay" id="hmenu-overlay" onclick="closeHMenu()"></div>
@@ -2244,9 +2241,6 @@ function renderAdmin() {
     var hint = document.getElementById('czava-hint'); if (hint) { hint.style.display = 'block'; hint.textContent = '點「上傳照片」可重新選擇'; }
   }
   document.getElementById('a-comm-vis').checked = s.commVis;
-  document.getElementById('a-ig-handle').value  = s.igHandle   || '@puff.andmom';
-  document.getElementById('a-ig-name').value    = s.igName     || '泡芙與媽';
-  document.getElementById('a-ig-url').value     = s.igStripUrl || '';
   document.getElementById('a-line').value       = s.lineUrl    || '';
   document.getElementById('a-ig').value         = s.igUrl      || '';
   document.getElementById('a-comm-pw').value    = s.commPw     || '4343';
@@ -2268,7 +2262,8 @@ function _buildCompactItemCard(item) {
     : (item.openD + ' – ' + item.closeD);
   var row = document.createElement('div');
   row.className = 'adm-arch-item';
-  row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
+  row.style.cssText = 'flex-wrap:wrap;cursor:pointer;margin-bottom:6px;background:var(--card)';
+  row.onclick = function(e) { if (e.target.closest('button')) return; tF(item.id); };
   row.innerHTML =
     '<div class="adm-arch-ithumb">' + th + '</div>' +
     '<div style="flex:1;min-width:0">' +
@@ -2780,9 +2775,6 @@ async function saveProfile() {
 
 async function saveSocial() {
   D.social.commVis    = document.getElementById('a-comm-vis').checked;
-  D.social.igHandle   = document.getElementById('a-ig-handle').value;
-  D.social.igName     = document.getElementById('a-ig-name').value;
-  D.social.igStripUrl = document.getElementById('a-ig-url').value;
   D.social.lineUrl    = document.getElementById('a-line').value;
   D.social.igUrl      = document.getElementById('a-ig').value;
   D.social.commPw     = document.getElementById('a-comm-pw').value;
@@ -2818,6 +2810,8 @@ function switchAdmTab(tab) {
   if (tab === 'shop') renderShopAdm();
   var fab = document.getElementById('shop-fab');
   if (fab) fab.classList.toggle('on', tab === 'shop');
+  var ifab = document.getElementById('items-fab');
+  if (ifab) ifab.classList.toggle('on', tab === 'items');
 }
 
 /* ── HAMBURGER MENU ── */
