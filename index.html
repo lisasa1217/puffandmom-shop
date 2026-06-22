@@ -217,6 +217,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .stat-row:last-child{border-bottom:none}
 .stat-row-name{flex:1;font-size:12px;color:var(--ink2);font-weight:300;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat-row-n{font-size:13px;font-weight:500;color:var(--ink);flex-shrink:0}
+.stat-col{width:52px;text-align:right;font-size:12px;font-weight:500;flex-shrink:0}
+.stat-col-hd{width:52px;text-align:right;font-size:9px;color:var(--ink3);font-weight:300;flex-shrink:0;letter-spacing:.3px}
 .stat-empty{text-align:center;padding:20px;font-size:12px;color:var(--ink3);font-weight:300}
 .clear-old-btn{display:block;width:100%;margin-top:18px;padding:10px;border-radius:9px;border:1px solid rgba(192,57,43,.3);background:none;font-family:inherit;font-size:12px;color:#b03a2e;cursor:pointer;letter-spacing:.3px;transition:background .15s}
 .clear-old-btn:active{background:rgba(192,57,43,.06)}
@@ -1958,10 +1960,11 @@ async function loadStats() {
     '</div>';
     var itemRows = D.items.filter(function(i){ return byItem[i.id] || byItemCal[i.id]; }).sort(function(a,b){ return (byItem[b.id]||0)-(byItem[a.id]||0); });
     if (itemRows.length) {
-      html += '<div class="asec-lbl" style="margin-bottom:8px">商品互動排行</div><div class="pcard">';
+      html += '<div class="asec-lbl" style="margin-bottom:8px">商品互動排行</div><div class="pcard">' +
+        '<div class="stat-row"><span class="stat-row-name"></span><span class="stat-col-hd">👆 購買</span><span class="stat-col-hd">📅 提醒</span></div>';
       itemRows.forEach(function(i){
         var buyN = byItem[i.id] || 0, calN = byItemCal[i.id] || 0;
-        html += '<div class="stat-row"><span class="stat-row-name">' + i.name + '</span><span class="stat-row-n" style="display:flex;gap:10px">' + (buyN ? '<span>👆 ' + buyN + '</span>' : '') + (calN ? '<span>📅 ' + calN + '</span>' : '') + '</span></div>';
+        html += '<div class="stat-row"><span class="stat-row-name">' + i.name + '</span><span class="stat-col">' + (buyN || '—') + '</span><span class="stat-col">' + (calN || '—') + '</span></div>';
       });
       html += '</div>';
     } else {
