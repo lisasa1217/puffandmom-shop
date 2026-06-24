@@ -544,6 +544,9 @@ input[type=file]{display:none}
 /* farewell hearts */
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
+/* ── 莎的清單 FAB ── */
+.shop-link-fab{position:fixed;left:0;top:28%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E05C30;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;text-decoration:none}
+.shop-link-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.shop-link-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 /* ── 團購客服 FAB ── */
 .cs-fab{position:fixed;left:0;top:42%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E8897A;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s}
 .cs-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.cs-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
@@ -1008,6 +1011,12 @@ input[type=file]{display:none}
     </div>
   </div>
 </div>
+
+<!-- 莎的清單 FAB -->
+<a class="shop-link-fab" id="shop-link-fab" href="shop.html" aria-label="莎的清單">
+  <span class="cs-fab-icon">🛍️</span>
+  <span class="cs-fab-lbl">莎的清單</span>
+</a>
 
 <!-- 團購客服 FAB -->
 <button class="cs-fab" onclick="scrollToEnded()" aria-label="團購客服">
@@ -2971,6 +2980,7 @@ function go(pg) {
   var inAdm = pg === 'admin';
   document.querySelector('.kuka-fab').style.display = inAdm ? 'none' : '';
   var csfab = document.querySelector('.cs-fab'); if(csfab) csfab.style.display = inAdm ? 'none' : '';
+  var slfab = document.getElementById('shop-link-fab'); if(slfab) slfab.style.display = inAdm ? 'none' : '';
   if (pg === 'front') renderFront();
   if (pg === 'admin') { switchAdmTab('items'); renderAdmin(); }
 }
@@ -3732,7 +3742,12 @@ async function addShopItem() {
   var d = res.data;
   D.shopItems.unshift({ id:d.id, name:d.name, desc:d.description||'', imgData:null, emoji:d.emoji, category:d.category||'', link:d.link||'', isTaobao:false, archived:false });
   renderShopAdm();
-  setTimeout(function(){ var f = document.getElementById('sif'+d.id); if(f) f.style.display=''; }, 80);
+  setTimeout(function(){
+    var f = document.getElementById('sif'+d.id); if(f) f.style.display='';
+    var cid = 'shop-' + d.id;
+    var cw = document.getElementById('czitem-' + cid);
+    if (cw && !cw._czBound) { czBindDrag(cw, cid); cw._czBound = true; }
+  }, 80);
 }
 
 async function delShopItem(id) {
