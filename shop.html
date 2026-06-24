@@ -414,6 +414,21 @@ async function init() {
   }
   renderCats();
   renderGrid();
+  /* show admin back-button if logged in */
+  if (sessionStorage.getItem('adminUnlocked') === '1') {
+    var admLink = document.createElement('a');
+    admLink.href = 'index.html#admin';
+    admLink.className = 'hmenu-link';
+    admLink.style.cssText = 'color:#E05C30;font-weight:500;border-top:1px solid var(--rule)';
+    admLink.innerHTML = '<svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="#E05C30" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>進入後台';
+    document.querySelector('.hmenu-links').appendChild(admLink);
+    /* also show a small pill in top strip */
+    var pill = document.createElement('a');
+    pill.href = 'index.html#admin';
+    pill.style.cssText = 'position:fixed;bottom:22px;right:16px;z-index:90;background:#E05C30;color:#fff;font-size:11px;font-weight:500;padding:7px 14px;border-radius:20px;text-decoration:none;box-shadow:0 3px 12px rgba(224,92,48,.35);letter-spacing:.5px';
+    pill.textContent = '⚙ 後台';
+    document.body.appendChild(pill);
+  }
   var veil = document.getElementById('loading-veil');
   if (veil) { veil.classList.add('fade'); setTimeout(function(){ veil.remove(); }, 400); }
 }

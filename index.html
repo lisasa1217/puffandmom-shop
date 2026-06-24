@@ -544,11 +544,11 @@ input[type=file]{display:none}
 /* farewell hearts */
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
-/* ── 莎的清單 FAB ── */
-.shop-link-fab{position:fixed;left:0;top:28%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E05C30;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;text-decoration:none}
+/* ── 莎的這個 FAB ── */
+.shop-link-fab{position:fixed;left:0;top:30%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E05C30;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;text-decoration:none}
 .shop-link-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.shop-link-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 /* ── 團購客服 FAB ── */
-.cs-fab{position:fixed;left:0;top:42%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E8897A;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s}
+.cs-fab{position:fixed;left:0;top:43%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E8897A;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s}
 .cs-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.cs-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
 .cs-fab-icon{font-size:16px;line-height:1;margin-bottom:3px;margin-left:7px}
 .cs-fab-lbl{font-size:10px;font-weight:500;color:var(--ink2);letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:5px}
@@ -1013,9 +1013,9 @@ input[type=file]{display:none}
 </div>
 
 <!-- 莎的清單 FAB -->
-<a class="shop-link-fab" id="shop-link-fab" href="shop.html" aria-label="莎的清單">
-  <span class="cs-fab-icon">🛍️</span>
-  <span class="cs-fab-lbl">莎的清單</span>
+<a class="shop-link-fab" id="shop-link-fab" href="shop.html" aria-label="莎的這個">
+  <span class="cs-fab-icon">🧡</span>
+  <span class="cs-fab-lbl">莎的這個</span>
 </a>
 
 <!-- 團購客服 FAB -->
@@ -1129,7 +1129,9 @@ async function initApp() {
   }
   /* hash scroll from shop.html */
   var hash = window.location.hash;
-  if (hash) {
+  if (hash === '#admin' && sessionStorage.getItem('adminUnlocked') === '1') {
+    setTimeout(function(){ go('admin'); }, 100);
+  } else if (hash) {
     setTimeout(function(){
       var el = document.getElementById(hash.slice(1));
       if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
@@ -3555,6 +3557,32 @@ initApp();
 
 /* ── SHOP ADMIN ── */
 var _shopDrag = { id: null, el: null, overEl: null };
+var _shopTDrag = { id: null, el: null, clone: null, offsetY: 0, overEl: null };
+(function(){
+  document.addEventListener('touchmove', function(e){
+    if (!_shopTDrag.id) return;
+    e.preventDefault();
+    var t = e.touches[0];
+    if (_shopTDrag.clone) _shopTDrag.clone.style.top = (t.clientY - _shopTDrag.offsetY) + 'px';
+    var cards = document.querySelectorAll('#shop-adm-list .adm-arch-item');
+    if (_shopTDrag.overEl) { _shopTDrag.overEl.classList.remove('shop-drag-over'); _shopTDrag.overEl = null; }
+    cards.forEach(function(c){
+      var r = c.getBoundingClientRect();
+      if (t.clientY >= r.top && t.clientY <= r.bottom && parseInt(c.dataset.sid) !== _shopTDrag.id) {
+        c.classList.add('shop-drag-over'); _shopTDrag.overEl = c;
+      }
+    });
+  }, {passive:false});
+  document.addEventListener('touchend', function(){
+    if (!_shopTDrag.id) return;
+    var fromId = _shopTDrag.id;
+    var toEl   = _shopTDrag.overEl;
+    if (_shopTDrag.clone) _shopTDrag.clone.remove();
+    if (_shopTDrag.el)    _shopTDrag.el.style.opacity = '';
+    if (toEl) { toEl.classList.remove('shop-drag-over'); var toId = parseInt(toEl.dataset.sid); _shopReorder(fromId, toId); }
+    _shopTDrag = { id: null, el: null, clone: null, offsetY: 0, overEl: null };
+  });
+})();
 
 function renderShopAdm() {
   var wrap = document.getElementById('shop-adm-list');
@@ -3624,6 +3652,20 @@ function renderShopAdm() {
       '</div>';
 
     row.appendChild(form);
+
+    /* touch drag on handle */
+    var handle = row.querySelector('.shop-drag-handle');
+    if (handle) handle.addEventListener('touchstart', function(e){
+      e.preventDefault();
+      var t = e.touches[0];
+      var rect = row.getBoundingClientRect();
+      _shopTDrag.id = item.id; _shopTDrag.el = row;
+      _shopTDrag.offsetY = t.clientY - rect.top;
+      var clone = row.cloneNode(false);
+      clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;opacity:.85;z-index:9999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.15);border-radius:10px;background:var(--card);height:' + rect.height + 'px;';
+      document.body.appendChild(clone); _shopTDrag.clone = clone;
+      row.style.opacity = '.3';
+    }, {passive:false});
 
     /* drag events */
     row.addEventListener('dragstart', function(e) {
