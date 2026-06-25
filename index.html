@@ -415,7 +415,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .savebtn{width:100%;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-size:13px;font-family:inherit;font-weight:400;cursor:pointer}
 .savebtn:active{opacity:.8}.savebtn.g{background:var(--green)}
 .adm-items{display:flex;flex-direction:column;gap:8px}
-.adm-icard{background:var(--card);border-radius:12px;border:1px solid var(--rule);overflow:hidden;transition:opacity .18s,border-color .12s}
+.adm-icard{background:var(--card);border-radius:9px;border:1px solid var(--rule);display:flex;flex-wrap:wrap;align-items:center;margin-bottom:6px;transition:opacity .18s,border-color .12s}
 .adm-icard.dragging-src{opacity:.38}
 .adm-icard.drag-over-top{border-top:2px solid #FF6B95}
 .adm-icard.drag-over-bot{border-bottom:2px solid #FF6B95}
@@ -440,8 +440,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .adm-end-perm-btn{width:100%;padding:10px;background:rgba(245,212,107,.12);border:1px solid rgba(212,168,40,.4);border-radius:9px;font-family:inherit;font-size:12px;color:#8B6400;cursor:pointer;margin-bottom:8px;letter-spacing:.3px;text-align:center;-webkit-tap-highlight-color:transparent}
 .adm-end-perm-btn:active{background:rgba(245,212,107,.28)}
 .perm-badge{display:inline-flex;align-items:center;background:rgba(243,224,167,.45);border:none;color:#7a5a20;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:400;letter-spacing:.5px;margin-left:4px}
-.adm-ihead{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer}
-.adm-ithumb{width:44px;height:44px;border-radius:8px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.adm-ihead{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;width:100%;box-sizing:border-box}
+.adm-ithumb{width:32px;height:32px;border-radius:6px;background:var(--yellow);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .adm-ithumb img{width:100%;height:100%;object-fit:cover}
 .adm-iinfo{flex:1;min-width:0}
 .adm-iname{font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;-webkit-user-select:text;user-select:text}
@@ -449,7 +449,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .adm-icard input,.adm-icard textarea,.adm-icard label{-webkit-user-select:text;user-select:text;cursor:auto}
 .adm-ibtns{display:flex;gap:6px}
 .adm-ibtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--rule);background:none;cursor:pointer;font-size:13px}
-.adm-iform{display:none;padding:0 14px 14px;border-top:1px solid var(--rule)}
+.adm-iform{display:none;padding:0 12px 12px;border-top:1px solid var(--rule);width:100%;box-sizing:border-box}
 .adm-iform.on{display:block;padding-top:13px}
 .hint-box{background:var(--bg);border-radius:7px;padding:9px 11px;font-size:10px;color:var(--ink3);line-height:1.7;margin-bottom:11px}
 .link-fold-hd{font-size:11px;color:var(--ink2);font-weight:500;padding:8px 2px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);margin-top:4px;margin-bottom:4px}
