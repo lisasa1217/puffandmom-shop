@@ -280,6 +280,7 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .shop-drag-over{outline:2px dashed var(--green);outline-offset:-2px}
 .sd-over-top{border-top:2px solid #E05C30!important}
 .sd-over-bot{border-bottom:2px solid #E05C30!important}
+.sd-dragging{opacity:.35!important;outline:2px dashed #E05C30;outline-offset:-2px}
 .fld-check{display:flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:4px}
 .fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
@@ -3558,21 +3559,15 @@ initApp();
 
 
 /* ── SHOP ADMIN drag-sort ── */
-var _sd = { active:false, id:null, el:null, clone:null, dy:0, overEl:null, before:true };
+var _sd = { active:false, id:null, el:null, overEl:null, before:true };
 
-function _sdStart(itemId, rowEl, clientY) {
+function _sdStart(itemId, rowEl) {
   if (_sd.active) _sdEnd();
-  var rect = rowEl.getBoundingClientRect();
   _sd.active = true; _sd.id = itemId; _sd.el = rowEl;
-  _sd.dy = clientY - rect.top;
-  var c = document.createElement('div');
-  c.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;height:' + rect.height + 'px;opacity:.86;z-index:9999;pointer-events:none;background:var(--card);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.2);display:flex;align-items:center;padding:0 10px;';
-  document.body.appendChild(c); _sd.clone = c;
-  rowEl.style.opacity = '.3';
+  rowEl.classList.add('sd-dragging');
 }
 function _sdMove(clientY) {
   if (!_sd.active) return;
-  _sd.clone.style.top = (clientY - _sd.dy) + 'px';
   if (_sd.overEl) { _sd.overEl.classList.remove('sd-over-top','sd-over-bot'); _sd.overEl = null; }
   document.querySelectorAll('#shop-adm-list .adm-arch-item').forEach(function(c) {
     if (parseInt(c.dataset.sid) === _sd.id) return;
@@ -3586,11 +3581,10 @@ function _sdMove(clientY) {
 }
 function _sdEnd() {
   if (!_sd.active) return;
-  var fromId = _sd.id, toEl = _sd.overEl, before = _sd.before;
   _sd.active = false;
-  if (_sd.clone) { _sd.clone.remove(); _sd.clone = null; }
-  if (_sd.el)    { _sd.el.style.opacity = ''; _sd.el = null; }
-  if (toEl) toEl.classList.remove('sd-over-top','sd-over-bot');
+  var fromId = _sd.id, toEl = _sd.overEl, before = _sd.before;
+  if (_sd.el) { _sd.el.classList.remove('sd-dragging'); _sd.el = null; }
+  if (toEl)   { toEl.classList.remove('sd-over-top','sd-over-bot'); }
   _sd.id = null; _sd.overEl = null;
   if (toEl) _shopReorder(fromId, parseInt(toEl.dataset.sid), before);
 }
@@ -3616,7 +3610,8 @@ function renderShopAdm() {
     row.className = 'adm-arch-item';
     row.id = 'si-row-' + item.id;
     row.dataset.sid = item.id;
-    row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
+    row.style.cssText = 'flex-wrap:wrap;cursor:pointer;margin-bottom:6px;background:var(--card)';
+    row.onclick = function(e) { if (e.target.closest('button,.shop-drag-handle')) return; toggleShopForm(item.id); };
 
     row.innerHTML =
       '<span class="shop-drag-handle" title="拖曳排序">⠿</span>' +
@@ -3672,11 +3667,11 @@ function renderShopAdm() {
     if (handle) {
       handle.addEventListener('touchstart', function(e){
         e.preventDefault(); e.stopPropagation();
-        _sdStart(item.id, row, e.touches[0].clientY);
+        _sdStart(item.id, row);
       }, {passive:false});
       handle.addEventListener('mousedown', function(e){
         e.preventDefault(); e.stopPropagation();
-        _sdStart(item.id, row, e.clientY);
+        _sdStart(item.id, row);
       });
     }
 
