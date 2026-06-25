@@ -3587,7 +3587,7 @@ var _shopTDrag = { id: null, el: null, clone: null, offsetY: 0, overEl: null };
 function renderShopAdm() {
   var wrap = document.getElementById('shop-adm-list');
   if (!wrap) return;
-  var list = D.shopItems.filter(function(i){ return !i.archived; });
+  var list = D.shopItems.filter(function(i){ return !i.archived; }).sort(function(a,b){ return a.sort_order - b.sort_order; });
   if (!list.length) {
     wrap.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--ink3);font-size:13px">還沒有選品，點右下角 ＋ 新增</div>';
     return;
