@@ -3557,38 +3557,47 @@ initApp();
 })();
 
 
-/* ── SHOP ADMIN ── */
-var _sd = { id:null, el:null, clone:null, dy:0, overEl:null, before:true };
+/* ── SHOP ADMIN drag-sort ── */
+var _sd = { active:false, id:null, el:null, clone:null, dy:0, overEl:null, before:true };
 
-(function(){
-  function _sdMove(clientY) {
-    if (!_sd.id) return;
-    _sd.clone.style.top = (clientY - _sd.dy) + 'px';
-    var cards = document.querySelectorAll('#shop-adm-list .adm-arch-item');
-    if (_sd.overEl) { _sd.overEl.classList.remove('sd-over-top','sd-over-bot'); _sd.overEl = null; }
-    cards.forEach(function(c){
-      if (parseInt(c.dataset.sid) === _sd.id) return;
-      var r = c.getBoundingClientRect();
-      if (clientY >= r.top && clientY <= r.bottom) {
-        _sd.before = clientY < r.top + r.height / 2;
-        c.classList.add(_sd.before ? 'sd-over-top' : 'sd-over-bot');
-        _sd.overEl = c;
-      }
-    });
-  }
-  function _sdEnd() {
-    if (!_sd.id) return;
-    var fromId = _sd.id, toEl = _sd.overEl, before = _sd.before;
-    _sd.clone.remove();
-    _sd.el.style.opacity = '';
-    if (_sd.overEl) _sd.overEl.classList.remove('sd-over-top','sd-over-bot');
-    _sd = { id:null, el:null, clone:null, dy:0, overEl:null, before:true };
-    if (toEl) _shopReorder(fromId, parseInt(toEl.dataset.sid), before);
-  }
-  document.addEventListener('pointermove', function(e){ _sdMove(e.clientY); });
-  document.addEventListener('pointerup',   function()  { _sdEnd(); });
-  document.addEventListener('pointercancel', function(){ _sdEnd(); });
-})();
+function _sdStart(itemId, rowEl, clientY) {
+  if (_sd.active) _sdEnd();
+  var rect = rowEl.getBoundingClientRect();
+  _sd.active = true; _sd.id = itemId; _sd.el = rowEl;
+  _sd.dy = clientY - rect.top;
+  var c = document.createElement('div');
+  c.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;height:' + rect.height + 'px;opacity:.86;z-index:9999;pointer-events:none;background:var(--card);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.2);display:flex;align-items:center;padding:0 10px;';
+  document.body.appendChild(c); _sd.clone = c;
+  rowEl.style.opacity = '.3';
+}
+function _sdMove(clientY) {
+  if (!_sd.active) return;
+  _sd.clone.style.top = (clientY - _sd.dy) + 'px';
+  if (_sd.overEl) { _sd.overEl.classList.remove('sd-over-top','sd-over-bot'); _sd.overEl = null; }
+  document.querySelectorAll('#shop-adm-list .adm-arch-item').forEach(function(c) {
+    if (parseInt(c.dataset.sid) === _sd.id) return;
+    var r = c.getBoundingClientRect();
+    if (clientY >= r.top && clientY <= r.bottom) {
+      _sd.before = clientY < r.top + r.height / 2;
+      c.classList.add(_sd.before ? 'sd-over-top' : 'sd-over-bot');
+      _sd.overEl = c;
+    }
+  });
+}
+function _sdEnd() {
+  if (!_sd.active) return;
+  var fromId = _sd.id, toEl = _sd.overEl, before = _sd.before;
+  _sd.active = false;
+  if (_sd.clone) { _sd.clone.remove(); _sd.clone = null; }
+  if (_sd.el)    { _sd.el.style.opacity = ''; _sd.el = null; }
+  if (toEl) toEl.classList.remove('sd-over-top','sd-over-bot');
+  _sd.id = null; _sd.overEl = null;
+  if (toEl) _shopReorder(fromId, parseInt(toEl.dataset.sid), before);
+}
+document.addEventListener('touchmove',  function(e){ if(_sd.active){e.preventDefault();_sdMove(e.touches[0].clientY);} }, {passive:false});
+document.addEventListener('touchend',   function(){ _sdEnd(); }, {passive:true});
+document.addEventListener('mousemove',  function(e){ _sdMove(e.clientY); });
+document.addEventListener('mouseup',    function(){ _sdEnd(); });
 
 function renderShopAdm() {
   var wrap = document.getElementById('shop-adm-list');
@@ -3658,19 +3667,18 @@ function renderShopAdm() {
 
     row.appendChild(form);
 
-    /* pointer drag on handle (works for both mouse & touch) */
+    /* drag handle: touch + mouse */
     var handle = row.querySelector('.shop-drag-handle');
-    if (handle) handle.addEventListener('pointerdown', function(e){
-      e.preventDefault();
-      handle.setPointerCapture(e.pointerId);
-      var rect = row.getBoundingClientRect();
-      _sd.id = item.id; _sd.el = row;
-      _sd.dy = e.clientY - rect.top;
-      var clone = document.createElement('div');
-      clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;height:' + rect.height + 'px;opacity:.85;z-index:9999;pointer-events:none;background:var(--card);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);transform:scale(1.02)';
-      document.body.appendChild(clone); _sd.clone = clone;
-      row.style.opacity = '.3';
-    });
+    if (handle) {
+      handle.addEventListener('touchstart', function(e){
+        e.preventDefault(); e.stopPropagation();
+        _sdStart(item.id, row, e.touches[0].clientY);
+      }, {passive:false});
+      handle.addEventListener('mousedown', function(e){
+        e.preventDefault(); e.stopPropagation();
+        _sdStart(item.id, row, e.clientY);
+      });
+    }
 
     wrap.appendChild(row);
   });
