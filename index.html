@@ -2986,6 +2986,7 @@ function go(pg) {
   document.querySelector('.kuka-fab').style.display = inAdm ? 'none' : '';
   var csfab = document.querySelector('.cs-fab'); if(csfab) csfab.style.display = inAdm ? 'none' : '';
   var slfab = document.getElementById('shop-link-fab'); if(slfab) slfab.style.display = inAdm ? 'none' : '';
+  if (!inAdm) { var sf=document.getElementById('shop-fab'); if(sf)sf.classList.remove('on'); var ifb=document.getElementById('items-fab'); if(ifb)ifb.classList.remove('on'); }
   if (pg === 'front') renderFront();
   if (pg === 'admin') { switchAdmTab('items'); renderAdmin(); }
 }
