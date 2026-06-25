@@ -278,6 +278,8 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .shop-drag-handle{font-size:17px;color:var(--ink3);cursor:grab;padding:8px 6px;flex-shrink:0;touch-action:none;line-height:1}
 .shop-drag-handle:active{cursor:grabbing;color:var(--ink)}
 .shop-drag-over{outline:2px dashed var(--green);outline-offset:-2px}
+.sd-over-top{border-top:2px solid #E05C30!important}
+.sd-over-bot{border-bottom:2px solid #E05C30!important}
 .fld-check{display:flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:4px}
 .fld-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
@@ -3556,32 +3558,36 @@ initApp();
 
 
 /* ── SHOP ADMIN ── */
-var _shopDrag = { id: null, el: null, overEl: null };
-var _shopTDrag = { id: null, el: null, clone: null, offsetY: 0, overEl: null };
+var _sd = { id:null, el:null, clone:null, dy:0, overEl:null, before:true };
+
 (function(){
-  document.addEventListener('touchmove', function(e){
-    if (!_shopTDrag.id) return;
-    e.preventDefault();
-    var t = e.touches[0];
-    if (_shopTDrag.clone) _shopTDrag.clone.style.top = (t.clientY - _shopTDrag.offsetY) + 'px';
+  function _sdMove(clientY) {
+    if (!_sd.id) return;
+    _sd.clone.style.top = (clientY - _sd.dy) + 'px';
     var cards = document.querySelectorAll('#shop-adm-list .adm-arch-item');
-    if (_shopTDrag.overEl) { _shopTDrag.overEl.classList.remove('shop-drag-over'); _shopTDrag.overEl = null; }
+    if (_sd.overEl) { _sd.overEl.classList.remove('sd-over-top','sd-over-bot'); _sd.overEl = null; }
     cards.forEach(function(c){
+      if (parseInt(c.dataset.sid) === _sd.id) return;
       var r = c.getBoundingClientRect();
-      if (t.clientY >= r.top && t.clientY <= r.bottom && parseInt(c.dataset.sid) !== _shopTDrag.id) {
-        c.classList.add('shop-drag-over'); _shopTDrag.overEl = c;
+      if (clientY >= r.top && clientY <= r.bottom) {
+        _sd.before = clientY < r.top + r.height / 2;
+        c.classList.add(_sd.before ? 'sd-over-top' : 'sd-over-bot');
+        _sd.overEl = c;
       }
     });
-  }, {passive:false});
-  document.addEventListener('touchend', function(){
-    if (!_shopTDrag.id) return;
-    var fromId = _shopTDrag.id;
-    var toEl   = _shopTDrag.overEl;
-    if (_shopTDrag.clone) _shopTDrag.clone.remove();
-    if (_shopTDrag.el)    _shopTDrag.el.style.opacity = '';
-    if (toEl) { toEl.classList.remove('shop-drag-over'); var toId = parseInt(toEl.dataset.sid); _shopReorder(fromId, toId); }
-    _shopTDrag = { id: null, el: null, clone: null, offsetY: 0, overEl: null };
-  });
+  }
+  function _sdEnd() {
+    if (!_sd.id) return;
+    var fromId = _sd.id, toEl = _sd.overEl, before = _sd.before;
+    _sd.clone.remove();
+    _sd.el.style.opacity = '';
+    if (_sd.overEl) _sd.overEl.classList.remove('sd-over-top','sd-over-bot');
+    _sd = { id:null, el:null, clone:null, dy:0, overEl:null, before:true };
+    if (toEl) _shopReorder(fromId, parseInt(toEl.dataset.sid), before);
+  }
+  document.addEventListener('pointermove', function(e){ _sdMove(e.clientY); });
+  document.addEventListener('pointerup',   function()  { _sdEnd(); });
+  document.addEventListener('pointercancel', function(){ _sdEnd(); });
 })();
 
 function renderShopAdm() {
@@ -3600,7 +3606,6 @@ function renderShopAdm() {
     var row = document.createElement('div');
     row.className = 'adm-arch-item';
     row.id = 'si-row-' + item.id;
-    row.setAttribute('draggable', 'true');
     row.dataset.sid = item.id;
     row.style.cssText = 'flex-wrap:wrap;cursor:default;margin-bottom:6px;background:var(--card)';
 
@@ -3653,43 +3658,18 @@ function renderShopAdm() {
 
     row.appendChild(form);
 
-    /* touch drag on handle */
+    /* pointer drag on handle (works for both mouse & touch) */
     var handle = row.querySelector('.shop-drag-handle');
-    if (handle) handle.addEventListener('touchstart', function(e){
+    if (handle) handle.addEventListener('pointerdown', function(e){
       e.preventDefault();
-      var t = e.touches[0];
+      handle.setPointerCapture(e.pointerId);
       var rect = row.getBoundingClientRect();
-      _shopTDrag.id = item.id; _shopTDrag.el = row;
-      _shopTDrag.offsetY = t.clientY - rect.top;
-      var clone = row.cloneNode(false);
-      clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;opacity:.85;z-index:9999;pointer-events:none;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.15);border-radius:10px;background:var(--card);height:' + rect.height + 'px;';
-      document.body.appendChild(clone); _shopTDrag.clone = clone;
+      _sd.id = item.id; _sd.el = row;
+      _sd.dy = e.clientY - rect.top;
+      var clone = document.createElement('div');
+      clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;height:' + rect.height + 'px;opacity:.85;z-index:9999;pointer-events:none;background:var(--card);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);transform:scale(1.02)';
+      document.body.appendChild(clone); _sd.clone = clone;
       row.style.opacity = '.3';
-    }, {passive:false});
-
-    /* drag events */
-    row.addEventListener('dragstart', function(e) {
-      _shopDrag.id = item.id;
-      _shopDrag.el = row;
-      e.dataTransfer.effectAllowed = 'move';
-      setTimeout(function(){ row.style.opacity = '.4'; }, 0);
-    });
-    row.addEventListener('dragend', function() {
-      row.style.opacity = '';
-      if (_shopDrag.overEl) _shopDrag.overEl.classList.remove('shop-drag-over');
-      _shopDrag = { id: null, el: null, overEl: null };
-    });
-    row.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      if (_shopDrag.overEl && _shopDrag.overEl !== row) _shopDrag.overEl.classList.remove('shop-drag-over');
-      _shopDrag.overEl = row;
-      row.classList.add('shop-drag-over');
-    });
-    row.addEventListener('drop', function(e) {
-      e.preventDefault();
-      row.classList.remove('shop-drag-over');
-      if (_shopDrag.id === item.id) return;
-      _shopReorder(_shopDrag.id, item.id);
     });
 
     wrap.appendChild(row);
@@ -3703,13 +3683,14 @@ function renderShopAdm() {
   }
 }
 
-function _shopReorder(fromId, toId) {
+function _shopReorder(fromId, toId, before) {
   var list = D.shopItems.filter(function(i){ return !i.archived; });
   var fi = list.findIndex(function(i){ return i.id === fromId; });
   var ti = list.findIndex(function(i){ return i.id === toId; });
   if (fi < 0 || ti < 0) return;
   var moved = list.splice(fi, 1)[0];
-  list.splice(ti, 0, moved);
+  ti = list.findIndex(function(i){ return i.id === toId; }); // recalc after splice
+  list.splice(before === false ? ti + 1 : ti, 0, moved);
   list.forEach(function(i, idx){ i.sort_order = idx; });
   /* persist in the background */
   Promise.all(list.map(function(i){
