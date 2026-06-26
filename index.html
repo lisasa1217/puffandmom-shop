@@ -3612,7 +3612,7 @@ function renderShopAdm() {
     row.id = 'si-row-' + item.id;
     row.dataset.sid = item.id;
     row.style.cssText = 'flex-wrap:wrap;cursor:pointer;margin-bottom:6px;background:var(--card)';
-    row.onclick = function(e) { if (e.target.closest('button,.shop-drag-handle')) return; toggleShopForm(item.id); };
+    row.onclick = function(e) { if (e.target.closest('button,.shop-drag-handle,#sif' + item.id)) return; toggleShopForm(item.id); };
 
     row.innerHTML =
       '<span class="shop-drag-handle" title="拖曳排序">⠿</span>' +
