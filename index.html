@@ -2277,7 +2277,7 @@ function _buildCompactItemCard(item) {
   var row = document.createElement('div');
   row.className = 'adm-arch-item';
   row.style.cssText = 'flex-wrap:wrap;cursor:pointer;margin-bottom:6px;background:var(--card)';
-  row.onclick = function(e) { if (e.target.closest('button')) return; tF(item.id); };
+  row.onclick = function(e) { if (e.target.closest('button,.adm-iform')) return; tF(item.id); };
   row.innerHTML =
     '<div class="adm-arch-ithumb">' + th + '</div>' +
     '<div style="flex:1;min-width:0">' +
