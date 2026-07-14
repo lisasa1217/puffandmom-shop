@@ -1701,8 +1701,9 @@ function renderActive(items, permanentItems, soonItems) {
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
           '</a>'
       : '';
-    var daysLeft = Math.ceil((new Date(item.closeD + 'T23:59:59') - now) / 86400000);
+    var daysLeft = Math.floor((new Date(item.closeD + 'T23:59:59') - now) / 86400000);
     var closingSoon = !isSoon && daysLeft >= 0 && daysLeft <= 2;
+    var closingBtnText = daysLeft === 0 ? '今晚結團！下單去' : '結團倒數' + daysLeft + '天';
     var el = document.createElement('div');
     el.className = isSoon ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = (idx * .05) + 's';
@@ -1715,7 +1716,7 @@ function renderActive(items, permanentItems, soonItems) {
     var _calSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="14" x2="12" y2="14" stroke-width="3" stroke-linecap="round"/><line x1="16" y1="14" x2="16" y2="14" stroke-width="3" stroke-linecap="round"/></svg>';
     var btnHtml = isSoon
       ? '<div class="acard-img-btn soon-remind"><a onclick="addToCalendar(' + item.id + ');event.preventDefault();">' + _calSvg + ' 設提醒</a></div>'
-      : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? '即將結團 →' : '前往購買 →') + '</a></div>';
+      : '<div class="acard-img-btn' + (closingSoon ? ' closing' : '') + '"><a href="' + (item.link || 'javascript:void(0)') + '"' + (item.link ? ' target="_blank" onclick="trackClick(\'buy\',' + item.id + ')"' : '') + '>' + (closingSoon ? closingBtnText : '前往購買 →') + '</a></div>';
     el.innerHTML =
       '<div class="acard-img">' + imgH + noteH + reelsBtnH + '</div>' +
       '<div class="acard-body">' +
