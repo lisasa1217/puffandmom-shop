@@ -1570,8 +1570,6 @@ function classify(item) {
   var closeD = new Date(item.closeD); closeD.setHours(0,0,0,0);
   var closeTs = new Date(item.closeD); closeTs.setHours(23,59,59,0);
   var daysToOpen = Math.ceil((open - now) / 86400000);
-  var daysSinceClose = Math.floor((now - closeD) / 86400000);
-  if (daysSinceClose > 30) return 'auto-archived';
   if (closeD < now) return 'ended';
   if (open <= now && closeTs >= new Date()) return 'active';
   if (daysToOpen > 0 && daysToOpen <= 7)  return 'soon';
@@ -2300,7 +2298,7 @@ function _buildItemCard(item, noHandle) {
   if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
   else {
     var st = classify(item);
-    stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[st] || '—';
+    stLabel = {soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[st] || '—';
   }
   var _permNotStarted = item.permanent && item.openD && item.openD > new Date().toISOString().slice(0,10);
   var subText = item.permanent
@@ -2319,7 +2317,7 @@ function _buildItemCard(item, noHandle) {
       '<div class="adm-ithumb">' + th + '</div>' +
       '<div class="adm-iinfo">' +
         '<div class="adm-iname">' + item.name + (item.permanent ? '<span class="perm-badge" style="margin-left:5px">常駐優惠</span>' : '') + '</div>' +
-        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? (_permNotStarted ? '行事曆預告' : '常駐') : ({soon:'即將開團', active:'開團中', ended:'已結團', 'auto-archived':'自動下架', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
+        '<div class="adm-isub">' + subText + ' · ' + (item.permanent ? (_permNotStarted ? '行事曆預告' : '常駐') : ({soon:'即將開團', active:'開團中', ended:'已結團', hidden:'未顯示'}[classify(item)] || '—')) + '</div>' +
       '</div>' +
       '<div class="adm-ibtns">' +
         '<button class="adm-ibtn" onclick="event.stopPropagation();tF(' + item.id + ')">✏️</button>' +
@@ -2393,9 +2391,7 @@ function renderAdmItems() {
   var archHint   = document.getElementById('adm-arch-hint');
 
   var archived     = D.items.filter(function(i){ return i.archived; });
-  var autoArchived = D.items.filter(function(i){ return !i.archived && !i.permanent && classify(i) === 'auto-archived'; });
-  var autoArchivedIds = autoArchived.map(function(i){ return i.id; });
-  var normal       = D.items.filter(function(i){ return !i.archived && autoArchivedIds.indexOf(i.id) === -1; });
+  var normal       = D.items.filter(function(i){ return !i.archived; });
   var normalNonPerm = normal.filter(function(i){ return !i.permanent; });
   var normalPerm    = normal.filter(function(i){ return  i.permanent; });
 
@@ -2484,8 +2480,8 @@ function renderAdmItems() {
     if (chev) chev.textContent = _admZoneOpen[z] ? '▼' : '▶';
   });
 
-  /* archive zone: explicitly archived + auto-archived */
-  var allArch = archived.concat(autoArchived);
+  /* archive zone: explicitly archived */
+  var allArch = archived;
   if (allArch.length) {
     archHint.style.display = 'none';
     allArch.forEach(function(item) {
