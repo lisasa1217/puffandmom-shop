@@ -2108,15 +2108,26 @@ function _openGoogleCal(item) {
 }
 
 var _calItem = null;
+var IG_REMIND_POST = 'https://www.instagram.com/p/DNNEmrNThws/';
 function addToCalendar(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   trackClick('calendar', id);
-  _calItem = item;
-  if (_isSafari()) {
-    document.getElementById('cal-notice-overlay').classList.add('on');
-  } else {
-    _openGoogleCal(item);
-  }
+  /* 統一流程（iOS/Android 皆同）：複製留言文字 → 跳轉 IG 置頂文貼上留言 */
+  var text = item.name + ' 提醒🔔';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).catch(function(){ _calFallbackCopy(text); });
+  } else { _calFallbackCopy(text); }
+  toast('✓ 已複製！貼上留言，開團時標記提醒你');
+  setTimeout(function(){ window.location.href = IG_REMIND_POST; }, 1100);
+}
+function _calFallbackCopy(text) {
+  try {
+    var t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.focus(); t.select();
+    document.execCommand('copy');
+    document.body.removeChild(t);
+  } catch(e) {}
 }
 
 function calConfirmDownload() {
