@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>莎的這個！這裡買的！｜泡芙與媽</title>
-<meta property="og:title" content="莎的這個！這裡買的！｜泡芙與媽">
+<title>莎這裡買的！｜泡芙與媽</title>
+<meta property="og:title" content="莎這裡買的！｜泡芙與媽">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://puffandmom-picks.vercel.app/shop.html">
 <meta property="og:image" content="https://puffandmom-picks.vercel.app/og.png">
@@ -259,14 +259,14 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
     </a>
     <a class="hmenu-link current" href="shop.html">
       <svg class="hmenu-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      莎的這個！
+      莎這裡買的
     </a>
   </div>
 </div>
 
 <!-- Hero -->
 <div class="shop-hero">
-  <div class="shop-hero-title">莎的這個！這裡買的！</div>
+  <div class="shop-hero-title">莎這裡買的！</div>
   <div class="shop-hero-sub">芙家日常用品購物清單，可以參考follow me~</div>
 </div>
 
@@ -335,6 +335,14 @@ function copyText(text, msg, btn) {
     _fallbackCopy(text);
   }
 }
+function copyTaobao(btn) {
+  var link = btn.dataset.link;
+  copyText(link, '✓ 已複製！正在打開淘寶…', btn);
+  /* 稍等複製完成後嘗試喚起淘寶 APP；沒安裝則停留在本頁 */
+  setTimeout(function() {
+    window.location.href = 'taobao://m.taobao.com';
+  }, 600);
+}
 function _fallbackCopy(text) {
   try {
     var t = document.createElement('textarea');
@@ -387,8 +395,8 @@ function renderGrid() {
       : '';
     var btnHtml, hintHtml = '';
     if (item.isTaobao) {
-      hintHtml = '<div class="shop-btn-hint">一鍵複製，打開淘寶APP搜尋</div>';
-      btnHtml = '<button class="shop-card-btn taobao" data-link="' + _esc(item.link) + '" onclick="copyText(this.dataset.link,\'✓ 已複製淘寶連結\',this)">複製淘寶連結</button>';
+      hintHtml = '<div class="shop-btn-hint">一鍵複製並開啟淘寶APP</div>';
+      btnHtml = '<button class="shop-card-btn taobao" data-link="' + _esc(item.link) + '" onclick="copyTaobao(this)">複製並開淘寶</button>';
     } else if (item.link) {
       btnHtml = '<a class="shop-card-btn" href="' + _esc(item.link) + '" target="_blank" rel="noopener" style="display:block;text-decoration:none">+1 跟著買</a>';
     } else {
