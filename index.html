@@ -2984,6 +2984,7 @@ function genTonightBroadcast() {
   });
   if (!hasTonight) { toast('今天沒有結團的商品喔'); renderBcSortList(); return; }
   document.getElementById('bc-header').value = '⚠️今晚結團⚠️\n最後機會！錯過要再等下次🥹';
+  document.getElementById('bc-show-date').checked = false;
   renderBcSortList();
   genBroadcast();
 }
