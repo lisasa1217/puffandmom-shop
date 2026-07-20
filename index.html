@@ -877,10 +877,11 @@ input[type=file]{display:none}
           <label class="bc-opt"><input type="checkbox" id="bc-show-desc" checked>商品說明</label>
           <label class="bc-opt"><input type="checkbox" id="bc-show-disc" checked>折扣碼</label>
         </div>
-        <div class="fld" style="margin-top:14px"><label>拖曳調整廣播順序</label>
+        <div class="fld" style="margin-top:14px"><label>勾選要廣播的商品・拖曳調整順序</label>
           <div class="bc-sort-list" id="bc-sort-list"></div>
         </div>
         <button class="savebtn g" onclick="genBroadcast()" style="margin-top:4px">⚡ 產生廣播文字</button>
+        <button class="savebtn" onclick="genTonightBroadcast()" style="margin-top:8px;background:#E05C30;color:#fff">⚠️ 今晚結團快速產生</button>
       </div>
       <div id="bc-result-wrap" style="display:none">
         <div class="asec-lbl">廣播內容（可直接編輯）</div>
@@ -2843,6 +2844,7 @@ function scrollToSec(id) {
 /* ── BROADCAST SORT LIST ── */
 var bcOrder = [];
 var bcDragId = null;
+var bcChecked = {}; /* id -> false 表示不勾選；預設全勾 */
 
 function renderBcSortList() {
   var active = D.items.filter(function(i){ return classify(i) === 'active'; });
@@ -2856,16 +2858,27 @@ function renderBcSortList() {
     list.innerHTML = '<div style="font-size:12px;color:var(--ink3);padding:10px 0;font-weight:300">目前沒有開團中的商品</div>';
     return;
   }
+  var today = new Date(); today.setHours(0,0,0,0);
   bcOrder.forEach(function(id) {
     var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
     var row = document.createElement('div');
     row.className = 'bc-sort-row';
     row.dataset.id = id;
     var closeFmt = '～' + item.closeD.slice(5).replace('-','/');
+    var closeDay = new Date(item.closeD); closeDay.setHours(0,0,0,0);
+    var dLeft = Math.round((closeDay - today) / 86400000);
+    var warn = '';
+    if (!item.permanent && dLeft === 0) warn = ' <span style="color:#E05C30;font-weight:700">⚠️今晚結團</span>';
+    else if (!item.permanent && dLeft > 0 && dLeft <= 2) warn = ' <span style="color:#E05C30">❗倒數' + dLeft + '天</span>';
+    var checked = bcChecked[id] === false ? '' : ' checked';
     row.innerHTML =
+      '<input type="checkbox" class="bc-item-chk" style="accent-color:#9EAA4A;width:15px;height:15px;flex-shrink:0"' + checked + '>' +
       '<span class="bc-sort-handle">☰</span>' +
       '<span class="bc-sort-name">' + item.name + '</span>' +
-      '<span class="bc-sort-date">' + closeFmt + '</span>';
+      '<span class="bc-sort-date">' + closeFmt + warn + '</span>';
+    var chk = row.querySelector('.bc-item-chk');
+    chk.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
+    chk.addEventListener('change', function(){ bcChecked[id] = this.checked; });
     row.addEventListener('touchstart', bcTouchStart, {passive:false});
     row.addEventListener('dragstart',  bcDragStart);
     row.addEventListener('dragover',   bcDragOver);
@@ -2934,8 +2947,9 @@ function genBroadcast() {
   var lines = [];
   if (header.trim()) { lines.push(header.trim()); lines.push(''); }
 
-  var ordered = bcOrder.map(function(id){ return D.items.find(function(i){ return i.id === id; }); }).filter(Boolean);
-  if (!ordered.length) { lines.push('目前沒有開團中的商品。'); }
+  var ordered = bcOrder.filter(function(id){ return bcChecked[id] !== false; })
+                       .map(function(id){ return D.items.find(function(i){ return i.id === id; }); }).filter(Boolean);
+  if (!ordered.length) { lines.push('目前沒有勾選的商品。'); }
 
   ordered.forEach(function(item, idx) {
     var nameLine = '✨' + item.name;
@@ -2953,6 +2967,25 @@ function genBroadcast() {
   result.style.height = 'auto';
   result.style.height = Math.min(result.scrollHeight, 420) + 'px';
   document.getElementById('bc-result-wrap').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function genTonightBroadcast() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var hasTonight = false;
+  bcOrder.forEach(function(id) {
+    var item = D.items.find(function(i){ return i.id === id; });
+    var isTonight = false;
+    if (item && !item.permanent) {
+      var c = new Date(item.closeD); c.setHours(0,0,0,0);
+      isTonight = c.getTime() === today.getTime();
+    }
+    bcChecked[id] = isTonight;
+    if (isTonight) hasTonight = true;
+  });
+  if (!hasTonight) { toast('今天沒有結團的商品喔'); renderBcSortList(); return; }
+  document.getElementById('bc-header').value = '⚠️今晚結團⚠️\n最後機會！錯過要再等下次🥹';
+  renderBcSortList();
+  genBroadcast();
 }
 
 function copyBroadcast() {
