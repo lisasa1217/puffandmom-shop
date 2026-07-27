@@ -2426,12 +2426,11 @@ function _buildItemCard(item, noHandle) {
   return el;
 }
 
-/* 改開始日期時，若截止日期空白或早於開始日 → 自動帶入開始日 +7 天 */
+/* 改開始日期時，截止日期自動帶入開始日 +7 天（可再手動調整） */
 function autoCloseDate(id) {
   var openEl  = document.getElementById('fo' + id);
   var closeEl = document.getElementById('fz' + id);
   if (!openEl || !closeEl || !openEl.value) return;
-  if (closeEl.value && closeEl.value >= openEl.value) return;
   var d = new Date(openEl.value + 'T00:00:00');
   d.setDate(d.getDate() + 7);
   closeEl.value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
