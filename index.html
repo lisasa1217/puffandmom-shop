@@ -2416,14 +2416,25 @@ function _buildItemCard(item, noHandle) {
         '<label class="sw"><input type="checkbox" id="fperm-' + item.id + '"' + (item.permanent ? ' checked' : '') + ' onchange="togglePermanent(' + item.id + ')"><span class="sw-sl"></span></label>' +
       '</div>' +
       '<div style="display:flex;gap:8px">' +
-        '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.openD === '2000-01-01' ? '' : item.openD) + '"></div>' +
+        '<div class="fld" style="flex:1"><label>開始日期</label><input type="date" id="fo' + item.id + '" value="' + (item.openD === '2000-01-01' ? '' : item.openD) + '" onchange="autoCloseDate(' + item.id + ')"></div>' +
         '<div class="fld" style="flex:1" id="fclose-' + item.id + '"' + (item.permanent ? ' style="display:none"' : '') + '><label>截止日期</label><input type="date" id="fz' + item.id + '" value="' + (item.permanent ? '' : item.closeD) + '"></div>' +
       '</div>' +
-      '<div class="hint-box">開始前 7 天內 → 限時團購中（灰階預告）／ 開始前 8 天以上 → 團購行事曆 ／ 開始～截止 → 限時團購中 ／ 截止後 30 天 → 自動下架 ／ 常駐優惠可設開始日</div>' +
+      '<div class="hint-box">開始前 7 天內 → 限時團購中（灰階預告）／ 開始前 8 天以上 → 團購行事曆 ／ 開始～截止 → 限時團購中 ／ 截止後 → 已結團（手動下架）／ 常駐優惠可設開始日</div>' +
       (item.permanent ? '<button class="adm-end-perm-btn" onclick="endPermanentItem(' + item.id + ')">🏁 手動結束開團 → 移至已結團</button>' : '') +
       '<button class="savebtn g" onclick="saveItem(' + item.id + ')">儲存</button>' +
     '</div>';
   return el;
+}
+
+/* 改開始日期時，若截止日期空白或早於開始日 → 自動帶入開始日 +7 天 */
+function autoCloseDate(id) {
+  var openEl  = document.getElementById('fo' + id);
+  var closeEl = document.getElementById('fz' + id);
+  if (!openEl || !closeEl || !openEl.value) return;
+  if (closeEl.value && closeEl.value >= openEl.value) return;
+  var d = new Date(openEl.value + 'T00:00:00');
+  d.setDate(d.getDate() + 7);
+  closeEl.value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
 function renderAdmItems() {
