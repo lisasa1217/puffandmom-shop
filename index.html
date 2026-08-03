@@ -2703,10 +2703,11 @@ async function archiveItem(id) {
 
 async function endPermanentItem(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
-  var today = new Date().toISOString().slice(0, 10);
+  /* 設為昨天，確保立刻判定為「已結團」，而非等到明天才生效 */
+  var yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
   item.permanent = false;
-  item.closeD = today;
-  var res = await sb.from('items').update({ close_d: today }).eq('id', id);
+  item.closeD = yesterday;
+  var res = await sb.from('items').update({ close_d: yesterday }).eq('id', id);
   if (res.error) { toast('❌ 操作失敗'); return; }
   toast('✓ 已手動結團，移至已結團區');
   renderAdmItems(); renderFront();
