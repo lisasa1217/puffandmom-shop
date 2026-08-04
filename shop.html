@@ -60,10 +60,10 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .shop-strip-title{flex:1;text-align:center;font-size:13px;font-weight:500;color:var(--ink);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .shop-strip-menu{
   display:flex;align-items:center;justify-content:center;
-  width:36px;height:36px;border-radius:8px;border:none;
-  background:none;cursor:pointer;flex-shrink:0;color:var(--ink);
-  font-size:20px;line-height:1;
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--rule);
+  background:var(--white);cursor:pointer;flex-shrink:0;color:var(--ink2);
 }
+.shop-strip-menu svg{width:16px;height:16px;stroke:var(--ink2)}
 
 /* ── Hamburger menu ── */
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -230,7 +230,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
     首頁
   </a>
   <div class="shop-strip-title" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:300;letter-spacing:3px;text-transform:uppercase">Puffmom Picks</div>
-  <button class="shop-strip-menu" onclick="openMenu()" aria-label="選單">☰</button>
+  <button class="shop-strip-menu" onclick="openMenu()" aria-label="選單">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="19" y2="16"/></svg>
+  </button>
 </div>
 
 <!-- Hamburger overlay & drawer -->

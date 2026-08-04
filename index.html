@@ -286,8 +286,9 @@ html,body{background:var(--bg);color:var(--ink);max-width:430px;margin:0 auto;mi
 .fld-check span{font-size:12px;color:var(--ink2);cursor:pointer}
 
 /* ── Hamburger menu ── */
-.hmenu-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:none;background:rgba(0,0,0,.28);cursor:pointer;color:#fff;font-size:18px;line-height:1;flex-shrink:0;padding:0;-webkit-tap-highlight-color:transparent}
-.hmenu-btn:active{background:rgba(0,0,0,.45)}
+.hmenu-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;color:#fff;flex-shrink:0;padding:0;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.hmenu-btn svg{width:16px;height:16px;stroke:#fff}
+.hmenu-btn:active{background:rgba(255,255,255,.45)}
 .hmenu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
 .hmenu-overlay.on{opacity:1;pointer-events:auto}
 .hmenu-drawer{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;max-width:100vw}
@@ -547,14 +548,20 @@ input[type=file]{display:none}
 /* farewell hearts */
 .kuka-heart-rise{position:fixed;bottom:8%;z-index:9200;pointer-events:none;font-size:28px;animation:kuka-hrise 2.4s ease forwards}
 @keyframes kuka-hrise{0%{opacity:0;transform:translateY(0) scale(.6) rotate(0deg)}18%{opacity:1;transform:translateY(-80px) scale(1.1) rotate(-8deg)}70%{opacity:.7;transform:translateY(-65vh) scale(1) rotate(12deg)}100%{opacity:0;transform:translateY(-92vh) scale(.7) rotate(-5deg)}}
-/* ── 莎的這個 FAB ── */
-.shop-link-fab{position:fixed;left:0;top:22%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E05C30;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s;text-decoration:none}
-.shop-link-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.shop-link-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
-/* ── 團購客服 FAB ── */
-.cs-fab{position:fixed;left:0;top:32%;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:none;border-radius:0 14px 14px 0;padding:7px 7px 7px 0;cursor:pointer;box-shadow:2px 2px 12px rgba(0,0,0,.1);border-left:3px solid #E8897A;-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s}
-.cs-fab:hover{transform:translateX(3px);filter:brightness(1.04)}.cs-fab:active{filter:brightness(.92);transform:translateX(1px) scale(.95)}
-.cs-fab-icon{font-size:16px;line-height:1;margin-bottom:3px;margin-left:7px}
-.cs-fab-lbl{font-size:10px;font-weight:500;color:var(--ink2);letter-spacing:.3px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;margin-left:5px}
+/* ── 莎這裡買的 / 團購客服 FAB ── */
+.shop-link-fab,.cs-fab{position:fixed;left:0;z-index:88;display:flex;flex-direction:column;align-items:center;background:var(--white);border:1px solid var(--rule);border-left:none;border-radius:0 14px 14px 0;padding:9px 9px 9px 7px;cursor:pointer;box-shadow:1px 2px 8px rgba(0,0,0,.06);-webkit-tap-highlight-color:transparent;transition:transform .18s,filter .18s,padding .25s ease;text-decoration:none}
+.shop-link-fab{top:24%}
+.cs-fab{top:33%}
+.shop-link-fab:hover,.cs-fab:hover{transform:translateX(3px);filter:brightness(1.02)}
+.shop-link-fab:active,.cs-fab:active{filter:brightness(.94);transform:translateX(1px) scale(.96)}
+.cs-fab-icon{width:16px;height:16px;margin-bottom:4px;flex-shrink:0}
+.shop-link-fab .cs-fab-icon svg{stroke:#5A9AB5}
+.cs-fab .cs-fab-icon svg{stroke:#D4A828}
+.cs-fab-icon svg{width:100%;height:100%}
+.cs-fab-lbl{font-size:10px;font-weight:400;color:var(--ink2);letter-spacing:.5px;writing-mode:vertical-rl;text-orientation:upright;line-height:1.2;white-space:nowrap;transition:opacity .2s ease,max-height .25s ease;max-height:60px;opacity:1}
+/* 滾動時收合成純圖示，停止滾動或往上滑再展開 */
+.shop-link-fab.mini .cs-fab-lbl,.cs-fab.mini .cs-fab-lbl{max-height:0;opacity:0;margin:0;pointer-events:none}
+.shop-link-fab.mini .cs-fab-icon,.cs-fab.mini .cs-fab-icon{margin-bottom:0}
 /* ── 小人退散 modal ── */
 .doll-overlay{position:fixed;inset:0;background:rgba(28,25,23,.5);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .doll-overlay.on{opacity:1;pointer-events:all}
@@ -661,7 +668,9 @@ input[type=file]{display:none}
 
   <!-- IG top strip -->
   <div class="ig-strip" id="ig-strip">
-    <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">☰</button>
+    <button class="hmenu-btn" onclick="openHMenu()" aria-label="選單">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="19" y2="16"/></svg>
+    </button>
   </div>
 
   <div id="line-nudge" style="display:none"></div>
@@ -1033,15 +1042,15 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- 莎的清單 FAB -->
+<!-- 莎這裡買的 FAB -->
 <a class="shop-link-fab" id="shop-link-fab" href="shop.html" aria-label="莎這裡買的">
-  <span class="cs-fab-icon">🧡</span>
+  <span class="cs-fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
   <span class="cs-fab-lbl">莎這裡買的</span>
 </a>
 
 <!-- 團購客服 FAB -->
 <button class="cs-fab" onclick="scrollToEnded()" aria-label="團購客服">
-  <span class="cs-fab-icon">🛒</span>
+  <span class="cs-fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
   <span class="cs-fab-lbl">團購客服</span>
 </button>
 
@@ -2242,6 +2251,26 @@ function hideNotePop() { if (_notePop) { _notePop.remove(); _notePop = null; } }
 document.addEventListener('click',     hideNotePop);
 document.addEventListener('scroll',    hideNotePop, {passive:true, capture:true});
 document.addEventListener('touchmove', hideNotePop, {passive:true});
+
+/* ── FAB 滾動收合：往下滑收成小圖示，往上滑或停下展開 ── */
+(function() {
+  var lastY = window.pageYOffset;
+  var idleTimer = null;
+  function setMini(mini) {
+    var slfab = document.getElementById('shop-link-fab');
+    var csfab = document.querySelector('.cs-fab');
+    if (slfab) slfab.classList.toggle('mini', mini);
+    if (csfab) csfab.classList.toggle('mini', mini);
+  }
+  window.addEventListener('scroll', function() {
+    var y = window.pageYOffset;
+    if (y > lastY + 4 && y > 80) setMini(true);
+    else if (y < lastY - 4) setMini(false);
+    lastY = y;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ setMini(false); }, 900);
+  }, {passive:true});
+})();
 
 function copyDisc(e, code, itemId) {
   e.stopPropagation();
