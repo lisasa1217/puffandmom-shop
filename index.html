@@ -2424,8 +2424,8 @@ function _buildItemCard(item, noHandle) {
         var nVal = nRed ? nr.slice(5) : nr;
         return '<div class="fld"><label>備註標籤（圖片角落顯示）</label>' +
           '<div class="note-color-pick">' +
-            '<label class="ncp-opt" title="黃色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:var(--yellow)"></span></label>' +
-            '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:#E05C30"></span></label>' +
+            '<label class="ncp-opt" title="白色（預設）"><input type="radio" name="ncp-' + item.id + '" value=""' + (nRed ? '' : ' checked') + '><span style="background:rgba(255,255,255,.8);border:1px solid var(--rule)"></span></label>' +
+            '<label class="ncp-opt" title="紅色（緊急）"><input type="radio" name="ncp-' + item.id + '" value="red"' + (nRed ? ' checked' : '') + '><span style="background:rgba(224,92,48,.85)"></span></label>' +
           '</div>' +
           '<input id="fnote' + item.id + '" value="' + nVal + '" placeholder="例如：限時優惠、加贈好禮" maxlength="12">' +
         '</div>';
