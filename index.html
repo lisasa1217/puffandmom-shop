@@ -741,8 +741,8 @@ input[type=file]{display:none}
     <div class="cs-hint-box" onclick="event.stopPropagation()">
       <div class="cs-hint-icon">✨</div>
       <div id="desc-pop-name" style="font-size:15px;font-weight:500;letter-spacing:.3px;margin-bottom:10px"></div>
-      <div id="desc-pop-text" class="cs-hint-text" style="text-align:left;margin-bottom:16px"></div>
-      <a id="desc-pop-ig" class="cs-hint-close" style="display:none;width:100%;padding:11px;font-size:13px;margin-bottom:8px;background:var(--bg);color:var(--ink2);text-decoration:none" target="_blank">前往 IG 看更多 →</a>
+      <div id="desc-pop-text" class="cs-hint-text" style="text-align:left;margin-bottom:16px;white-space:pre-line;word-break:break-word"></div>
+      <a id="desc-pop-ig" class="cs-hint-close" style="display:none;width:100%;padding:12px;font-size:13px;margin-bottom:8px;background:var(--ink);color:#fff;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,.15)" target="_blank">IG精選限動看更多 →</a>
       <button class="cs-hint-close" onclick="closeDescPop()">了解，關閉</button>
     </div>
   </div>
@@ -2333,8 +2333,7 @@ function _detailBtnH(item) {
   if (!hasDesc && hasIg) {
     return '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' + svg + '詳細介紹</a>';
   }
-  var label = hasIg ? '詳細介紹' : '商品說明';
-  return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openDescPop(' + item.id + ')">' + svg + label + '</a>';
+  return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openDescPop(' + item.id + ')">' + svg + '詳細介紹</a>';
 }
 function openDescPop(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
