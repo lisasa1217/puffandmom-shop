@@ -510,6 +510,8 @@ input[type=file]{display:none}
 .sh-a.primary{background:var(--green);color:#fff}
 .sh-a.linec{background:var(--line-g);color:#fff}
 .sh-a.ghost{background:none;border:1px solid var(--rule);color:var(--ink2)}
+.sh-a.igc{background:none;border:1px solid var(--rule);color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:5px}
+.sh-a.igc svg{width:14px;height:14px}
 
 /* password modal */
 /* ── 每日誇誇 FAB（隱藏）── */
@@ -984,6 +986,7 @@ input[type=file]{display:none}
     <div class="sh-desc" id="sh-desc"></div>
     <div class="sh-acts">
       <a id="sh-buy" class="sh-a primary" href="#" target="_blank">前往購買</a>
+      <a id="sh-ig" class="sh-a igc" href="#" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>前往 IG 看更多</a>
       <a id="sh-line" class="sh-a linec" href="#">加入 LINE 通知</a>
       <button class="sh-a ghost" onclick="closeSheet()">關閉</button>
     </div>
@@ -1719,11 +1722,7 @@ function renderActive(items, permanentItems, soonItems) {
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? '' : '') + '>'
       : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '✦') + '</div>';
-    var igBtnH = item.igUrl
-      ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' +
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' +
-          '詳細介紹</a>'
-      : '';
+    var igBtnH = _detailBtnH(item);
     var reelsBtnH = item.reelsUrl
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
@@ -1793,7 +1792,7 @@ function renderActive(items, permanentItems, soonItems) {
       ? '<img src="' + item.imgData + '" alt=""' + (isGray ? '' : '') + '>'
       : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '✦') + '</div>';
     var reelsBtnH = item.reelsUrl ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg></a>' : '';
-    var igBtnH = item.igUrl ? '<a class="detail-btn" href="' + item.igUrl + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>詳細介紹</a>' : '';
+    var igBtnH = _detailBtnH(item);
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
     var noteH = permNotStarted
       ? '<div class="acard-note acard-note-soon" style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" width="11" height="11"><circle cx="8" cy="8" r="6"/><line x1="8" y1="4" x2="8" y2="8"/><line x1="8" y1="8" x2="11" y2="10"/></svg>' + daysToOpen + ' 天後開團</div>'
@@ -2306,11 +2305,26 @@ function openSheet(id) {
   document.getElementById('sh-name').textContent = item.name;
   document.getElementById('sh-desc').textContent = item.desc || '';
   var buy = document.getElementById('sh-buy'); buy.href = item.link || '#'; buy.style.display = item.link ? 'block' : 'none';
+  var ig  = document.getElementById('sh-ig'); ig.style.display = item.igUrl ? 'flex' : 'none';
+  if (item.igUrl) ig.href = item.igUrl;
   var ln  = document.getElementById('sh-line'); ln.style.display = D.social.lineUrl ? 'block' : 'none';
   if (D.social.lineUrl) ln.href = D.social.lineUrl;
   document.getElementById('overlay').classList.add('on');
 }
 function closeSheet() { document.getElementById('overlay').classList.remove('on'); }
+
+/* ── 卡片上的「商品說明／詳細介紹」按鈕：依有無說明文字／IG連結自動決定行為，避免兩顆按鈕打架 ── */
+function _detailBtnH(item) {
+  var hasDesc = !!(item.desc && item.desc.trim());
+  var hasIg   = !!item.igUrl;
+  if (!hasDesc && !hasIg) return '';
+  var svg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  if (!hasDesc && hasIg) {
+    return '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' + svg + '詳細介紹</a>';
+  }
+  var label = hasIg ? '詳細介紹' : '商品說明';
+  return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openSheet(' + item.id + ')">' + svg + label + '</a>';
+}
 
 /* ── ADMIN ── */
 function renderAdmin() {
