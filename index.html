@@ -736,6 +736,17 @@ input[type=file]{display:none}
     </div>
   </div>
 
+  <!-- 商品說明彈窗 -->
+  <div class="cs-hint-overlay" id="desc-overlay" onclick="closeDescPop()">
+    <div class="cs-hint-box" onclick="event.stopPropagation()">
+      <div class="cs-hint-icon">✨</div>
+      <div id="desc-pop-name" style="font-size:15px;font-weight:500;letter-spacing:.3px;margin-bottom:10px"></div>
+      <div id="desc-pop-text" class="cs-hint-text" style="text-align:left;margin-bottom:16px"></div>
+      <a id="desc-pop-ig" class="cs-hint-close" style="display:none;width:100%;padding:11px;font-size:13px;margin-bottom:8px;background:var(--bg);color:var(--ink2);text-decoration:none" target="_blank">前往 IG 看更多 →</a>
+      <button class="cs-hint-close" onclick="closeDescPop()">了解，關閉</button>
+    </div>
+  </div>
+
   <div id="community-block" class="community">
     <div class="comm-label">加入社群</div>
     <p class="comm-desc">不吵鬧的社群日常，最新團購資訊與選品心得<br>別讓喜歡的團購偷偷結束了！</p>
@@ -2323,8 +2334,17 @@ function _detailBtnH(item) {
     return '<a class="detail-btn" href="' + item.igUrl + '" target="_blank">' + svg + '詳細介紹</a>';
   }
   var label = hasIg ? '詳細介紹' : '商品說明';
-  return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openSheet(' + item.id + ')">' + svg + label + '</a>';
+  return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openDescPop(' + item.id + ')">' + svg + label + '</a>';
 }
+function openDescPop(id) {
+  var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
+  document.getElementById('desc-pop-name').textContent = item.name;
+  document.getElementById('desc-pop-text').textContent = item.desc || '';
+  var ig = document.getElementById('desc-pop-ig');
+  if (item.igUrl) { ig.href = item.igUrl; ig.style.display = 'block'; } else { ig.style.display = 'none'; }
+  document.getElementById('desc-overlay').classList.add('on');
+}
+function closeDescPop() { document.getElementById('desc-overlay').classList.remove('on'); }
 
 /* ── ADMIN ── */
 function renderAdmin() {
