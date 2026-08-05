@@ -1741,7 +1741,7 @@ function renderActive(items, permanentItems, soonItems) {
       : '';
     var daysLeft = Math.floor((new Date(item.closeD + 'T23:59:59') - now) / 86400000);
     var closingSoon = !isSoon && daysLeft >= 0 && daysLeft <= 2;
-    var closingBtnText = daysLeft === 0 ? '今晚結團！下單去' : '最後' + daysLeft + '天！前往購買→';
+    var closingBtnText = daysLeft === 0 ? '今晚結團！下單去' : '倒數' + daysLeft + '天！前往購買→';
     var el = document.createElement('div');
     el.className = isSoon ? 'acard soon-card' : 'acard fu';
     el.style.animationDelay = (idx * .05) + 's';
