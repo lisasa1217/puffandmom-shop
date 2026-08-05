@@ -1638,7 +1638,7 @@ function renderFront() {
 
   var soon = [], active = [], ended = [], permanent = [], scheduled = [];
   D.items.forEach(function(i) {
-    if (i.archived) return;
+    if (i.archived || i._isDraft) return;
     var st = classify(i);
     if (i.permanent) {
       if (st === 'scheduled') { scheduled.push(i); return; } // 超過7天 → 行事曆
@@ -2836,7 +2836,7 @@ async function saveItem(id) {
   item.discCode  = discOn ? (document.getElementById('fdc-' + id).value || '') : '';
   item.discLabel = discOn ? (document.getElementById('fdlabel-' + id).value || '') : '';
 
-  var res = await sb.from('items').update({
+  var payload = {
     name:        item.name,
     emoji:       item.emoji,
     img_data:    item.imgData,
@@ -2849,8 +2849,20 @@ async function saveItem(id) {
     ig_url:      item.igUrl,
     reels_url:   item.reelsUrl,
     note:        item.note
-  }).eq('id', item.id);
+  };
+  var res;
+  if (item._isDraft) {
+    payload.sort_order = 0;
+    res = await sb.from('items').insert(payload).select().single();
+  } else {
+    res = await sb.from('items').update(payload).eq('id', item.id);
+  }
   if (res.error) { toast('❌ 儲存失敗：' + res.error.message); console.error(res.error); return; }
+  if (item._isDraft) {
+    delete item._isDraft;
+    item.id = res.data.id;
+    id = item.id;
+  }
   toast('✓ 已儲存');
   renderAdmItems();
   setTimeout(function(){ var f = document.getElementById('if' + id); if (f) f.classList.add('on'); }, 80);
@@ -2861,8 +2873,10 @@ function delItem(id) {
   var name = item ? item.name : '此商品';
   document.getElementById('confirm-msg').innerHTML = '確定要刪除「' + name + '」嗎？<br><span style="font-size:11px;color:var(--ink3)">此動作無法復原</span>';
   document.getElementById('confirm-ok').onclick = async function() {
-    var res = await sb.from('items').delete().eq('id', id);
-    if (res.error) { toast('❌ 刪除失敗，請重試'); console.error(res.error); closeConfirm(); return; }
+    if (!item || !item._isDraft) {
+      var res = await sb.from('items').delete().eq('id', id);
+      if (res.error) { toast('❌ 刪除失敗，請重試'); console.error(res.error); closeConfirm(); return; }
+    }
     D.items = D.items.filter(function(i){ return i.id !== id; });
     closeConfirm();
     toast('🗑️ 已刪除');
@@ -2872,25 +2886,20 @@ function delItem(id) {
 }
 function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('on'); }
 
-async function addItem() {
+/* 新增商品先建立「草稿」，只存在畫面上，尚未按儲存不會寫入資料庫、也不會出現在前台 */
+function addItem() {
   var today = new Date().toISOString().slice(0,10);
   var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
-  var res = await sb.from('items').insert({
-    name: '', emoji: '✦', img_data: null,
-    open_d: today, close_d: close,
-    link: '', description: '', disc_code: '', disc_label: '', ig_url: '', reels_url: '', note: '', sort_order: 0
-  }).select().single();
-  if (res.error) { toast('❌ 新增失敗，請重試'); console.error(res.error); return; }
-  var d = res.data;
+  var tempId = -Date.now();
   D.items.unshift({
-    id: d.id, name: d.name, emoji: d.emoji, imgData: d.img_data,
-    openD: d.open_d, closeD: d.close_d, link: d.link,
-    desc: d.description, discCode: d.disc_code, discLabel: d.disc_label || '',
-    igUrl: d.ig_url, reelsUrl: d.reels_url || '', note: d.note || '',
-    permanent: false, archived: false
+    id: tempId, name: '', emoji: '✦', imgData: null,
+    openD: today, closeD: close, link: '',
+    desc: '', discCode: '', discLabel: '',
+    igUrl: '', reelsUrl: '', note: '',
+    permanent: false, archived: false, _isDraft: true
   });
   renderAdmItems();
-  setTimeout(function(){ var f = document.getElementById('if' + d.id); if (f) f.classList.add('on'); }, 80);
+  setTimeout(function(){ var f = document.getElementById('if' + tempId); if (f) f.classList.add('on'); }, 80);
 }
 
 async function saveProfile() {
