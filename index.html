@@ -3846,7 +3846,7 @@ function renderShopAdm() {
 }
 
 function _shopReorder(fromId, toId, before) {
-  var list = D.shopItems.filter(function(i){ return !i.archived; });
+  var list = D.shopItems.filter(function(i){ return !i.archived; }).sort(function(a,b){ return a.sort_order - b.sort_order; });
   var fi = list.findIndex(function(i){ return i.id === fromId; });
   var ti = list.findIndex(function(i){ return i.id === toId; });
   if (fi < 0 || ti < 0) return;
