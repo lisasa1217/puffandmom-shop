@@ -1138,7 +1138,8 @@ async function initApp() {
         pwVis:      profile.pw_vis      !== false
       };
     }
-    var iRes = await sb.from('items').select('*').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
+    /* 已下架商品的圖片不在首次載入時抓取，避免每個訪客都重複下載用不到的舊圖，浪費流量額度 */
+    var iRes = await sb.from('items').select('*').neq('open_d', '1970-01-01').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
     if (iRes.data) {
       D.items = iRes.data.map(function(i) {
         return {
@@ -1160,7 +1161,7 @@ async function initApp() {
         };
       });
     }
-    var sRes = await sb.from('shop_items').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:true});
+    var sRes = await sb.from('shop_items').select('*').eq('archived', false).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if (sRes.data) {
       D.shopItems = sRes.data.map(function(i){
         return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
@@ -2934,6 +2935,26 @@ function toggleAdmZone(zone) {
   var chev = document.getElementById('adm-' + zone + '-chevron');
   if (wrap) wrap.style.display = _admZoneOpen[zone] ? '' : 'none';
   if (chev) chev.textContent = _admZoneOpen[zone] ? '▼' : '▶';
+  if (zone === 'arch' && _admZoneOpen[zone]) loadArchivedItems();
+}
+
+/* 已下架商品清單只在管理員實際點開「封存」區時才抓取（含圖片），平常瀏覽/管理不會載入 */
+var _archivedItemsLoaded = false;
+async function loadArchivedItems() {
+  if (_archivedItemsLoaded) return;
+  _archivedItemsLoaded = true;
+  var res = await sb.from('items').select('*').eq('open_d', '1970-01-01').order('sort_order', {ascending: true}).order('created_at', {ascending: true});
+  if (res.error) { toast('❌ 載入封存商品失敗'); _archivedItemsLoaded = false; return; }
+  (res.data || []).forEach(function(i) {
+    if (D.items.some(function(x){ return x.id === i.id; })) return;
+    D.items.push({
+      id: i.id, name: i.name || '', emoji: i.emoji || '✦', imgData: i.img_data || null,
+      openD: i.open_d || '', closeD: i.close_d || '', link: i.link || '', desc: i.description || '',
+      discCode: i.disc_code || '', igUrl: i.ig_url || '', reelsUrl: i.reels_url || '', note: i.note || '',
+      discLabel: i.disc_label || '', permanent: false, archived: true
+    });
+  });
+  renderAdmItems();
 }
 
 function switchAdmTab(tab) {
