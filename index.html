@@ -1174,6 +1174,8 @@ async function initApp() {
   if (sessionStorage.getItem('adminUnlocked') === '1') {
     document.getElementById('tab-bar').style.display = '';
     startAdminTimeout();
+  } else {
+    trackClick('pageview', null);
   }
   /* hash scroll from shop.html */
   var hash = window.location.hash;
@@ -2062,19 +2064,28 @@ async function loadStats() {
       .gte('created_at', monthStart)
       .order('id',{ascending:false}).limit(2000);
     var data = res.data || [];
-    var cnt = {buy:0,ig_detail:0,calendar:0,disc_copy:0,line:0,ig_follow:0};
-    var byItem = {}, byItemCal = {};
+    var cnt = {buy:0,ig_detail:0,calendar:0,disc_copy:0,line:0,ig_follow:0,pageview:0,shop_pageview:0,shop_buy:0,shop_taobao:0};
+    var byItem = {}, byItemCal = {}, byShop = {};
     data.forEach(function(c) {
       if (cnt[c.event_type] !== undefined) cnt[c.event_type]++;
       if (c.item_id && c.event_type === 'buy') byItem[c.item_id] = (byItem[c.item_id]||0)+1;
       if (c.item_id && c.event_type === 'calendar') byItemCal[c.item_id] = (byItemCal[c.item_id]||0)+1;
+      if (c.item_id && (c.event_type === 'shop_buy' || c.event_type === 'shop_taobao')) byShop[c.item_id] = (byShop[c.item_id]||0)+1;
     });
+    var shopClicks = cnt.shop_buy + cnt.shop_taobao;
+    var buyRate = cnt.pageview ? Math.round(cnt.buy / cnt.pageview * 100) : 0;
+    var buyRateShow = (cnt.pageview && buyRate <= 100) ? buyRate + '%' : '—';
     var html = '<div class="stat-grid">' +
+      '<div class="stat-card-sm"><div class="stat-num">' + cnt.pageview + '</div><div class="stat-lbl">首頁瀏覽次數</div></div>' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.buy + '</div><div class="stat-lbl">購買點擊</div></div>' +
+      '<div class="stat-card-sm"><div class="stat-num">' + buyRateShow + '</div><div class="stat-lbl">購買轉換率</div></div>' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.calendar + '</div><div class="stat-lbl">加入行事曆</div></div>' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.disc_copy + '</div><div class="stat-lbl">折扣碼複製</div></div>' +
       '<div class="stat-card-sm"><div class="stat-num">' + cnt.line + '</div><div class="stat-lbl">LINE 點擊</div></div>' +
-    '</div>';
+      '<div class="stat-card-sm"><div class="stat-num">' + cnt.shop_pageview + '</div><div class="stat-lbl">莎的清單瀏覽</div></div>' +
+      '<div class="stat-card-sm"><div class="stat-num">' + shopClicks + '</div><div class="stat-lbl">莎的清單點擊</div></div>' +
+    '</div>' +
+    '<div style="font-size:10px;color:var(--ink3);margin:-8px 0 14px;line-height:1.6">瀏覽次數剛開始統計，數字會從現在起慢慢累積，過去的購買點擊資料仍完整保留</div>';
     var itemRows = D.items.filter(function(i){ return byItem[i.id] || byItemCal[i.id]; }).sort(function(a,b){ return (byItem[b.id]||0)-(byItem[a.id]||0); });
     if (itemRows.length) {
       html += '<div class="asec-lbl" style="margin-bottom:8px">商品互動排行</div><div class="pcard">' +
@@ -2086,6 +2097,15 @@ async function loadStats() {
       html += '</div>';
     } else {
       html += '<div class="stat-empty">尚無點擊記錄，需先在 Supabase 建立 clicks 資料表</div>';
+    }
+    var shopRows = D.shopItems.filter(function(i){ return byShop[i.id]; }).sort(function(a,b){ return (byShop[b.id]||0)-(byShop[a.id]||0); });
+    if (shopRows.length) {
+      html += '<div class="asec-lbl" style="margin:16px 0 8px">莎的清單互動排行</div><div class="pcard">' +
+        '<div class="stat-row"><span class="stat-row-name"></span><span class="stat-col-hd">🛍 點擊</span></div>';
+      shopRows.forEach(function(i){
+        html += '<div class="stat-row"><span class="stat-row-name">' + i.name + '</span><span class="stat-col">' + byShop[i.id] + '</span></div>';
+      });
+      html += '</div>';
     }
     el.innerHTML = html;
   } catch(e) {
