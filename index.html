@@ -2335,7 +2335,7 @@ function handleLineNudge(e) { trackClick('line',null); if (!D.social.lineUrl) { 
 function openSheet(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   document.getElementById('sh-name').textContent = item.name;
-  document.getElementById('sh-desc').textContent = item.desc || '';
+  document.getElementById('sh-desc').innerHTML = _linkify(item.desc || '');
   var buy = document.getElementById('sh-buy'); buy.href = item.link || '#'; buy.style.display = item.link ? 'block' : 'none';
   var ig  = document.getElementById('sh-ig'); ig.style.display = item.igUrl ? 'flex' : 'none';
   if (item.igUrl) ig.href = item.igUrl;
@@ -2356,10 +2356,17 @@ function _detailBtnH(item) {
   }
   return '<a class="detail-btn" href="javascript:void(0)" onclick="event.stopPropagation();openDescPop(' + item.id + ')">' + svg + '詳細介紹</a>';
 }
+/* 把純文字裡的網址轉成可點擊連結，其餘文字照樣跳脫避免 HTML 注入 */
+function _linkify(text) {
+  var esc = (text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return esc.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+    return '<a href="' + url + '" target="_blank" rel="noopener" style="color:var(--green-dk);text-decoration:underline;word-break:break-all">' + url + '</a>';
+  });
+}
 function openDescPop(id) {
   var item = D.items.find(function(i){ return i.id === id; }); if (!item) return;
   document.getElementById('desc-pop-name').textContent = item.name;
-  document.getElementById('desc-pop-text').textContent = item.desc || '';
+  document.getElementById('desc-pop-text').innerHTML = _linkify(item.desc || '');
   var ig = document.getElementById('desc-pop-ig');
   if (item.igUrl) { ig.href = item.igUrl; ig.style.display = 'flex'; } else { ig.style.display = 'none'; }
   document.getElementById('desc-overlay').classList.add('on');
