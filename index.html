@@ -909,7 +909,7 @@ input[type=file]{display:none}
     <div class="asec">
       <div class="asec-lbl">LINE 廣播訊息產生器</div>
       <div class="pcard" style="margin-bottom:14px">
-        <div class="fld"><label>開頭文字</label><textarea id="bc-header" style="height:44px">❤️‍🔥開團中❤️‍🔥</textarea></div>
+        <div class="fld"><label>開頭文字</label><textarea id="bc-header" style="height:44px">📢開團中₊⁺⋆</textarea></div>
         <div class="bc-opts">
           <label class="bc-opt"><input type="checkbox" id="bc-show-date" checked>截止日期</label>
           <label class="bc-opt"><input type="checkbox" id="bc-show-desc" checked>商品說明</label>
@@ -1145,7 +1145,7 @@ async function initApp() {
         return {
           id:        i.id,
           name:      i.name        || '',
-          emoji:     i.emoji       || '✦',
+          emoji:     i.emoji       || '⧓',
           imgData:   i.img_data    || null,
           openD:     i.open_d      || '',
           closeD:    i.close_d     || '',
@@ -1164,7 +1164,7 @@ async function initApp() {
     var sRes = await sb.from('shop_items').select('*').eq('archived', false).order('sort_order',{ascending:true}).order('created_at',{ascending:true});
     if (sRes.data) {
       D.shopItems = sRes.data.map(function(i){
-        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'✦', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
+        return { id:i.id, name:i.name||'', desc:i.description||'', imgData:i.img_data||null, emoji:i.emoji||'⧓', category:i.category||'', link:i.link||'', isTaobao:i.is_taobao||false, archived:i.archived||false };
       });
     }
   } catch(e) {
@@ -1735,7 +1735,7 @@ function renderActive(items, permanentItems, soonItems) {
       : (item.closeD.slice(5).replace('-', '/') + ' 截止');
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt=""' + (isSoon ? '' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '✦') + '</div>';
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '⧓') + '</div>';
     var igBtnH = _detailBtnH(item);
     var reelsBtnH = item.reelsUrl
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
@@ -1804,7 +1804,7 @@ function renderActive(items, permanentItems, soonItems) {
     var isGray = !!permNotStarted;
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt=""' + (isGray ? '' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '✦') + '</div>';
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '⧓') + '</div>';
     var reelsBtnH = item.reelsUrl ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg></a>' : '';
     var igBtnH = _detailBtnH(item);
     var _nr = item.note || '', _nRed = _nr.startsWith('[red]'), _nTxt = _nRed ? _nr.slice(5) : _nr;
@@ -1873,7 +1873,7 @@ function renderPermanent(items) {
     var isGray = !!permNotStarted;
     var imgH = item.imgData
       ? '<img src="' + item.imgData + '" alt=""' + (isGray ? '' : '') + '>'
-      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '✦') + '</div>';
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--yellow);">' + (item.emoji || '⧓') + '</div>';
     var reelsBtnH = item.reelsUrl
       ? '<a class="reels-play-btn" href="' + item.reelsUrl + '" target="_blank" onclick="event.stopPropagation()">' +
           '<svg viewBox="0 0 16 16" fill="white" width="14" height="14" style="margin-left:2px"><polygon points="4,2 14,8 4,14"/></svg>' +
@@ -2405,7 +2405,7 @@ function _buildCompactItemCard(item) {
   form.style.boxSizing = 'border-box';
   var th = item.imgData
     ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">'
-    : '<span style="font-size:14px">' + (item.emoji || '✦') + '</span>';
+    : '<span style="font-size:14px">' + (item.emoji || '⧓') + '</span>';
   var sub = item.permanent
     ? ('常駐優惠' + (item.openD && item.openD !== '2000-01-01' ? '・' + item.openD + ' 起' : ''))
     : (item.openD + ' – ' + item.closeD);
@@ -2429,7 +2429,7 @@ function _buildCompactItemCard(item) {
 }
 
 function _buildItemCard(item, noHandle) {
-  var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '✦');
+  var th = item.imgData ? '<img src="' + item.imgData + '">' : (item.emoji || '⧓');
   var stLabel;
   if (item.permanent) stLabel = '<span class="perm-badge">常駐優惠</span>';
   else {
@@ -2466,7 +2466,7 @@ function _buildItemCard(item, noHandle) {
       '<div class="crop-card">' +
         '<div class="crop-zone rect" id="czitem-' + item.id + '">' +
           (item.imgData ? '<img id="czresult-' + item.id + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5;" src="' + item.imgData + '">' : '') +
-          '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '✦') + '</span>點擊上傳圖片</div>' +
+          '<div class="cph" id="czitem-ph-' + item.id + '"' + (item.imgData ? ' style="display:none"' : '') + '><span>' + (item.emoji || '⧓') + '</span>點擊上傳圖片</div>' +
           '<div class="chint" id="czitem-hint-' + item.id + '" style="display:' + (item.imgData ? 'block' : 'none') + '">' + (item.imgData ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
         '</div>' +
         '<div class="crop-scale" id="czitem-scrow-' + item.id + '" style="display:none">' +
@@ -2631,7 +2631,7 @@ function renderAdmItems() {
   if (allArch.length) {
     archHint.style.display = 'none';
     allArch.forEach(function(item) {
-      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : '<span>' + (item.emoji || '✦') + '</span>';
+      var th = item.imgData ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">' : '<span>' + (item.emoji || '⧓') + '</span>';
       var row = document.createElement('div'); row.className = 'adm-arch-item';
       row.innerHTML =
         '<div class="adm-arch-ithumb">' + th + '</div>' +
@@ -2919,7 +2919,7 @@ function addItem() {
   var close = new Date(Date.now() + 10 * 864e5).toISOString().slice(0,10);
   var tempId = -Date.now();
   D.items.unshift({
-    id: tempId, name: '', emoji: '✦', imgData: null,
+    id: tempId, name: '', emoji: '⧓', imgData: null,
     openD: today, closeD: close, link: '',
     desc: '', discCode: '', discLabel: '',
     igUrl: '', reelsUrl: '', note: '',
@@ -2975,7 +2975,7 @@ async function loadArchivedItems() {
   (res.data || []).forEach(function(i) {
     if (D.items.some(function(x){ return x.id === i.id; })) return;
     D.items.push({
-      id: i.id, name: i.name || '', emoji: i.emoji || '✦', imgData: i.img_data || null,
+      id: i.id, name: i.name || '', emoji: i.emoji || '⧓', imgData: i.img_data || null,
       openD: i.open_d || '', closeD: i.close_d || '', link: i.link || '', desc: i.description || '',
       discCode: i.disc_code || '', igUrl: i.ig_url || '', reelsUrl: i.reels_url || '', note: i.note || '',
       discLabel: i.disc_label || '', permanent: false, archived: true
@@ -3131,7 +3131,7 @@ function genBroadcast() {
     if (showDate && !item.permanent) nameLine += '（～' + item.closeD.slice(5).replace('-','/') + '）';
     lines.push(nameLine);
     if (item.link) lines.push(item.link);
-    if (showDesc && item.desc) lines.push('✦ ' + item.desc);
+    if (showDesc && item.desc) lines.push('⧓ ' + item.desc);
     if (showDisc && item.discCode) lines.push('🏷 折扣碼：' + item.discCode);
     if (idx < ordered.length - 1) lines.push('');
   });
@@ -3158,7 +3158,7 @@ function genTonightBroadcast() {
     if (isTonight) hasTonight = true;
   });
   if (!hasTonight) { toast('今天沒有結團的商品喔'); renderBcSortList(); return; }
-  document.getElementById('bc-header').value = '⚠️今晚結團⚠️\n最後機會！錯過要再等下次🥹';
+  document.getElementById('bc-header').value = '❗️今晚結團❗️';
   document.getElementById('bc-show-date').checked = false;
   renderBcSortList();
   genBroadcast();
@@ -3812,7 +3812,7 @@ function renderShopAdm() {
   list.forEach(function(item) {
     var th = item.imgData
       ? '<img src="' + item.imgData + '" style="width:100%;height:100%;object-fit:cover">'
-      : '<span style="font-size:14px">' + (item.emoji || '✦') + '</span>';
+      : '<span style="font-size:14px">' + (item.emoji || '⧓') + '</span>';
     var row = document.createElement('div');
     row.className = 'adm-arch-item';
     row.id = 'si-row-' + item.id;
@@ -3852,7 +3852,7 @@ function renderShopAdm() {
         '<div class="crop-card">' +
           '<div class="crop-zone sq" id="czitem-' + cid + '">' +
             (hasImg ? '<img id="czresult-' + cid + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5" src="' + item.imgData + '">' : '') +
-            '<div class="cph" id="czitem-ph-' + cid + '"' + (hasImg ? ' style="display:none"' : '') + '><span>✦</span>點擊上傳圖片</div>' +
+            '<div class="cph" id="czitem-ph-' + cid + '"' + (hasImg ? ' style="display:none"' : '') + '><span>⧓</span>點擊上傳圖片</div>' +
             '<div class="chint" id="czitem-hint-' + cid + '" style="display:' + (hasImg ? 'block' : 'none') + '">' + (hasImg ? '點「重新上傳」可更換' : '拖曳移動・滑桿縮放') + '</div>' +
           '</div>' +
           '<div class="crop-scale" id="czitem-scrow-' + cid + '" style="display:none"><label>縮放</label><input type="range" id="czitem-sc-' + cid + '" min="0.1" max="4" step="0.01" value="1" oninput="cropScaleChange(\'' + cid + '\')"></div>' +
@@ -3961,7 +3961,7 @@ async function saveShopItem(id) {
 
 async function addShopItem() {
   var res = await sb.from('shop_items').insert({
-    name:'', emoji:'✦', img_data:null, category:'', link:'',
+    name:'', emoji:'⧓', img_data:null, category:'', link:'',
     description:'', is_taobao:false, archived:false, sort_order:0
   }).select().single();
   if (res.error) {
