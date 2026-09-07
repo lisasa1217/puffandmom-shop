@@ -1445,8 +1445,9 @@ function cropApply(id) {
   var gx, gy, gw, gh;
   if (isAva(id)) { gw = Math.round(ww * 0.76); gh = gw; gx = (ww - gw) / 2; gy = (wh - gh) / 2; }
   else           { gx = 0; gy = 0; gw = ww; gh = wh; }
-  var OUT  = isAva(id) ? 400 : 800;
-  var OUTH = isAva(id) ? 400 : Math.round(800 * gh / gw);
+  /* 縮小輸出尺寸＋加強壓縮比例，讓以後每次上傳都自動是小檔案，不用手動處理 */
+  var OUT  = isAva(id) ? 320 : 640;
+  var OUTH = isAva(id) ? 320 : Math.round(640 * gh / gw);
   var canvas = document.createElement('canvas');
   canvas.width = OUT; canvas.height = OUTH;
   var ctx = canvas.getContext('2d');
@@ -1458,7 +1459,7 @@ function cropApply(id) {
   var tmpImg = wrapEl.querySelector('img.cimg');
   if (!tmpImg) return;
   ctx.drawImage(tmpImg, srcX, srcY, srcW, srcH, 0, 0, OUT, OUTH);
-  var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.74);
 
   if (tmpImg) tmpImg.style.display = 'none';
   var res = document.getElementById('czresult-' + id);
