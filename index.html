@@ -918,7 +918,7 @@ input[type=file]{display:none}
         <div class="fld" style="margin-top:14px"><label>勾選要廣播的商品・拖曳調整順序</label>
           <div class="bc-sort-list" id="bc-sort-list"></div>
         </div>
-        <button class="savebtn g" onclick="genBroadcast()" style="margin-top:4px">⚡ 產生廣播文字</button>
+        <button class="savebtn g" onclick="resetBroadcastForm();genBroadcast()" style="margin-top:4px">⚡ 產生廣播文字</button>
         <button class="savebtn" onclick="genTonightBroadcast()" style="margin-top:8px;background:#E05C30;color:#fff">⚠️ 今晚結團快速產生</button>
       </div>
       <div id="bc-result-wrap" style="display:none">
@@ -3114,6 +3114,13 @@ function bcTouchEnd(e) {
   renderBcSortList();
 }
 
+/* 一般「產生廣播文字」按鈕使用，把「今晚結團快速產生」留下的特殊狀態清掉，恢復預設，不用重整頁面 */
+function resetBroadcastForm() {
+  bcChecked = {};
+  document.getElementById('bc-header').value = '📢開團中₊⁺⋆';
+  document.getElementById('bc-show-date').checked = true;
+  renderBcSortList();
+}
 function genBroadcast() {
   var showDate = document.getElementById('bc-show-date').checked;
   var showDesc = document.getElementById('bc-show-desc').checked;
