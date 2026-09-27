@@ -846,8 +846,7 @@ input[type=file]{display:none}
         <div class="fld"><label>關於我</label><textarea id="a-bio">精選好物，嚴格把關品質。每一樣都是親身試用過後才開團，讓你買得安心、用得滿意。</textarea></div>
         <div class="fld"><label>封面背景</label>
           <div id="cover-preview" style="width:100%;height:100px;border-radius:10px;background:linear-gradient(135deg,#d4c5b2,#b2c5d4);background-size:cover;background-position:center;margin-bottom:8px;border:1px solid var(--rule)"></div>
-          <button type="button" onclick="document.getElementById('cover-file').click()" style="width:100%;padding:10px;border-radius:9px;border:1.5px dashed var(--rule);background:none;font-family:inherit;font-size:13px;color:var(--ink2);cursor:pointer;letter-spacing:.3px">📷 上傳封面照片</button>
-          <input type="file" id="cover-file" accept="image/*" style="display:none" onchange="coverLoad(event)">
+          <div style="font-size:11px;color:var(--ink3);line-height:1.6">封面已改為統一設計，想更換請直接跟 Claude 說</div>
         </div>
         <button class="savebtn" onclick="saveProfile()">儲存個人資料</button>
       </div>
